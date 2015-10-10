@@ -3,6 +3,9 @@
 /**
  * Module dependencies.
  */
+//Initialize Babel
+require('babel/register');  
+
 var _ = require('lodash'),
   chalk = require('chalk'),
   glob = require('glob'),
