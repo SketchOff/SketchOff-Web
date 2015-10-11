@@ -46,6 +46,15 @@ function shuffle(array) {
   return array;
 }
 
+// Creates a list of randomly generated phrases
+function generatePhrases() {
+	return ['old duck', 'pregnant paperclip', 'fat chair', 'trendy turtles', 'fluffy cups'];
+}
+
+// Show the judge the phrases and prompt him to chose amongst them
+function showJudge(phrases) {
+
+}
 
 class PublicGameRoom {
 
@@ -65,7 +74,7 @@ class PublicGameRoom {
         // Create and set a time id for game_room
         this._id = generateID();
         // Create a socket channel for game_room and subscribe players
-        this.game_socket = createGameSocket(this.players, this.playerDisconnects);
+        this.game_socket = createGameSocket(this.players, this.playerDisconnects, this.startGame);
     }
 
     set gameState(state) {
@@ -99,6 +108,13 @@ class PublicGameRoom {
     newJudge () {
         this.judge = this.players.pop();
         this.players = this.players.unshift(this.judge);
+    }
+
+    // Begin the game by prompting judge to pick a phrase
+    startGame() {
+    	this.game_state = this.game_states[1];
+    	let phrases = generatePhrases();
+    	showJudge(phrases);
     }
 }
 
