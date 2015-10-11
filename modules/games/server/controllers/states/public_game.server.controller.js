@@ -1,14 +1,38 @@
 'use strict';
 
-var GameRooms = require('../game_rooms.server.controller');
+import {GameRooms} from '../game_rooms.server.controller';
 
-class GameEstablished {
+export class Establishing {
 	constructor(GameRoom) {
+		console.log('ESTABLISHING');
 		this.GameRoom = GameRoom;
-		this.sayHello();
 	}
+}
 
-	sayHello() {
-		console.log('hello');
+export class Starting {
+	constructor(GameRoom) {
+		console.log('STARTING');
+		this.GameRoom = GameRoom;
+	}
+}
+
+export class Ending {
+	constructor(GameRoom) {
+		console.log('ENDING');
+		this.GameRoom = GameRoom;
+	}
+}
+
+export class SelectingWinner {
+	constructor(GameRoom) {
+		console.log('SELECTING_WINNER');
+		this.GameRoom = GameRoom;
+	}
+}
+
+export class DisplayingResults {
+	constructor(GameRoom) {
+		console.log('DISPLAYING_RESULTS');
+		this.GameRoom = GameRoom;
 	}
 }

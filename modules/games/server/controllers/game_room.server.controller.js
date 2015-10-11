@@ -1,11 +1,10 @@
 'use strict';
 
-var PublicGameStates = require('./states/public_game.server.controller');
-var PrivateGameStates = require('./states/private_game.server.controller');
-var GameSocket = require('../sockets/game.server.socket.config');
+import * as PublicGameStates from './states/public_game.server.controller';
+import * as PrivateGameStates from './states/private_game.server.controller';
+import * as GameSocket from '../sockets/game.server.socket.config';
 
-
-export class GameRoom {
+export default class GameRoom {
 
     constructor(players, public_room) {
         // Set players prop, return error if not array
@@ -20,18 +19,19 @@ export class GameRoom {
         // Setup states, private or public
         this.States = public_room ? PublicGameStates : PrivateGameStates;
         // Create a new socket channel for the room and connect the players
-        this.GameSocket = new GameSocket(this.players);
+        // this.GameSocket = new GameSocket(this.players);
 
-        // Player disconnects from socket
-        this.GameSocket.on('player disconnect', function(player) {
-            this.playerDisconnects(player);
-        });
+        // // Player disconnects from socket
+        // this.GameSocket.on('player disconnect', function(player) {
+        //     this.playerDisconnects(player);
+        // });
 
-        // TODO: Handle socket ready timeout
-        this.GameSocket.on('socket ready', function(player) {
-            // Set Initial State
-            if (public_room) this.CurrState = new this.States.GameEstablished();
-        });
+        // // TODO: Handle socket ready timeout
+        // this.GameSocket.on('socket ready', function(player) {
+        //     // Set Initial State
+        //     if (public_room) this.CurrState = new this.States.GameEstablished();
+        // });
+        this.CurrState = new this.States.Establishing();
     }
 
     set gameState(State) {
