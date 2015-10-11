@@ -1,5 +1,8 @@
 'use strict';
 
+var util = require('util');
+var EventEmitter = require('events').EventEmitter;
+
 var Games = {};
 
 class PublicGameRoom {
@@ -54,23 +57,23 @@ class PublicGameRoom {
     }
 
     // Sets a new judge by popping the end player
-    newJudge () {
+    newJudge() {
         this.judge = this.players.pop();
         this.players = this.players.unshift(this.judge);
     }
 
     // Begin the game by prompting judge to pick a phrase
     startGame() {
-    	this.game_state = this.game_states[1];
-    	let phrases = generatePhrases();
-    	showJudge(phrases);
+        this.emit('hello', 'hi');
+        this.game_state = this.game_states[1];
+        let phrases = generatePhrases();
+        showJudge(phrases);
     }
 }
 
-var x = new PublicGameRoom([1, 2, 3]);
-console.log(x.gameState);
-console.log(x.players);
-x.playerExits(1);
+util.inherits(PublicGameRoom, EventEmitter);
+
+exports.PublicGameRoom = PublicGameRoom;
 
 /**
 Helper Functions
@@ -95,32 +98,33 @@ function generateID() {
 // Returns a random integer between min (included) and max (included)
 // Using Math.round() will give you a non-uniform distribution!
 function getRandomIntInclusive(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 // The de-facto unbiased shuffle algorithm is the Fisher-Yates (aka Knuth) Shuffle.
 function shuffle(array) {
-  var currentIndex = array.length, temporaryValue, randomIndex ;
+    var currentIndex = array.length,
+        temporaryValue, randomIndex;
 
-  // While there remain elements to shuffle...
-  while (0 !== currentIndex) {
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
 
-    // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex -= 1;
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
 
-    // And swap it with the current element.
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temporaryValue;
-  }
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
 
-  return array;
+    return array;
 }
 
 // Creates a list of randomly generated phrases
 function generatePhrases() {
-	return ['old duck', 'pregnant paperclip', 'fat chair', 'trendy turtles', 'fluffy cups'];
+    return ['old duck', 'pregnant paperclip', 'fat chair', 'trendy turtles', 'fluffy cups'];
 }
 
 // Show the judge the phrases and prompt him to chose amongst them
@@ -130,5 +134,5 @@ function showJudge(phrases) {
 
 // Kill the game by deleting it from the game map
 function killGame(gameID) {
-	delete Games[gameID];
+    delete Games[gameID];
 }
