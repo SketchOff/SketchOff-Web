@@ -5,8 +5,12 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         // This provides Authentication context.
         $scope.authentication = Authentication;
 
+        // Make sure the Socket is connected
+        if (!Socket.socket) {
+            Socket.connect();
+        }
+
         $scope.joinPublicGame = function() {
-            // Make sure the Socket is connected
             Socket.emit('join public game');
         };
     }
