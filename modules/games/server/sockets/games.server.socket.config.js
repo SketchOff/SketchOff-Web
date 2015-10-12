@@ -6,5 +6,8 @@
 
 // Create the game socket.io configuration
 export default function(io, socket) {
-	
+
+    socket.on('join public game', function() {
+        console.log(socket.request.user.username);
+    });
 }
