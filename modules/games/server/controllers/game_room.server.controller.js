@@ -18,20 +18,6 @@ export default class GameRoom {
         this.max_players = 8;
         // Set to true if judge leaves
         this.no_winner = false;
-        
-        // Create a new socket channel for the room and connect the players
-        // this.GameSocket = new GameSocket(this.players);
-
-        // // Player disconnects from socket
-        // this.GameSocket.on('player disconnect', function(player) {
-        //     this.playerDisconnects(player);
-        // });
-
-        // // TODO: Handle socket ready timeout
-        // this.GameSocket.on('socket ready', function(player) {
-        //     // Set Initial State
-        //     if (is_public_room) this.CurrState = new this.States.GameEstablished();
-        // });
         this.State = is_public_room ? new PublicGameStates.Establishing(this) : new PrivateGameStates.Establishing(this);
     }
 
