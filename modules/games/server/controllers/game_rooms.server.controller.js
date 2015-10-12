@@ -2,10 +2,28 @@
 
 import GameRoom from './game_room.server.controller.js';
 
-export var GameRooms = new Map();
+var GameRooms = new Map();
 
-exports.createGame = function () {
-	new GameRoom([1,2,3,4,5,6], true);
+exports.createGame = function(players, public_game) {
+    new GameRoom(players, public_game, generateID());
 };
 
-exports.createGame();
+exports.createGame([1, 2, 3, 4, 5, 6], true);
+
+/**
+Helper Functions
+*/
+
+// Generate id based on epoch for the game_room
+function generateID() {
+    // current time
+    var now = new Date();
+    // nanoseconds since arbitrary time
+    var ns = process.hrtime()[1].toString();
+    // number of milliseconds since 1970, divide by 1,000,000 and floor for smaller number 
+    var epoch = now.valueOf().toString();
+    // combine epoch with ns to be safe and avoid collisions 
+    var id = epoch + ns;
+
+    return id;
+}

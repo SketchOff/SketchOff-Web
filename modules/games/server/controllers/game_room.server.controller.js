@@ -2,15 +2,15 @@
 
 import * as PublicGameStates from './states/public_game.server.controller';
 import * as PrivateGameStates from './states/private_game.server.controller';
-import * as GameSocket from '../sockets/game.server.socket.config';
 
 export default class GameRoom {
 
-    constructor(players, public_room) {
+    constructor(players, public_room, game_id) {
         // Set players prop, return error if not array
         if (Array.isArray(players)) this.players = players;
         else throw 'Attempted to create game without correct players param';
-
+        // Set the game_id generated from the game_rooms controller
+        this.game_id = game_id;
         // Set min and max players
         this.min_players = 3;
         this.max_players = 8;
@@ -18,6 +18,7 @@ export default class GameRoom {
         this.no_winner = false;
         // Setup states, private or public
         this.States = public_room ? PublicGameStates : PrivateGameStates;
+        
         // Create a new socket channel for the room and connect the players
         // this.GameSocket = new GameSocket(this.players);
 
