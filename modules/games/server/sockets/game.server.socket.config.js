@@ -1,5 +1,9 @@
 'use strict';
 
+// Player connect to game, if game state is establishing
+// Wait until all players connect before changing the games state to start
+
+
 // // Create the chat configuration
 // module.exports = function (io, socket) {
 //   // Emit the status event when a new socket client is connected

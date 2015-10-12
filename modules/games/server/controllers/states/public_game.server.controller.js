@@ -47,7 +47,6 @@ export class Terminating {
 	constructor(GameRoom) {
 		console.log('TERMINATING');
 		this.state_name = 'TERMINATING';
-		this.GameRoom = GameRoom;
 		GameRooms.removeGameRoom(GameRoom._id);
 	}
 }
