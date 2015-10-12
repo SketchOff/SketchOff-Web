@@ -7,7 +7,9 @@
 // Create the game socket.io configuration
 export default function(io, socket) {
 
+	// Player requests to join a public game
     socket.on('join public game', function() {
         console.log(socket.request.user.username);
+        // add player to queue
     });
 }
