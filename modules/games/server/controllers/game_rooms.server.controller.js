@@ -5,7 +5,8 @@ import GameRoom from './game_room.server.controller.js';
 var GameRooms = new Map();
 
 exports.createGame = function(players, public_game) {
-    new GameRoom(players, public_game, generateID());
+	var game_id = generateID();
+    GameRooms.set(game_id, new GameRoom(players, public_game, game_id));
 };
 
 exports.createGame([1, 2, 3, 4, 5, 6], true);
