@@ -32,14 +32,14 @@ export default class GameRoom {
         //     // Set Initial State
         //     if (public_room) this.CurrState = new this.States.GameEstablished();
         // });
-        this.CurrState = public_room ? new PublicGameStates.Establishing(this).state_name : new PrivateGameStates.Establishing(this).state_name;
+        this.CurrState = public_room ? new PublicGameStates.Establishing(this) : new PrivateGameStates.Establishing(this);
     }
 
-    set gameState(State) {
+    set CurrState(State) {
         this.CurrState = State;
     }
 
-    get gameState() {
+    get CurrState() {
         return this.CurrState;
     }
 

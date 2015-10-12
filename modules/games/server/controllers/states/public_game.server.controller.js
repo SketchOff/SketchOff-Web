@@ -7,6 +7,7 @@ export class Establishing {
 		console.log('ESTABLISHING');
 		this.state_name = 'ESTABLISHING';
 		GameRoom.players = shuffle(GameRoom.players);
+		GameRoom.judge = GameRoom.players[0];
 	}
 }
 
