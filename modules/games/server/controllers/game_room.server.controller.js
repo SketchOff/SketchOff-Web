@@ -32,15 +32,15 @@ export default class GameRoom {
         //     // Set Initial State
         //     if (public_room) this.CurrState = new this.States.GameEstablished();
         // });
-        this.CurrState = public_room ? new PublicGameStates.Establishing(this) : new PrivateGameStates.Establishing(this);
+        this.State = public_room ? new PublicGameStates.Establishing(this) : new PrivateGameStates.Establishing(this);
     }
 
     set CurrState(State) {
-        this.CurrState = State;
+        this.State = State;
     }
 
     get CurrState() {
-        return this.CurrState;
+        return this.State;
     }
 
     // When a player presses leave game

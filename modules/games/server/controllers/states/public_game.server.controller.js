@@ -50,6 +50,7 @@ export class Terminating {
 		GameRooms.removeGameRoom(GameRoom._id);
 	}
 }
+
 /**
 Establishing Helpers
 */
