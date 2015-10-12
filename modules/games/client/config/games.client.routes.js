@@ -7,10 +7,10 @@ angular.module('games').config(['$stateProvider',
     $stateProvider
       .state('games', {
         abstract: true,
-        url: '/articles',
+        url: '/',
         template: '<ui-view/>'
       })
-      .state('articles.list', {
+      .state('games.room', {
         url: '',
         templateUrl: 'modules/games/client/views/game-room.client.view.html'
       });
