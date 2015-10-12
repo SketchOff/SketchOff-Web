@@ -10,14 +10,14 @@ export default class GameRoom {
         if (Array.isArray(players)) this.players = players;
         else throw 'Attempted to create game without correct players param';
         // Set the game_id generated from the game_rooms controller
-        this.game_id = game_id;
+        this._id = game_id;
+        // Is game public, if not then game is private
+        this.public_room = public_room;
         // Set min and max players
         this.min_players = 3;
         this.max_players = 8;
         // Set to true if judge leaves
         this.no_winner = false;
-        // Setup states, private or public
-        this.States = public_room ? PublicGameStates : PrivateGameStates;
         
         // Create a new socket channel for the room and connect the players
         // this.GameSocket = new GameSocket(this.players);
@@ -32,7 +32,7 @@ export default class GameRoom {
         //     // Set Initial State
         //     if (public_room) this.CurrState = new this.States.GameEstablished();
         // });
-        this.CurrState = new this.States.Establishing();
+        this.CurrState = public_room ? new PublicGameStates.Establishing(this).state_name : new PrivateGameStates.Establishing(this).state_name;
     }
 
     set gameState(State) {
@@ -49,28 +49,15 @@ export default class GameRoom {
         this.players.splice(this.players.indexOf(playerToRemove), 1);
 
         // If theres not enough players to continue, terminate game
-        if (this.players.length < this.min_players) this.CurrState = 'TERMINATE';
+        if (this.players.length < this.min_players) {
+            this.CurrState = this.public_room ? new PublicGameStates.Terminating(this).state_name : new PrivateGameStates.Terminating(this).state_name;
+        }
         // Enough players to keep game open
         else {
-            // Disconnect the player from the game socket
-            this.game_socket.kickPlayer(playerToRemove);
             // The judge left the game, no winner can be determined
             // TODO: Flag judge for leaving mid-game!
             if (playerToRemove === this.judge) this.no_winner = true;
         }
     }
 
-    // When a player disconnects without warning, e.g. closes window
-    playerDisconnects(playerToRemove) {
-        // Delete player from players array
-        this.players.splice(this.players.indexOf(playerToRemove), 1);
-        // If theres not enough players to continue, terminate game
-        if (this.players.length < this.min_players) this.CurrState = 'TERMINATE';
-        // Enough players to keep game room open
-        else {
-            // The judge left the game, no winner can be determined
-            // TODO: Flag judge for leaving mid-game!
-            if (playerToRemove === this.judge) this.no_winner = true;
-        }
-    }
 }

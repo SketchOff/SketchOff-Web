@@ -4,18 +4,31 @@ import GameRoom from './game_room.server.controller.js';
 
 var GameRooms = new Map();
 
-exports.createGame = function(players, public_game) {
-	var game_id = generateID();
-    GameRooms.set(game_id, new GameRoom(players, public_game, game_id));
-};
+// Create a new game room and add it to the GameRooms map
+export function createGameRoom(players, public_game) {
+    var game_room_id = generateID();
+    GameRooms.set(game_room_id, new GameRoom(players, public_game, game_room_id));
+}
 
-exports.createGame([1, 2, 3, 4, 5, 6], true);
+// remove a GameRoom from the GameRooms map
+export function removeGameRoom(game_room_id) {
+	GameRooms.delete(game_room_id);
+}
+
+exports.createGameRoom([1, 2, 3, 4, 5, 6], true);
+setInterval(function() {
+    for (var value of GameRooms.values()) {
+        console.log(value);
+        value.playerExits(value.players[0]);
+    }
+    if (GameRooms.size === 0) console.log('EMPTY');
+}, 1000);
 
 /**
 Helper Functions
 */
 
-// Generate id based on epoch for the game_room
+// Generate id based on epoch node ns time for the game_room
 function generateID() {
     // current time
     var now = new Date();
