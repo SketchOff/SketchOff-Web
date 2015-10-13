@@ -1,6 +1,7 @@
 'use strict';
 
 import {min_players, max_players} from './game_room.server.controller';
+import * as QueueStates from './states/queue.states.server.controller';
 
 var Queue = new Queue();
 
