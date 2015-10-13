@@ -60,6 +60,8 @@ export default class GameRoom {
         var index = getRandomIntInclusive(0, this.players.length-1);
         this.players.splice(index, 0, player);
     }
+
+    // TODO: Add a cleanup function that unregisters all callbacks (methods of the Game object) that were registered on socket events.
 }
 
 // Returns a random integer between min (included) and max (included)
