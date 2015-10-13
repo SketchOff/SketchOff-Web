@@ -1,7 +1,7 @@
 'use strict';
 
-import * as PublicGameStates from './states/public_game.server.controller';
-import * as PrivateGameStates from './states/private_game.server.controller';
+import * as PublicGameStates from './states/public_game.states.server.controller';
+import * as PrivateGameStates from './states/private_game.states.server.controller';
 
 // Set min and max players
 export var min_players = 3;
