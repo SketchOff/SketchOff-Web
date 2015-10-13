@@ -23,7 +23,10 @@ export class SelectingWinner {
 	constructor(GameRoom) {
 		console.log('SELECTING_WINNER');
 		this.state_name = 'SELECTING_WINNER';
-		this.GameRoom = GameRoom;
+
+		if (GameRoom.players.length < GameRoom.max_players) {
+			// Add game room id to Queue's available games array
+		}
 	}
 }
 
@@ -31,7 +34,6 @@ export class Ending {
 	constructor(GameRoom) {
 		console.log('ENDING');
 		this.state_name = 'ENDING';
-		this.GameRoom = GameRoom;
 	}
 }
 
