@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-var articlesPolicy = require('../controllers/game_rooms.server.controller');
+var GameRoomManager = require('../controllers/game_room_manager.server.controller');
 
 module.exports = function (app) {
   // // Articles collection routes

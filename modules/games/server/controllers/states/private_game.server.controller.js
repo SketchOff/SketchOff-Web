@@ -1,6 +1,6 @@
 'use strict';
 
-import {GameRooms} from '../game_rooms.server.controller';
+import {GameRoomManager} from '../game_room_manager.server.controller';
 
 export class Establishing {
 	constructor(GameRoom) {

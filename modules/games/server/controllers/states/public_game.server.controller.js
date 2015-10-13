@@ -1,6 +1,6 @@
 'use strict';
 
-import * as GameRoomManager from '../game_rooms.server.controller';
+import * as GameRoomManager from '../game_room_manager.server.controller';
 
 export class Establishing {
 	constructor(GameRoom) {
@@ -41,6 +41,7 @@ export class Ending {
 		this.state_name = 'ENDING';
 
 		// display results
+		// save game info to game history schema
 		// go to establishing after 15s
 	}
 }
