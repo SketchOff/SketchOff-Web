@@ -30,6 +30,14 @@ export default class GameRoom {
         return this.State;
     }
 
+    getStateName() {
+        return this.State.state_name;
+    }
+
+    isFull() {
+        return this.players.length === max_players;
+    }
+
     // When a player presses leave game
     playerExits(player) {
         // Delete player from players array
