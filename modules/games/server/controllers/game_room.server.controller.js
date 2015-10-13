@@ -3,6 +3,10 @@
 import * as PublicGameStates from './states/public_game.server.controller';
 import * as PrivateGameStates from './states/private_game.server.controller';
 
+// Set min and max players
+var min_players = 3;
+var max_players = 7;
+
 export default class GameRoom {
 
     constructor(players, is_public_room, game_id) {
@@ -13,9 +17,6 @@ export default class GameRoom {
         this._id = game_id;
         // Is game public, if not then game is private
         this.is_public_room = is_public_room;
-        // Set min and max players
-        this.min_players = 3;
-        this.max_players = 7;
         // Set to true if judge leaves
         this.no_winner = false;
         this.State = is_public_room ? new PublicGameStates.Establishing(this) : new PrivateGameStates.Establishing(this);
@@ -35,7 +36,7 @@ export default class GameRoom {
         this.players.splice(this.players.indexOf(player), 1);
 
         // If theres not enough players to continue, terminate game
-        if (this.players.length < this.min_players) {
+        if (this.players.length < min_players) {
             this.CurrState = this.is_public_room ? new PublicGameStates.Terminating(this).state_name : new PrivateGameStates.Terminating(this).state_name;
         }
         // Enough players to keep game open
