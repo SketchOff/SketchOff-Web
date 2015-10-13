@@ -2,6 +2,7 @@
 
 var queue = [];
 
-function addPlayer(player) {
+export function addPlayer(player) {
+	// add player to queue
 	queue.push(player);
 }
