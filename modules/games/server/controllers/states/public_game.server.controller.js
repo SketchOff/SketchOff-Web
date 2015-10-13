@@ -26,10 +26,12 @@ export class SelectingWinner {
 		console.log('SELECTING_WINNER');
 		this.state_name = 'SELECTING_WINNER';
 
+		// Prompt judge to select winner
+
 		if (GameRoom.players.length < GameRoom.max_players) {
 			// Add game room id to Queue's available games array
 		}
-		// After winner selected, go to ending
+		// After winner selected, go to ending <== Handled by game socket manager
 	}
 }
 
