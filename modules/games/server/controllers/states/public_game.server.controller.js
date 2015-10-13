@@ -1,6 +1,6 @@
 'use strict';
 
-import * as GameRooms from '../game_rooms.server.controller';
+import * as GameRoomManager from '../game_rooms.server.controller';
 
 export class Establishing {
 	constructor(GameRoom) {
@@ -9,7 +9,7 @@ export class Establishing {
 		GameRoom.players = shuffle(GameRoom.players);
 		GameRoom.judge = GameRoom.players[0];
 		// TODO: show phrases to judge
-		// TODO: change to drawing when judge selects a phrase <--- handled by GameSocketManager
+		// changes to drawing state when judge selects a phrase <--- handled by GameSocketManager
 	}
 }
 
@@ -29,6 +29,7 @@ export class SelectingWinner {
 		if (GameRoom.players.length < GameRoom.max_players) {
 			// Add game room id to Queue's available games array
 		}
+		// After winner selected, go to ending
 	}
 }
 
@@ -36,6 +37,9 @@ export class Ending {
 	constructor(GameRoom) {
 		console.log('ENDING');
 		this.state_name = 'ENDING';
+
+		// display results
+		// go to establishing after 15s
 	}
 }
 
@@ -43,7 +47,7 @@ export class Terminating {
 	constructor(GameRoom) {
 		console.log('TERMINATING');
 		this.state_name = 'TERMINATING';
-		GameRooms.removeGameRoom(GameRoom._id);
+		GameRoomManager.removeGameRoom(GameRoom._id);
 	}
 }
 
