@@ -15,7 +15,7 @@ export default class GameRoom {
         this.is_public_room = is_public_room;
         // Set min and max players
         this.min_players = 3;
-        this.max_players = 8;
+        this.max_players = 7;
         // Set to true if judge leaves
         this.no_winner = false;
         this.State = is_public_room ? new PublicGameStates.Establishing(this) : new PrivateGameStates.Establishing(this);
