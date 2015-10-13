@@ -11,18 +11,10 @@ export class Establishing {
 	}
 }
 
-export class Starting {
+export class Drawing {
 	constructor(GameRoom) {
-		console.log('STARTING');
-		this.state_name = 'STARTING';
-		this.GameRoom = GameRoom;
-	}
-}
-
-export class Ending {
-	constructor(GameRoom) {
-		console.log('ENDING');
-		this.state_name = 'ENDING';
+		console.log('DRAWING');
+		this.state_name = 'DRAWING';
 		this.GameRoom = GameRoom;
 	}
 }
@@ -35,10 +27,10 @@ export class SelectingWinner {
 	}
 }
 
-export class DisplayingResults {
+export class Ending {
 	constructor(GameRoom) {
-		console.log('DISPLAYING_RESULTS');
-		this.state_name = 'DISPLAYING_RESULTS';
+		console.log('ENDING');
+		this.state_name = 'ENDING';
 		this.GameRoom = GameRoom;
 	}
 }
