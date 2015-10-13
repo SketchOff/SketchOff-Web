@@ -8,6 +8,8 @@ export class Establishing {
 		this.state_name = 'ESTABLISHING';
 		GameRoom.players = shuffle(GameRoom.players);
 		GameRoom.judge = GameRoom.players[0];
+		// TODO: show phrases to judge
+		// TODO: change to drawing when judge selects a phrase <--- handled by GameSocketManager
 	}
 }
 
