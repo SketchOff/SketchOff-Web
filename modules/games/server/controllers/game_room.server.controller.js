@@ -30,9 +30,9 @@ export default class GameRoom {
     }
 
     // When a player presses leave game
-    playerExits(playerToRemove) {
+    playerExits(player) {
         // Delete player from players array
-        this.players.splice(this.players.indexOf(playerToRemove), 1);
+        this.players.splice(this.players.indexOf(player), 1);
 
         // If theres not enough players to continue, terminate game
         if (this.players.length < this.min_players) {
@@ -42,8 +42,19 @@ export default class GameRoom {
         else {
             // The judge left the game, no winner can be determined
             // TODO: Flag judge for leaving mid-game!
-            if (playerToRemove === this.judge) this.no_winner = true;
+            if (player === this.judge) this.no_winner = true;
         }
     }
 
+    // Add a player to the game
+    addPlayer(player) {
+        var index = getRandomIntInclusive(0, this.players.length-1);
+        this.players.splice(index, 0, player);
+    }
+}
+
+// Returns a random integer between min (included) and max (included)
+// Using Math.round() will give you a non-uniform distribution!
+function getRandomIntInclusive(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
