@@ -14,7 +14,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
             Socket.emit('join public game');
             var modalInstance = $uibModal.open({
                 animation: $scope.animationsEnabled,
-                templateUrl: 'modules/core/client/views/wait.client.view.html'
+                templateUrl: 'modules/core/client/views/waiting_for_game.client.modal.view.html'
             });
         };
     }
