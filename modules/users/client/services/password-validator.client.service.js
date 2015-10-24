@@ -1,9 +1,19 @@
 'use strict';
 
+
 // PasswordValidator service used for testing the password strength
 angular.module('users').factory('PasswordValidator', ['$window',
   function ($window) {
-    var owaspPasswordStrengthTest = $window.owaspPasswordStrengthTest;
+
+
+      var owaspPasswordStrengthTest = $window.owaspPasswordStrengthTest;
+      owaspPasswordStrengthTest.config({
+          allowPassphrases       : true,
+          maxLength              : 128,
+          minLength              : 6,
+          minPhraseLength        : 20,
+          minOptionalTestsToPass : 0,
+      }); // doesnt work...
 
     return {
       getResult: function (password) {
