@@ -12,13 +12,15 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 
         $scope.joinPublicGame = function() {
             Socket.emit('join public game');
+            $scope.animationsEnabled = true;
             var modalInstance = $uibModal.open({
                 animation: $scope.animationsEnabled,
-                templateUrl: 'modules/core/client/views/waiting-for-game.client.modal.view.html'
+                templateUrl: 'modules/core/client/views/waiting-for-game.client.modal.view.html',
+                controller: 'WaitingForGameCtrl'
             });
-            $timeout(function() {
-                modalInstance.close();
-            }, 3000);
+            // $timeout(function() {
+            //     modalInstance.close();
+            // }, 3000);
         };
     }
 ]);
