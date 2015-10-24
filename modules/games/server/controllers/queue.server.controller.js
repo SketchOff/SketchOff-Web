@@ -5,8 +5,6 @@
 import {min_players, max_players} from './game_room.server.controller';
 import * as QueueStates from './states/queue.states.server.controller';
 
-export var Queue = new Queue();
-
 class Queue {
     constructor() {
         this.players = [];
@@ -20,6 +18,9 @@ class Queue {
     }
 
 }
+
+export var q = new Queue();
+
 
 // export function addPlayer(player) {
 //     // add player to queue
