@@ -1,5 +1,7 @@
 'use strict';
 
+import {min_players, max_players} from '../game_room.server.controller';
+
 // No Available Games and not enough players to create a new game
 export class NotEnough {
 	constructor(queue) {
@@ -8,7 +10,7 @@ export class NotEnough {
 
 	addPlayer(player) {
 		this.queue.players.push(player);
-		if (this.queue.numPlayers() > 3) {
+		if (this.queue.numPlayers() >= min_players) {
 			this.queue.setState('ENOUGH');
 		}
 	}
@@ -18,7 +20,9 @@ export class NotEnough {
 export class Enough {
 	constructor(queue) {
 		this.queue = queue;
+		this.queue.createGame();
 	}
+
 }
 
 export class AvailableGames {

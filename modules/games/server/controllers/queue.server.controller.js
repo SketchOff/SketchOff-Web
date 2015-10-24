@@ -4,6 +4,7 @@
 
 import {min_players, max_players} from './game_room.server.controller';
 import * as QueueStates from './states/queue.states.server.controller';
+import * as GameRoomManager from './game_room_manager.server.controller';
 
 class Queue {
     constructor() {
@@ -17,13 +18,27 @@ class Queue {
     }
 
     numPlayers() {
-    	return this.players.length;
+        return this.players.length;
     }
 
     setState(state) {
-    	if (state === 'ENOUGH') {
-    		this.state = new QueueStates.Enough(this);
-    	}
+        switch (state) {
+            case 'ENOUGH':
+                this.state = new QueueStates.Enough(this);
+                break;
+            case 'NOT_ENOUGH':
+                this.state = new QueueStates.NotEnough(this);
+                break;
+        }
+    }
+
+    createGame() {
+        var gamePlayers = this.players.slice(0, max_players);
+        if (gamePlayers.length >= min_players) {
+            GameRoomManager.createGameRoom(gamePlayers, true);
+        } else {
+            this.queue.setState('NOT_ENOUGH');
+        }
     }
 
 }
