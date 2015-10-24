@@ -15,7 +15,7 @@ export class AvailableGames {
         this.queue = queue;
     }
     addPlayer(player) {
-        let ps = this.queue.players
+        let ps = this.queue.players;
         let gs = this.queue.availableGames;
 
 
