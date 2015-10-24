@@ -9,12 +9,15 @@ class Queue {
     constructor() {
         this.players = [];
         this.availableGames = [];
-        this.state = new QueueStates.NotEnough();
+        this.state = new QueueStates.NotEnough(this);
     }
 
     addPlayer(player) {
         this.state.addPlayer(player);
+    }
 
+    numPlayers() {
+    	return this.players.length;
     }
 
 }
