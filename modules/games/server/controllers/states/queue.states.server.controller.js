@@ -8,13 +8,17 @@ export class NotEnough {
 
 	addPlayer(player) {
 		this.queue.players.push(player);
-		console.log('number of players in queue', this.queue.numPlayers());
+		if (this.queue.numPlayers() > 3) {
+			this.queue.setState('ENOUGH');
+		}
 	}
 }
 
 // No Available Games, but enough players to create a new game
 export class Enough {
-
+	constructor(queue) {
+		this.queue = queue;
+	}
 }
 
 export class AvailableGames {
@@ -22,7 +26,6 @@ export class AvailableGames {
         this.queue = queue;
     }
     addPlayer(player) {
-        let ps = this.queue.players;
-        let gs = this.queue.availableGames;
+        
     }
 }

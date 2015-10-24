@@ -20,6 +20,12 @@ class Queue {
     	return this.players.length;
     }
 
+    setState(state) {
+    	if (state === 'ENOUGH') {
+    		this.state = new QueueStates.Enough(this);
+    	}
+    }
+
 }
 
 export var q = new Queue();
