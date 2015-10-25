@@ -7,7 +7,7 @@ var io = require('socket.io');
 export class Establishing {
 	constructor(GameRoom) {
 		this.GameRoom = GameRoom;
-		console.log(GameRoom._id, 'ESTABLISHING');
+		console.log('ESTABLISHING', GameRoom._id);
 		this.state_name = 'ESTABLISHING';
 		GameRoom.players = shuffle(GameRoom.players);
 		GameRoom.judge = GameRoom.players[0];
@@ -24,8 +24,8 @@ export class Establishing {
 		console.log('players', player_names);
 		this.GameRoom.players.forEach(function(player) {
 			player.join(this.GameRoom._id);
-			player.broadcast.to(this.GameRoom._id).emit('update game', 'SERVER', player + ' has connected to this room');
-		});
+			// player.broadcast.to(this.GameRoom._id).emit('update game', 'SERVER', player + ' has connected to this room');
+		}, this);
 	}
 }
 
