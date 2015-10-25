@@ -2,14 +2,30 @@
 
 import * as GameRoomManager from '../game_room_manager.server.controller';
 
+var io = require('socket.io');
+
 export class Establishing {
 	constructor(GameRoom) {
-		console.log('ESTABLISHING');
+		this.GameRoom = GameRoom;
+		console.log(GameRoom._id, 'ESTABLISHING');
 		this.state_name = 'ESTABLISHING';
 		GameRoom.players = shuffle(GameRoom.players);
 		GameRoom.judge = GameRoom.players[0];
+		this.connectPlayers();
 		// TODO: show phrases to judge
 		// changes to drawing state when judge selects a phrase <--- handled by GameSocketManager
+	}
+
+	connectPlayers() {
+		var player_names = [];
+		this.GameRoom.players.forEach(function(player) {
+			player_names.push(player.request.user.username);
+		});
+		console.log('players', player_names);
+		this.GameRoom.players.forEach(function(player) {
+			player.join(this.GameRoom._id);
+			player.broadcast.to(this.GameRoom._id).emit('update game', 'SERVER', player + ' has connected to this room');
+		});
 	}
 }
 
