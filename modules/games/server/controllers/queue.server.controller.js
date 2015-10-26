@@ -20,6 +20,7 @@ class Queue {
     }
 
     addPlayer(player) {
+        console.log('Current state when adding players', this.state.name);
         this.state.addPlayer(player);
     }
 

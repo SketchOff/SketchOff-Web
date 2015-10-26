@@ -7,7 +7,7 @@ export class Establishing {
 	constructor(GameRoom) {
 		this.GameRoom = GameRoom;
 		console.log('ESTABLISHING', GameRoom._id);
-		this.state_name = 'ESTABLISHING';
+		this.name = 'ESTABLISHING';
 		GameRoom.players = shuffle(GameRoom.players);
 		GameRoom.judge = GameRoom.players[0];
 		this.connectPlayers();
@@ -27,20 +27,28 @@ export class Establishing {
 		}, this);
 		getIO().to(this.GameRoom._id).emit('ESTABLISHED');
 	}
+
+	getName() {
+		return this.name;
+	}
 }
 
 export class Drawing {
 	constructor(GameRoom) {
 		console.log('DRAWING');
-		this.state_name = 'DRAWING';
+		this.name = 'DRAWING';
 		this.GameRoom = GameRoom;
+	}
+
+	getName() {
+		return this.name;
 	}
 }
 
 export class SelectingWinner {
 	constructor(GameRoom) {
 		console.log('SELECTING_WINNER');
-		this.state_name = 'SELECTING_WINNER';
+		this.name = 'SELECTING_WINNER';
 
 		// Prompt judge to select winner
 
@@ -49,24 +57,36 @@ export class SelectingWinner {
 		}
 		// After winner selected, go to ending <== Handled by game socket manager
 	}
+
+	getName() {
+		return this.name;
+	}
 }
 
 export class Ending {
 	constructor(GameRoom) {
 		console.log('ENDING');
-		this.state_name = 'ENDING';
+		this.name = 'ENDING';
 
 		// display results
 		// save game info to game history schema
 		// go to establishing after 15s
+	}
+
+	getName() {
+		return this.name;
 	}
 }
 
 export class Terminating {
 	constructor(GameRoom) {
 		console.log('TERMINATING');
-		this.state_name = 'TERMINATING';
+		this.name = 'TERMINATING';
 		GameRoomManager.removeGameRoom(GameRoom._id);
+	}
+
+	getName() {
+		return this.name;
 	}
 }
 
