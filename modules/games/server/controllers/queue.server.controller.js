@@ -42,6 +42,7 @@ class Queue {
     createGame() {
         var gamePlayers = this.players.slice(0, max_players);
         if (gamePlayers.length >= min_players) {
+            gamePlayers = this.players.splice(0, max_players);
             GameRoomManager.createGameRoom(gamePlayers, true);
         } else {
             this.queue.setState('NOT_ENOUGH');
