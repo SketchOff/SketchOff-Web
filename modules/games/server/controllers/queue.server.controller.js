@@ -6,6 +6,12 @@ import {min_players, max_players} from './game_room.server.controller';
 import * as QueueStates from './states/queue.states.server.controller';
 import * as GameRoomManager from './game_room_manager.server.controller';
 
+var _io;
+
+export function getIO() {
+    return _io;
+}
+
 class Queue {
     constructor() {
         this.players = [];
@@ -41,6 +47,9 @@ class Queue {
         }
     }
 
+    setIO(io) {
+        _io = io;
+    }
 }
 
 export var q = new Queue();

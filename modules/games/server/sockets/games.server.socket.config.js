@@ -2,8 +2,13 @@
 
 import {q} from '../controllers/queue.server.controller';
 
+var setSocket = false;
 // Create the game socket.io configuration
 export default function(io, socket) {
+	if (!setSocket) {
+		setSocket = true;
+		q.setIO(io);
+	}
 
     socket.on('join public game', function() {
         console.log(socket.request.user.username, 'clicked join public game');

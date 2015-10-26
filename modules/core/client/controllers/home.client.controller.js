@@ -22,5 +22,10 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
             //     modalInstance.close();
             // }, 3000);
         };
+
+        // Add an event listener to the 'ESTABLISHED' event
+        Socket.on('ESTABLISHED', function(message) {
+            alert('game established');
+        });
     }
 ]);

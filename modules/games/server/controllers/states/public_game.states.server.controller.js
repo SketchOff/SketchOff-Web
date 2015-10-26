@@ -1,8 +1,7 @@
 'use strict';
 
 import * as GameRoomManager from '../game_room_manager.server.controller';
-
-var io = require('socket.io');
+import {getIO} from '../queue.server.controller';
 
 export class Establishing {
 	constructor(GameRoom) {
@@ -26,6 +25,7 @@ export class Establishing {
 			player.join(this.GameRoom._id);
 			// player.broadcast.to(this.GameRoom._id).emit('update game', 'SERVER', player + ' has connected to this room');
 		}, this);
+		getIO().to(this.GameRoom._id).emit('ESTABLISHED');
 	}
 }
 
