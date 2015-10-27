@@ -15,7 +15,7 @@ angular.module('core').controller('WaitingForGameCtrl', ['$scope', 'Authenticati
 
         // Add an event listener to the 'ESTABLISHED' event
         Socket.on('ESTABLISHED', function(message) {
-            console.log('game established');
+            console.log('game established, message=', message._id);
             $modalInstance.close();
             $state.go('games.room');
         });

@@ -31,7 +31,7 @@ export default class GameRoom {
     }
 
     getStateName() {
-        return this.State.state_name;
+        return this.State.getName();
     }
 
     isFull() {
