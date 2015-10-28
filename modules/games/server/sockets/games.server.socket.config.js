@@ -15,4 +15,8 @@ export default function(io, socket) {
         // TODO: Check if a user is already playing a game before adding them to the queue
         q.addPlayer(socket);
     });
+
+    socket.on('game info', function() {
+    	console.log(socket.request.user.username, 'is requesting game info');
+    });
 }
