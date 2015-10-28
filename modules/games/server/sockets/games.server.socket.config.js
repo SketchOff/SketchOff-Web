@@ -33,5 +33,6 @@ export default function(io, socket) {
     socket.on('set phrase', function(msg) {
         var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
         console.log('dis nigga chose the following phrase', msg);
+        GameRoom.setPhrase(msg);
     });
 }

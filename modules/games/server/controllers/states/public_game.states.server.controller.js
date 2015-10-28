@@ -39,6 +39,7 @@ export class Drawing {
         console.log('DRAWING');
         this.name = 'DRAWING';
         this.GameRoom = GameRoom;
+        getIO().to(this.GameRoom._id).emit('DRAWING', this.GameRoom.getPhrase());
     }
 
     getName() {
