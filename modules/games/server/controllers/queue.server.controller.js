@@ -20,7 +20,6 @@ class Queue {
     }
 
     addPlayer(player) {
-        console.log('Current state when adding players', this.state.name);
         this.state.addPlayer(player);
     }
 
@@ -37,6 +36,11 @@ class Queue {
                 this.state = new QueueStates.NotEnough(this);
                 break;
         }
+        console.log(this.getStateName());
+    }
+
+    getStateName() {
+        return this.state.name;
     }
 
     createGame() {

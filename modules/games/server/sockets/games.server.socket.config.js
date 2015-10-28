@@ -12,13 +12,11 @@ export default function(io, socket) {
 	}
 
     socket.on('join public game', function() {
-        console.log(socket.request.user.username, 'clicked join public game');
         // TODO: Check if a user is already playing a game before adding them to the queue
         q.addPlayer(socket);
     });
 
     socket.on('get game info', function() {
-    	console.log(socket.request.user.username, 'is requesting game info');
     	var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
     	socket.emit('game info response', {_id: GameRoom._id, players: GameRoom.getPlayerUserNames().join(', '), state: GameRoom.getStateName()});
     });
