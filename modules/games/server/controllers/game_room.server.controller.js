@@ -61,6 +61,14 @@ export default class GameRoom {
         this.players.splice(index, 0, player);
     }
 
+    getPlayerUserNames() {
+        var player_names = [];
+        this.players.forEach(function(player) {
+            player_names.push(player.request.user.username);
+        });
+        return player_names;
+    }
+
     // TODO: Add a cleanup function that unregisters all callbacks (methods of the Game object) that were registered on socket events.
 }
 

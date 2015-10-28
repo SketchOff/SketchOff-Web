@@ -23,20 +23,13 @@ export class Establishing {
     }
 
     connectPlayers() {
-        var player_names = [];
 
         this.GameRoom.players.forEach(function(player) {
-            player_names.push(player.request.user.username);
             player.join(this.GameRoom._id);
+            player.game_room_id = this.GameRoom._id;
         }, this);
 
-        var emit_msg = {
-            id: this.GameRoom._id,
-            state: this.name,
-            players: player_names
-        };
-
-        getIO().to(this.GameRoom._id).emit('ESTABLISHED', 'fuck');
+        getIO().to(this.GameRoom._id).emit('ESTABLISHED');
     }
 
 }

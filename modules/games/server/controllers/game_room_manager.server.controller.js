@@ -15,14 +15,9 @@ export function removeGameRoom(game_room_id) {
 	GameRooms.delete(game_room_id);
 }
 
-// exports.createGameRoom([1, 2, 3, 4, 5, 6], true);
-// setInterval(function() {
-//     for (var value of GameRooms.values()) {
-//         console.log(value);
-//         value.playerExits(value.players[0]);
-//     }
-//     if (GameRooms.size === 0) console.log('EMPTY');
-// }, 1000);
+export function getGameRoom(game_room_id) {
+    return GameRooms.get(game_room_id);
+}
 
 /**
 Helper Functions

@@ -1,6 +1,7 @@
 'use strict';
 
 import {q} from '../controllers/queue.server.controller';
+import * as GameRooms from '../controllers/game_room_manager.server.controller';
 
 var setSocket = false;
 // Create the game socket.io configuration
@@ -16,7 +17,9 @@ export default function(io, socket) {
         q.addPlayer(socket);
     });
 
-    socket.on('game info', function() {
+    socket.on('get game info', function() {
     	console.log(socket.request.user.username, 'is requesting game info');
+    	var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
+    	socket.emit('game info response', {_id: GameRoom._id, players: GameRoom.getPlayerUserNames().join(', '), state: GameRoom.getStateName()});
     });
 }

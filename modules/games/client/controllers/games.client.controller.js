@@ -6,9 +6,16 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         $scope.authentication = Authentication;
 
         var getGameInfo = function() {
-            Socket.emit('game info');
+            Socket.emit('get game info');
             console.log('game info emitted');
         };
+   		getGameInfo();
+
+        Socket.on('game info response', function(msg) {
+        	$scope.GameRoom = msg;
+        });
+
+
     }
 
 ]);
