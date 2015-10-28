@@ -20,6 +20,7 @@ export default class GameRoom {
         // Set to true if judge leaves
         this.no_winner = false;
         this.State = is_public_room ? new PublicGameStates.Establishing(this) : new PrivateGameStates.Establishing(this);
+        this.judge = this.players[0];
     }
 
     set CurrState(State) {
@@ -67,6 +68,10 @@ export default class GameRoom {
             player_names.push(player.request.user.username);
         });
         return player_names;
+    }
+
+    getJudgeUserName() {
+        return this.judge.request.user.username;
     }
 
     // TODO: Add a cleanup function that unregisters all callbacks (methods of the Game object) that were registered on socket events.

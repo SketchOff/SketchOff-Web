@@ -18,6 +18,6 @@ export default function(io, socket) {
 
     socket.on('get game info', function() {
     	var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
-    	socket.emit('game info response', {_id: GameRoom._id, players: GameRoom.getPlayerUserNames().join(', '), state: GameRoom.getStateName()});
+    	socket.emit('game info response', {_id: GameRoom._id, players: GameRoom.getPlayerUserNames().join(', '), state: GameRoom.getStateName(), judge: GameRoom.getJudgeUserName()});
     });
 }
