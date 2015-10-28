@@ -4,7 +4,7 @@ import * as PublicGameStates from './states/public_game.states.server.controller
 import * as PrivateGameStates from './states/private_game.states.server.controller';
 
 // Set min and max players
-export var min_players = 3;
+export var min_players = 2;
 export var max_players = 7;
 
 export default class GameRoom {
