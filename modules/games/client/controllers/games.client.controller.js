@@ -4,6 +4,7 @@
 angular.module('games').controller('GamesController', ['$scope', 'Authentication', 'Socket', '$interval',
     function($scope, Authentication, Socket, $interval) {
         $scope.authentication = Authentication;
+        $scope.GameRoom = {};
 
         var getGameInfo = function() {
             Socket.emit('get game info');
@@ -15,7 +16,14 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         	$scope.GameRoom = msg;
         });
 
+        Socket.on('phrases', function(msg) {
+            console.log(msg);
+            $scope.GameRoom.phrases = msg;
+        });
 
+        $scope.setPhrase = function(phrase) {
+            Socket.emit('set phrase', phrase);
+        };
     }
 
 ]);

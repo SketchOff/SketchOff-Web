@@ -58,7 +58,7 @@ export default class GameRoom {
 
     // Add a player to the game
     addPlayer(player) {
-        var index = getRandomIntInclusive(0, this.players.length-1);
+        var index = getRandomIntInclusive(0, this.players.length - 1);
         this.players.splice(index, 0, player);
     }
 
@@ -74,11 +74,20 @@ export default class GameRoom {
         return this.judge.request.user.username;
     }
 
+    getJudge() {
+        return this.judge;
+    }
+
+    getPhrases() {
+        var phrases = ['pregnant pencils', 'fried black people', 'crusty clothes', 'pesty pelicans'];
+        return phrases;
+    }
+
     // TODO: Add a cleanup function that unregisters all callbacks (methods of the Game object) that were registered on socket events.
 }
 
 // Returns a random integer between min (included) and max (included)
 // Using Math.round() will give you a non-uniform distribution!
 function getRandomIntInclusive(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
