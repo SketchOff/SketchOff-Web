@@ -39,6 +39,7 @@ export class Drawing {
         console.log('DRAWING');
         this.name = 'DRAWING';
         this.GameRoom = GameRoom;
+        this.GameRoom.timesUpPlayers = [];
         getIO().to(this.GameRoom._id).emit('DRAWING', this.GameRoom.getPhrase());
     }
 
@@ -51,6 +52,8 @@ export class SelectingWinner {
     constructor(GameRoom) {
         console.log('SELECTING_WINNER');
         this.name = 'SELECTING_WINNER';
+        this.GameRoom = GameRoom;
+        getIO().to(this.GameRoom._id).emit('SELECTING_WINNER');
 
         // Prompt judge to select winner
 
@@ -67,6 +70,7 @@ export class SelectingWinner {
 
 export class Ending {
     constructor(GameRoom) {
+        this.GameRoom = GameRoom;
         console.log('ENDING');
         this.name = 'ENDING';
 

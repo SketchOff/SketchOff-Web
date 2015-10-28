@@ -21,6 +21,7 @@ export default class GameRoom {
         this.no_winner = false;
         this.State = new this.RoomStates.Establishing(this);
         this.judge = this.players[0];
+        this.timesUpPlayers = [];
     }
 
     setState(State) {
@@ -86,6 +87,10 @@ export default class GameRoom {
 
     getPhrase() {
         return this.phrase;
+    }
+
+    getNumPlayers() {
+        return this.players.length;
     }
 
     // TODO: Add a cleanup function that unregisters all callbacks (methods of the Game object) that were registered on socket events.

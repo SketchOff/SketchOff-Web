@@ -35,4 +35,14 @@ export default function(io, socket) {
         console.log('dis nigga chose the following phrase', msg);
         GameRoom.setPhrase(msg);
     });
+
+    socket.on('drawing times up', function() {
+        var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
+        GameRoom.timesUpPlayers.push(socket.request.user.username);
+        console.log(GameRoom.timesUpPlayers);
+        if(GameRoom.timesUpPlayers.length === GameRoom.getNumPlayers()-1) {
+            console.log('ALL PLAYERS TIME ENDED... SWITCH STATE');
+            GameRoom.setState('SelectingWinner');
+        }
+    });
 }
