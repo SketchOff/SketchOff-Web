@@ -6,8 +6,11 @@
     <h4>Judge: <i>{{GameRoom.judge}}</i></h4>
     <h4>Phrase: <i>{{GameRoom.phrase}}</i></h4>
     <h4>State: <i>{{GameRoom.state}}</i></h4>
-    <div id="choose-phrase" ng-if="authentication.user.username === GameRoom.judge">
+    <div id="choose-phrase" ng-if="authentication.user.username === GameRoom.judge && GameRoom.state === 'ESTABLISHING'">
     	<h3 style="color:blue">Ur da judge. Choose a phrase.</h3>
     	<button class="btn btn-info" ng-repeat="phrase in GameRoom.phrases" style="margin-right: 8px" ng-click=setPhrase(phrase)>{{phrase}}</button>
+    </div>
+    <div class="drawing-countdown" ng-if="GameRoom.state === 'DRAWING'">
+    	<h3 style="color: green"> Time Left: {{Drawing.countdown}}<h3>
     </div>
 </section>
