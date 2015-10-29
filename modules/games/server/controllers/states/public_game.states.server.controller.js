@@ -73,6 +73,7 @@ export class Ending {
         this.GameRoom = GameRoom;
         console.log('ENDING');
         this.name = 'ENDING';
+        getIO().to(this.GameRoom._id).emit('ENDING');
 
         // display results
         // save game info to game history schema

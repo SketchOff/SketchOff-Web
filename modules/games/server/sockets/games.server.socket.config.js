@@ -45,4 +45,18 @@ export default function(io, socket) {
             GameRoom.setState('SelectingWinner');
         }
     });
+
+    socket.on('set winner', function(msg) {
+        console.log('winner selected:', msg);
+        var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
+        GameRoom.setWinner(msg);
+        GameRoom.setState('Ending');
+    });
+
+    socket.on('selecting winner times up', function() {
+        console.log('selecting winner times up');
+        var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
+        GameRoom.noWinner();
+        GameRoom.setState('Ending');
+    });
 }

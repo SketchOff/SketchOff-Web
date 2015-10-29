@@ -11,10 +11,10 @@
     <button class="btn btn-info" ng-repeat="phrase in GameRoom.phrases" style="margin-right: 8px" ng-click=setPhrase(phrase)>{{phrase}}</button>
     </div>
     <div class="drawing-countdown" ng-if="GameRoom.state === 'DRAWING'">
-        <h3 style="color: green"> Time Left: {{Drawing.countdown}}<h3>
+        <h3 style="color: green">Drawing Time Left: {{Drawing.countdown}}<h3>
     </div>
-    <div class="selecting-winner-countdown" ng-if="authentication.user.username === GameRoom.judge && GameRoom.state === 'SELECTING_WINNER'">
-    	<h3 style="color: green"> Time Left: {{SelectingWinner.countdown}}<h3>
+    <div class="selecting-winner-countdown" ng-if="GameRoom.state === 'SELECTING_WINNER'">
+    	<h3 style="color: green">Winner Selection Time Left: {{SelectingWinner.countdown}}<h3>
     </div>
     <button class="btn btn-info" ng-repeat="player in GameRoom.players" style="margin-right: 8px" ng-click=setWinner(player) ng-if="GameRoom.state === 'SELECTING_WINNER' && authentication.user.username === GameRoom.judge && player !== GameRoom.judge">{{player}}</button>
 </section>

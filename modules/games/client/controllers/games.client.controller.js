@@ -28,7 +28,7 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
                 $scope.SelectingWinner.countdown--;
             }, 1000, selecting_winner_time).then(function() {
                 console.log("Selecting Winner Time Finished.");
-                if (!isJudge) Socket.emit('select winner times up');
+                if(isJudge) Socket.emit('selecting winner times up');
             });
         };
 
@@ -61,8 +61,16 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
             startSelectWinnerCountDown();
         });
 
+        Socket.on('ENDING', function() {
+            $scope.GameRoom.state = 'ENDING';
+        });
+
         $scope.setPhrase = function(phrase) {
             Socket.emit('set phrase', phrase);
+        };
+
+        $scope.setWinner = function(winner) {
+            Socket.emit('set winner', winner);
         };
     }
 
