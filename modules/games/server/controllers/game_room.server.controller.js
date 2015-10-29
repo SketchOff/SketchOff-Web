@@ -19,9 +19,11 @@ export default class GameRoom {
         this.RoomStates = is_public_room ? PublicGameStates : PrivateGameStates;
         // Set to true if judge leaves
         this.no_winner = false;
+        this.first_game = true;
         this.State = new this.RoomStates.Establishing(this);
         this.judge = this.players[0];
-        this.timesUpPlayers = [];
+        this.finished_drawing_players = [];
+        this.ready_for_new_game_players = [];
         this.winner = null;
     }
 
@@ -77,7 +79,7 @@ export default class GameRoom {
     }
 
     getPhrases() {
-        var phrases = ['pregnant pencils', 'fried black people', 'crusty clothes', 'pesty pelicans'];
+        var phrases = ['pregnant pencils', 'tall people', 'smelly clothes', 'pesty pelicans'];
         return phrases;
     }
 
@@ -100,6 +102,14 @@ export default class GameRoom {
 
     setWinner(winner) {
         this.winner = winner;
+    }
+
+    allPlayersFinishedDrawing() {
+        return (this.finished_drawing_players.length === this.getNumPlayers() - 1);
+    }
+
+    everyoneIsReadyForNewGame() {
+        return (this.ready_for_new_game_players.length === this.getNumPlayers());
     }
 
     // TODO: Add a cleanup function that unregisters all callbacks (methods of the Game object) that were registered on socket events.

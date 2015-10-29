@@ -11,9 +11,12 @@ export class Establishing {
         this.GameRoom = GameRoom;
         console.log('ESTABLISHING', GameRoom._id);
         this.name = 'ESTABLISHING';
-        GameRoom.players = shuffle(GameRoom.players);
-        GameRoom.judge = GameRoom.players[0];
-        this.connectPlayers();
+        this.GameRoom.players = shuffle(GameRoom.players);
+        this.GameRoom.judge = GameRoom.players[0];
+        if (this.GameRoom.first_game) {
+            this.connectPlayers();
+            console.log('connecting players');
+        }
         // TODO: show phrases to judge
         // changes to drawing state when judge selects a phrase <--- handled by GameSocketManager
     }
@@ -70,9 +73,12 @@ export class SelectingWinner {
 
 export class Ending {
     constructor(GameRoom) {
-        this.GameRoom = GameRoom;
         console.log('ENDING');
         this.name = 'ENDING';
+        this.GameRoom = GameRoom;
+        this.GameRoom.first_game = false;
+        this.GameRoom.finished_drawing_players = [];
+        this.GameRoom.ready_for_new_game_players = [];
         getIO().to(this.GameRoom._id).emit('ENDING');
 
         // display results

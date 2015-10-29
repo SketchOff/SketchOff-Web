@@ -16,12 +16,13 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         $scope.SelectingWinner.countdown = selecting_winner_time;
         $scope.Ending.countdown = new_round_time;
         var isJudge = false;
+        var setWinner = false;
 
         var startDrawingCountDown = function() {
             $interval(function() {
                 $scope.Drawing.countdown--;
             }, 1000, drawing_time).then(function() {
-                console.log("Drawing Time Finished.");
+                console.log('Drawing Time Finished.');
                 if (!isJudge) Socket.emit('drawing times up');
             });
         };
@@ -30,8 +31,10 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
             $interval(function() {
                 $scope.SelectingWinner.countdown--;
             }, 1000, selecting_winner_time).then(function() {
-                console.log("Selecting Winner Time Finished.");
-                if (isJudge) Socket.emit('selecting winner times up');
+                if (isJudge && !setWinner) {
+                    console.log('Selecting Winner Time Finished.');
+                    Socket.emit('selecting winner times up');
+                } else setWinner = false;
             });
         };
 
@@ -39,7 +42,7 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
             $interval(function() {
                 $scope.Ending.countdown--;
             }, 1000, new_round_time).then(function() {
-                console.log("Round Transmission Finished.");
+                console.log('Round Transmission Finished.');
                 Socket.emit('start new round');
             });
         };
@@ -62,6 +65,10 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
             $scope.GameRoom.phrases = msg;
         });
 
+        Socket.on('ESTABLISHING', function() {
+            this.GameRoom.state = 'ESTABLISHING';
+        });
+
         Socket.on('DRAWING', function(msg) {
             $scope.GameRoom.state = 'DRAWING';
             $scope.GameRoom.phrase = msg;
@@ -74,6 +81,7 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         });
 
         Socket.on('ENDING', function() {
+            console.log('ending');
             $scope.GameRoom.state = 'ENDING';
             startNewGameCountDown();
             Socket.emit('start new game');
@@ -84,6 +92,7 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         };
 
         $scope.setWinner = function(winner) {
+            setWinner = true;
             Socket.emit('set winner', winner);
         };
     }

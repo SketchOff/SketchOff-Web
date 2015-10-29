@@ -38,9 +38,8 @@ export default function(io, socket) {
 
     socket.on('drawing times up', function() {
         var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
-        GameRoom.timesUpPlayers.push(socket.request.user.username);
-        console.log(GameRoom.timesUpPlayers);
-        if(GameRoom.timesUpPlayers.length === GameRoom.getNumPlayers()-1) {
+        GameRoom.finished_drawing_players.push(socket.request.user.username);
+        if (GameRoom.allPlayersFinishedDrawing()) {
             console.log('ALL PLAYERS TIME ENDED... SWITCH STATE');
             GameRoom.setState('SelectingWinner');
         }
@@ -58,5 +57,14 @@ export default function(io, socket) {
         var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
         GameRoom.noWinner();
         GameRoom.setState('Ending');
+    });
+
+    socket.on('start new game', function() {
+        var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
+        GameRoom.ready_for_new_game_players.push(socket.request.user.username);
+        if (GameRoom.everyoneIsReadyForNewGame()) {
+            console.log('ALL PLAYERS READY FOR NEW GAME... RESTARTING');
+            GameRoom.setState('Establishing');
+        }
     });
 }
