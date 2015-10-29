@@ -76,3 +76,6 @@ mongod
 ## run with api keys
 
 gruntWithKeys.sh
+
+# emacs temp files
+*~
