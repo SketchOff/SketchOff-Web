@@ -16,9 +16,11 @@ export class Establishing {
         if (this.GameRoom.first_game) {
             this.connectPlayers();
             console.log('connecting players');
+            getIO().to(this.GameRoom._id).emit('ESTABLISHED');
+        } else {
+            console.log('emmitted establishing');
+            getIO().to(this.GameRoom._id).emit('ESTABLISHING');
         }
-        // TODO: show phrases to judge
-        // changes to drawing state when judge selects a phrase <--- handled by GameSocketManager
     }
 
     getName() {
@@ -31,8 +33,6 @@ export class Establishing {
             player.join(this.GameRoom._id);
             player.game_room_id = this.GameRoom._id;
         }, this);
-
-        getIO().to(this.GameRoom._id).emit('ESTABLISHED');
     }
 
 }
