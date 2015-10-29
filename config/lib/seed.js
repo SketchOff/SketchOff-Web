@@ -97,16 +97,27 @@ function reportError (err) {
 module.exports.start = function start() {
   var User = mongoose.model('User');
   return new Promise(function (resolve, reject) {
-    var seedUser = {
-      username: 'user',
-      password: 'User_Password1!',
-      provider: 'local',
-      email: 'user@localhost.com',
-      firstName: 'User',
-      lastName: 'Local',
-      displayName: 'User Local',
-      roles: ['user']
-    };
+      var seedUsers = [
+	  {
+	      username: 'user1',
+	      password: 'User_Password1!',
+	      provider: 'local',
+	      email: 'user1@localhost.com',
+	      firstName: 'UserOne',
+	      lastName: 'Local Man',
+	      displayName: 'User Local One',
+	      roles: ['user']
+	  },
+	  {
+	      username: 'user2',
+	      password: 'User_Password1!',
+	      provider: 'local',
+	      email: 'user2@localhost.com',
+	      firstName: 'UserTwo',
+	      lastName: 'Local Man',
+	      displayName: 'User Local Two',
+	      roles: ['user']
+	  }];
 
     var seedAdmin = {
       username: 'admin',
@@ -121,7 +132,10 @@ module.exports.start = function start() {
 
     var user = null;
     var adminAccount = new User(seedAdmin);
-    var userAccount = new User(seedUser);
+    var userAccounts = [];
+    seedUsers.forEach(function(u) {
+	userAccounts.push(new User(u));
+    });  
 
     //If production only seed admin if it does not exist
     if (process.env.NODE_ENV === 'production') {
@@ -133,15 +147,23 @@ module.exports.start = function start() {
       .catch(reportError);
     } else {
       // Add both Admin and User account
+	User.generateRandomPassphrase()
+	    .then(seedTheUser(adminAccount))
+	    .then(function () {
+		resolve();
+            })
+	    .catch(reportError);
 
-      User.generateRandomPassphrase()
-      .then(seedTheUser(userAccount))
-      .then(User.generateRandomPassphrase)
-      .then(seedTheUser(adminAccount))
-      .then(function () {
-          resolve();
-        })
-      .catch(reportError);
+	userAccounts.forEach(function (u) {
+	    User.generateRandomPassphrase()
+		.then(seedTheUser(u))
+		.then(User.generateRandomPassphrase)
+		.then(seedTheUser(u))
+		.then(function () {
+		    resolve();
+		})
+		.catch(reportError);
+	});
     }
   });
 };

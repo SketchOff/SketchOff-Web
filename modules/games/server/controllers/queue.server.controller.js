@@ -2,14 +2,23 @@
 
 // Player: { id: someid, socket: theirsocket, io: theirio, user: associateduser }
 
-import {min_players, max_players} from './game_room.server.controller';
+import {
+    min_players, max_players
+}
+from './game_room.server.controller';
 import * as QueueStates from './states/queue.states.server.controller';
 import * as GameRoomManager from './game_room_manager.server.controller';
+
+var _io;
+
+export function getIO() {
+    return _io;
+}
 
 class Queue {
     constructor() {
         this.players = [];
-        this.availableGames = [];
+        this.available_games = [];
         this.state = new QueueStates.NotEnough(this);
     }
 
@@ -23,24 +32,44 @@ class Queue {
 
     setState(state) {
         switch (state) {
-            case 'ENOUGH':
-                this.state = new QueueStates.Enough(this);
-                break;
             case 'NOT_ENOUGH':
                 this.state = new QueueStates.NotEnough(this);
                 break;
+            case 'AVAILABLE_GAMES':
+                this.state = new QueueStates.AvailableGames(this);
+                break;
         }
+        console.log(this.getStateName());
+    }
+
+    getStateName() {
+        return this.state.name;
     }
 
     createGame() {
         var gamePlayers = this.players.slice(0, max_players);
         if (gamePlayers.length >= min_players) {
+            gamePlayers = this.players.splice(0, max_players);
             GameRoomManager.createGameRoom(gamePlayers, true);
-        } else {
-            this.queue.setState('NOT_ENOUGH');
         }
     }
 
+    setIO(io) {
+        _io = io;
+    }
+
+    addAvailableGame(game_id) {
+        console.log(game_id, 'added to available games');
+        this.available_games.push(game_id);
+        this.setState('AVAILABLE_GAMES');
+    }
+
+    removeAvailableGame(game_id) {
+        console.log(game_id, 'removed from available games');
+        var available_game_index = this.available_games.indexOf(game_id);
+        if (available_game_index > -1) this.available_games.splice(available_game_index, 1);
+        if (this.available_games < 1) this.setState('NOT_ENOUGH');
+    }
 }
 
 export var q = new Queue();
