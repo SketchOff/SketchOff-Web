@@ -79,7 +79,7 @@ export class Ending {
         this.GameRoom.first_game = false;
         this.GameRoom.finished_drawing_players = [];
         this.GameRoom.ready_for_new_game_players = [];
-        getIO().to(this.GameRoom._id).emit('ENDING');
+        getIO().to(this.GameRoom._id).emit('ENDING', this.GameRoom.winner);
 
         // display results
         // save game info to game history schema

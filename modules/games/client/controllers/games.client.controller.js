@@ -5,7 +5,6 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
     function($scope, Authentication, Socket, $interval) {
         $scope.authentication = Authentication;
         $scope.GameRoom = {};
-        $scope.GameRoom.phrase = 'not chosen';
         $scope.Drawing = {};
         $scope.SelectingWinner = {};
         $scope.Ending = {};
@@ -70,6 +69,9 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
 
         Socket.on('ESTABLISHING', function() {
             $scope.GameRoom.state = 'ESTABLISHING';
+            $scope.GameRoom.phrase = undefined;
+            $scope.GameRoom.winner = undefined;
+            // TODO: Give judge a countdown to select phrase, otherwise kick judge
         });
 
         Socket.on('DRAWING', function(msg) {
@@ -83,9 +85,11 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
             startSelectingWinnerCountDown();
         });
 
-        Socket.on('ENDING', function() {
+        Socket.on('ENDING', function(msg) {
             console.log('ending');
             $scope.GameRoom.state = 'ENDING';
+            if (msg === null) msg='No winner';
+            $scope.GameRoom.winner = msg;
             startNewGameCountDown();
         });
 

@@ -18,7 +18,6 @@ export default class GameRoom {
         // Is game public, if not then game is private
         this.RoomStates = is_public_room ? PublicGameStates : PrivateGameStates;
         // Set to true if judge leaves
-        this.no_winner = false;
         this.first_game = true;
         this.State = new this.RoomStates.Establishing(this);
         this.judge = this.players[0];
@@ -52,7 +51,7 @@ export default class GameRoom {
         else {
             // The judge left the game, no winner can be determined
             // TODO: Flag judge for leaving mid-game!
-            if (player === this.judge) this.no_winner = true;
+            if (player === this.judge) this.winner = null;
         }
     }
 
@@ -97,7 +96,7 @@ export default class GameRoom {
     }
 
     noWinner() {
-        this.no_winner = true;
+        this.winner = null;
     }
 
     setWinner(winner) {
