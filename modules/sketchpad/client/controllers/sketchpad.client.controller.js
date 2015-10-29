@@ -1,7 +1,7 @@
 'use strict';
 
 // Sketchpad [large blob] controller
-angular.module('games').controller('SketchpadController', ['$scope', 'Authentication', 'Socket'
+angular.module('games').controller('SketchpadController', ['$scope', 'Authentication', 'Socket',
   function ($scope, $stateParams, $location, Authentication, Socket) {
     $scope.authentication = Authentication;
     $scope.messageQ = [];
@@ -14,7 +14,7 @@ angular.module('games').controller('SketchpadController', ['$scope', 'Authentica
     	$scope.mouseX = event.pageX;
     	$scope.mouseY = event.pageY;
     	$scope.mouseTool = $scope.currentTool;
-    }
+    };
 
     // Connect Socket if not connected
     if (!Socket.socket) {
@@ -29,8 +29,8 @@ angular.module('games').controller('SketchpadController', ['$scope', 'Authentica
     // Method for sending data
     $scope.sendMessage = function() {
     	var spData = {
-    		data: this.spData; // SEE DESIGN DOC 4.2.2
-    	}
+    		data: this.spData // SEE DESIGN DOC 4.2.2
+    	};
 
     	// TODO: Validate data
 
