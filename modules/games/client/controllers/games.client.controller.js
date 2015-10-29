@@ -8,10 +8,13 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         $scope.GameRoom.phrase = 'not chosen';
         $scope.Drawing = {};
         $scope.SelectingWinner = {};
+        $scope.Ending = {};
         var drawing_time = 5;
         var selecting_winner_time = 5;
+        var new_round_time = 5;
         $scope.Drawing.countdown = drawing_time;
         $scope.SelectingWinner.countdown = selecting_winner_time;
+        $scope.Ending.countdown = new_round_time;
         var isJudge = false;
 
         var startDrawingCountDown = function() {
@@ -23,12 +26,21 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
             });
         };
 
-        var startSelectWinnerCountDown = function() {
+        var startSelectingWinnerCountDown = function() {
             $interval(function() {
                 $scope.SelectingWinner.countdown--;
             }, 1000, selecting_winner_time).then(function() {
                 console.log("Selecting Winner Time Finished.");
-                if(isJudge) Socket.emit('selecting winner times up');
+                if (isJudge) Socket.emit('selecting winner times up');
+            });
+        };
+
+        var startNewGameCountDown = function() {
+            $interval(function() {
+                $scope.Ending.countdown--;
+            }, 1000, new_round_time).then(function() {
+                console.log("Round Transmission Finished.");
+                Socket.emit('start new round');
             });
         };
 
@@ -58,11 +70,13 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
 
         Socket.on('SELECTING_WINNER', function() {
             $scope.GameRoom.state = 'SELECTING_WINNER';
-            startSelectWinnerCountDown();
+            startSelectingWinnerCountDown();
         });
 
         Socket.on('ENDING', function() {
             $scope.GameRoom.state = 'ENDING';
+            startNewGameCountDown();
+            Socket.emit('start new game');
         });
 
         $scope.setPhrase = function(phrase) {
