@@ -25,6 +25,14 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         };
 
 	$scope.startPrivateGame = function() {
+            $scope.animationsEnabled = true;
+            modalInstance = $uibModal.open({
+                animation: $scope.animationsEnabled,
+                templateUrl: 'modules/core/client/views/waiting-for-game.client.modal.view.html',
+                controller: 'WaitingForPrivateGameCtrl'
+
+        });
+
 	};
 
     }

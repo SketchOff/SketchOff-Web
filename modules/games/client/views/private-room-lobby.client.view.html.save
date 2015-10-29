@@ -1,0 +1,8 @@
+<section ng-controller="GamesController">
+    <h1>Welcome To The Private Room Lobby</h1>
+    <h3 style="color: red">Lobby Info
+    <h4>ID: <i>{{GameRoom._id}}</i></h4>
+    <h4>Current players: <i>{{GameRoom.players}}</i></h4>
+    <h4>Judge: <i>{{GameRoom.judge}}</i></h4>
+    <h4>State: <i>{{GameRoom.state}}</i></h4>
+</section>

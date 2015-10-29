@@ -1,9 +1,13 @@
 'use strict';
 
-// Games controller
+//Games controller
 angular.module('games').controller('GamesController', ['$scope', 'Authentication', 'Socket', '$interval',
     function($scope, Authentication, Socket, $interval) {
         $scope.authentication = Authentication;
+
+	$scope.Test = {};
+	$scope.Test.players = ['Player 1', 'Player A', 'Player !'];
+
 
         var getGameInfo = function() {
             Socket.emit('get game info');
