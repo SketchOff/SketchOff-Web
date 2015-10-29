@@ -74,5 +74,5 @@ mongod
 *.sln
 
 ## run with api keys
-gruntWithKeys.sh
 
+gruntWithKeys.sh
