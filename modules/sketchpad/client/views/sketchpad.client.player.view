@@ -1,0 +1,24 @@
+<section ng-controller="SketchpadController" bn-document-click="handleClick($event)">
+	<div id="canvasContainer">
+	<!--TODO: Remove CSS out when I figure it out -->
+		<canvas id="canvas" padding-left="0" padding-right="0" margin-left="auto" margin-rght="auto" display="block" width="640" height="480" style="border: 1px solid black">
+		      Your browser does not support HTML5 Canvas
+		</canvas>
+	</div>
+	<br>
+
+	<div id="buttonContainer">
+	</div>
+
+	<div id="messageDataContainer">
+		<input type="hidden" id="spData" name="spData" ng-model="spData" placeholder="">
+	</div>
+	<div id="logContainer">
+		<li ng-repeat="entry in log">{{entry.msg}}</li>
+	</div>
+	<div id="debugVars">
+		<p>Click X: {{mouseX}}</p>
+		<p>Click Y: {{mouseY}}</p>
+		<p>Click Tool: {{mouseTool}}</p>
+	</div>
+</section>

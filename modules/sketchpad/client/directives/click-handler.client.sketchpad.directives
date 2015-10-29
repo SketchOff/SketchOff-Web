@@ -1,0 +1,29 @@
+app.directive('bn-document-click', function($document, $parse) {
+	// This is literally a hack to get this to work but out of ideas pls refactor later
+	// TODO: ^
+	var linkFunction = function($scope, $element, $attributes) {
+		// Get expression to eval on scope
+		var scopeExpression = $attributes.bnDocumentClick;
+
+		// Compile scope expression
+		// Quas wes exort
+		var invoker = $parse(scopeExpression);
+
+		// bind to document 
+		// bad
+		// angular why
+		$document.on("click", function (event) {
+			// I have literally no idea why this is done something about reinvoking angularJs's context again and then doing some shit about scope to reapply?
+			$scope.$apply(function() {
+				invoker( $scope, {$event:event}) ;
+			});
+		});
+
+		// Todo: make sure this actually is deleting event lsiteners
+		$scope.$on("$destroy", function() {
+    		$document.removeListener("click");
+    	});
+
+    	return(linkFunction);
+	}
+});
