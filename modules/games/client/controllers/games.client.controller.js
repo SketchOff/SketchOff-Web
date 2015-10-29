@@ -7,16 +7,28 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         $scope.GameRoom = {};
         $scope.GameRoom.phrase = 'not chosen';
         $scope.Drawing = {};
-        var drawing_time = 10;
+        $scope.SelectingWinner = {};
+        var drawing_time = 5;
+        var selecting_winner_time = 5;
         $scope.Drawing.countdown = drawing_time;
+        $scope.SelectingWinner.countdown = selecting_winner_time;
         var isJudge = false;
 
-        var startCountDown = function() {
+        var startDrawingCountDown = function() {
             $interval(function() {
                 $scope.Drawing.countdown--;
             }, 1000, drawing_time).then(function() {
-                console.log("Finished.");
+                console.log("Drawing Time Finished.");
                 if (!isJudge) Socket.emit('drawing times up');
+            });
+        };
+
+        var startSelectWinnerCountDown = function() {
+            $interval(function() {
+                $scope.SelectingWinner.countdown--;
+            }, 1000, selecting_winner_time).then(function() {
+                console.log("Selecting Winner Time Finished.");
+                if (!isJudge) Socket.emit('select winner times up');
             });
         };
 
@@ -41,12 +53,13 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         Socket.on('DRAWING', function(msg) {
             $scope.GameRoom.state = 'DRAWING';
             $scope.GameRoom.phrase = msg;
-            startCountDown();
+            startDrawingCountDown();
         });
 
         Socket.on('SELECTING_WINNER', function() {
             $scope.GameRoom.state = 'SELECTING_WINNER';
-        }); 
+            startSelectWinnerCountDown();
+        });
 
         $scope.setPhrase = function(phrase) {
             Socket.emit('set phrase', phrase);

@@ -23,7 +23,7 @@ export default function(io, socket) {
         var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
         socket.emit('game info response', {
             _id: GameRoom._id,
-            players: GameRoom.getPlayerUserNames().join(', '),
+            players: GameRoom.getPlayerUserNames(),
             state: GameRoom.getStateName(),
             judge: GameRoom.getJudgeUserName(),
             phrases: GameRoom.getPhrases()
