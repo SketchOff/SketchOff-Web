@@ -19,6 +19,7 @@ export default class GameRoom {
         this.RoomStates = is_public_room ? PublicGameStates : PrivateGameStates;
         // Set to true if judge leaves
         this.first_game = true;
+        this.available = true;
         this.State = new this.RoomStates.Establishing(this);
         this.judge = this.players[0];
         this.finished_drawing_players = [];
@@ -109,6 +110,10 @@ export default class GameRoom {
 
     everyoneIsReadyForNewGame() {
         return (this.ready_for_new_game_players.length === this.getNumPlayers());
+    }
+
+    isAvailable() {
+        return this.available;
     }
 
     // TODO: Add a cleanup function that unregisters all callbacks (methods of the Game object) that were registered on socket events.

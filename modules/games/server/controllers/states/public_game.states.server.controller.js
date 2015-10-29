@@ -2,7 +2,11 @@
 
 import * as GameRoomManager from '../game_room_manager.server.controller';
 import {
-    getIO
+    min_players, max_players
+}
+from '../game_room.server.controller';
+import {
+    getIO, q
 }
 from '../queue.server.controller';
 
@@ -20,6 +24,7 @@ export class Establishing {
         } else {
             console.log('emmitted establishing');
             getIO().to(this.GameRoom._id).emit('ESTABLISHING');
+            q.removeAvailableGame(this.GameRoom._id);
         }
     }
 
@@ -42,7 +47,6 @@ export class Drawing {
         console.log('DRAWING');
         this.name = 'DRAWING';
         this.GameRoom = GameRoom;
-        this.GameRoom.timesUpPlayers = [];
         getIO().to(this.GameRoom._id).emit('DRAWING', this.GameRoom.getPhrase());
     }
 
@@ -57,13 +61,7 @@ export class SelectingWinner {
         this.name = 'SELECTING_WINNER';
         this.GameRoom = GameRoom;
         getIO().to(this.GameRoom._id).emit('SELECTING_WINNER');
-
-        // Prompt judge to select winner
-
-        if (GameRoom.players.length < GameRoom.max_players) {
-            // Add game room id to Queue's available games array
-        }
-        // After winner selected, go to ending <== Handled by game socket manager
+        if(!this.GameRoom.isFull()) q.addAvailableGame(this.GameRoom._id);
     }
 
     getName() {
