@@ -72,3 +72,10 @@ mongod
 *.ntvs*
 *.njsproj
 *.sln
+
+## run with api keys
+
+gruntWithKeys.sh
+
+# emacs temp files
+*~

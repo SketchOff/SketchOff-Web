@@ -24,5 +24,8 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
             // }, 3000);
         };
 
+	$scope.startPrivateGame = function() {
+	};
+
     }
 ]);
