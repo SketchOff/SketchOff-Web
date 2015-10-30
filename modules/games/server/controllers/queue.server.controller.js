@@ -1,6 +1,5 @@
 'use strict';
 
-// Player: { id: someid, socket: theirsocket, io: theirio, user: associateduser }
 
 import {min_players, max_players} from './game_room.server.controller';
 import * as QueueStates from './states/queue.states.server.controller';
@@ -20,7 +19,19 @@ class Queue {
     }
 
     addPlayer(player) {
-        this.state.addPlayer(player);
+        // check if already in
+        // if in. emit to socket
+        if(this.players.some(function(p) { return p.request.user.username === player.request.user.username; })) {
+            console.log('player already in game');
+            console.log(this.players);
+            player.emit('already in game redirect');
+
+        } else {
+            console.log(this.players.map(p => p.request.user.username));
+            console.log("adding " + player.request.user.username);
+            this.state.addPlayer(player);
+        }
+
     }
 
     numPlayers() {
