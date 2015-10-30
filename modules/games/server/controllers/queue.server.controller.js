@@ -21,7 +21,7 @@ class Queue {
         this.state = new QueueStates.NotEnough(this);
     }
 
-    addPlayer(player) {
+    addPlayer(player) { // TODO TEST
         console.log(GameRoomManager.getGameRoomMap().values());
         if(this.players.some(function(p) {
             return p.request.user.username === player.request.user.username;
@@ -33,7 +33,7 @@ class Queue {
             console.log(this.players.map(p => p.request.user.username));
             console.log("adding " + player.request.user.username);
             this.players.push(player);
-            this.state.addPlayer(player);
+            this.state.addPlayer();
         }
 
     }
@@ -117,8 +117,10 @@ function isInAGame(player, manager) {
     var it = manager.getGameRoomMap().values();
     var result = false;
     for(var g of it) {
-        if (g.getPlayerUserNames().some(n => player.request.user.username === n))
+        if (g.getPlayerUserNames().some(n => player.request.user.username === n)) {
             result = true;
+            break;
+        }
     }
     return result;
 }
