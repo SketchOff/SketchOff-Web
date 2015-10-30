@@ -32,6 +32,9 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
             $scope.GameRoom.phrase = undefined;
             $scope.GameRoom.winner = undefined;
             $scope.GameRoom.judge = msg;
+            $scope.GameRoom.drawing_countdown = null;
+            $scope.GameRoom.winner_selection_countdown = null;
+            $scope.GameRoom.new_game_countdown = null;
             // TODO: Give judge a countdown to select phrase, otherwise kick judge
         });
 
@@ -56,11 +59,15 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         });
 
         Socket.on('drawing countdown', function(msg) {
-            $scope.GameRoom.drawing_time = msg;
+            $scope.GameRoom.drawing_countdown = msg;
         });
 
         Socket.on('selecting winner countdown', function(msg) {
-            $scope.GameRoom.winner_selection_time = msg;
+            $scope.GameRoom.winner_selection_countdown = msg;
+        });
+
+        Socket.on('new game countdown', function(msg) {
+            $scope.GameRoom.new_game_countdown = msg;
         });
 
         $scope.setPhrase = function(phrase) {

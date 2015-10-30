@@ -31,6 +31,8 @@ export class Establishing {
             getIO().to(this.GameRoom._id).emit('ESTABLISHING', this.GameRoom.judge.request.user.username);
             q.removeAvailableGame(this.GameRoom._id);
         }
+        // TODO: Add timer for choosing phrase
+        // Timers.countdownFactory(this.GameRoom, 'choose_phrase_time', 'Drawing', 'choosing phrase countdown');
     }
 
     getName() {
@@ -83,6 +85,8 @@ export class Ending {
         this.GameRoom = GameRoom;
         this.GameRoom.first_game = false;
         getIO().to(this.GameRoom._id).emit('ENDING', this.GameRoom.winner);
+        Timers.countdownFactory(this.GameRoom, 'new_game_time', 'Establishing', 'new game countdown');
+
 
         // display results
         // save game info to game history schema
