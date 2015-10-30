@@ -1,6 +1,9 @@
 'use strict';
 
-import { min_players, max_players } from '../game_room.server.controller';
+import {
+    min_players, max_players
+}
+from '../game_room.server.controller';
 import * as GameRoomManager from '../game_room_manager.server.controller';
 
 // No Available Games and not enough players to create a new game
@@ -37,13 +40,20 @@ export class AvailableGames {
     constructor(queue) {
         this.name = 'AVAILABLE_GAMES';
         this.queue = queue;
+        if (this.queue.players.length) {
+            for (var player of this.queue.players) {
+                if (!this.queue.players.length) break;
+                this.addPlayer(player);
+            }
+        }
     }
+
     addPlayer(player) {
         console.log('Adding player during available game state');
         var added = false;
         for (var id of this.queue.available_games) {
             var GameRoom = GameRoomManager.getGameRoom(id);
-            if(GameRoom && !GameRoom.isFull()) {
+            if (GameRoom && !GameRoom.isFull()) {
                 GameRoom.addWaitingPlayer(player);
                 added = true;
                 if (GameRoom.isFull()) this.queue.removeAvailableGame(id);
