@@ -25,6 +25,10 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
             });
         };
 
+        var getUserName = functon() {
+            return $scope.authentication.user._id;
+        };
+
         var startSelectingWinnerCountDown = function() {
             $scope.SelectingWinner.countdown = selecting_winner_time;
 

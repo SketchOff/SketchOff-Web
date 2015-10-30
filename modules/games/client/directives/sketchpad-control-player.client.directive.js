@@ -5,7 +5,7 @@ angular.module('games')
   	return{
   		restrict: "A",
     	link: function(scope, element){
-    		console.log(element);
+    	//console.log(element);
       	var ctx = element[0].getContext('2d');
 
       // var ctx2 = element[1].getContext('2d');
@@ -16,7 +16,7 @@ angular.module('games')
       // variable that decides if something should be drawn on mousemove
       var drawing = false;
       
-      var cID = 1;
+      var cID = scope.getUserName();
 
       // the last coordinates before the current move
       var lastX;
