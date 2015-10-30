@@ -24,11 +24,12 @@ export class Establishing {
             console.log('connecting players');
             getIO().to(this.GameRoom._id).emit('ESTABLISHED');
         } else {
+            this.addWaitingPlayers();
             var x = this.GameRoom.players.shift();
             this.GameRoom.players.push(x);
             this.GameRoom.judge = this.GameRoom.players[0];
             console.log('emmitted establishing');
-            getIO().to(this.GameRoom._id).emit('ESTABLISHING', this.GameRoom.judge.request.user.username);
+            getIO().to(this.GameRoom._id).emit('ESTABLISHING', {judge: this.GameRoom.judge.request.user.username, players: this.GameRoom.getPlayerUserNames(), waiting_players: this.GameRoom.getWaitingPlayerUserNames()});
             q.removeAvailableGame(this.GameRoom._id);
         }
         // TODO: Add timer for choosing phrase
@@ -40,11 +41,15 @@ export class Establishing {
     }
 
     connectPlayers() {
-
         this.GameRoom.players.forEach(function(player) {
             player.join(this.GameRoom._id);
             player.game_room_id = this.GameRoom._id;
         }, this);
+    }
+
+    addWaitingPlayers() {
+        this.GameRoom.players = this.GameRoom.players.concat(this.GameRoom.waiting_players);
+        this.GameRoom.waiting_players = [];
     }
 
 }

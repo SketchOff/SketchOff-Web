@@ -85,6 +85,14 @@ export default class GameRoom {
         return player_names;
     }
 
+    getWaitingPlayerUserNames() {
+        var waiting_player_names = [];
+        this.waiting_players.forEach(function(player) {
+            waiting_player_names.push(player.request.user.username);
+        });
+        return waiting_player_names;
+    }
+
     getJudgeUserName() {
         return this.judge.request.user.username;
     }
@@ -122,15 +130,6 @@ export default class GameRoom {
     isAvailable() {
         return this.available;
     }
-
-    getWaitingPlayerUserNames() {
-        var waiting_player_names = [];
-        this.waiting_players.forEach(function(player) {
-            waiting_player_names.push(player.request.user.username);
-        });
-        return waiting_player_names;
-    }
-
 
     // TODO: Add a cleanup function that unregisters all callbacks (methods of the Game object) that were registered on socket events.
 }

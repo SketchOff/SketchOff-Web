@@ -24,14 +24,10 @@ export default function(io, socket) {
         socket.emit('game info response', {
             _id: GameRoom._id,
             players: GameRoom.getPlayerUserNames(),
-            players_waiting: GameRoom.getWaitingPlayerUserNames(),
+            waiting_players: GameRoom.getWaitingPlayerUserNames(),
             state: GameRoom.getStateName(),
             judge: GameRoom.getJudgeUserName(),
-            phrases: GameRoom.getPhrases(), 
-            choose_phrase_time: GameRoom.choose_phrase_time,
-            drawing_time: GameRoom.drawing_time,
-            winner_selection_time: GameRoom.winner_selection_time,
-            new_game_time: GameRoom.new_game_time
+            phrases: GameRoom.getPhrases()
         });
     });
 

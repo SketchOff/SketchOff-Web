@@ -31,7 +31,9 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
             $scope.GameRoom.state = 'ESTABLISHING';
             $scope.GameRoom.phrase = undefined;
             $scope.GameRoom.winner = undefined;
-            $scope.GameRoom.judge = msg;
+            $scope.GameRoom.judge = msg.judge;
+            $scope.GameRoom.players = msg.players;
+            $scope.GameRoom.waiting_players = msg.waiting_players;
             $scope.GameRoom.drawing_countdown = null;
             $scope.GameRoom.winner_selection_countdown = null;
             $scope.GameRoom.new_game_countdown = null;
@@ -55,7 +57,7 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         });
 
         Socket.on('player joined', function(msg) {
-            $scope.GameRoom.players_waiting = msg;
+            $scope.GameRoom.waiting_players = msg;
         });
 
         Socket.on('drawing countdown', function(msg) {
