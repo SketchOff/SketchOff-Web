@@ -1,12 +1,14 @@
 'use strict';
 
 angular.module('games')
-  	.directive('drawing-player', function () {
+  	.directive('drawingPlayer', function () {
   	return{
   		restrict: "A",
     	link: function(scope, element){
+    		console.log(element);
       var ctx = element[0].getContext('2d');
-      var ctx2 = element[1].getContext('2d');
+
+      // var ctx2 = element[1].getContext('2d');
 
       // variable that indicates if in a gamestate where drawing s allowed
       var canDraw = true;
@@ -108,6 +110,7 @@ angular.module('games')
           			currentX, currentY, toolColor, toolSize
           		]);
           		drawUpDot(currentX, currentY, lastX, lastY, toolColor, toolSize);
+          		socketSendMessage();
           		break;
           	case 1:
           		break;
@@ -141,6 +144,12 @@ angular.module('games')
       // Pushes toolData (for tooltypes in an array) into socket data
       function socketPushToolData(data) {
       	socketQueue.data.toolData.push(data);
+      }
+
+      // Sends socket message
+      function socketSendMessage() {
+      	// TODO: Implement
+      	flushSocketQueueData();
       }
         
      	////////////////////////
@@ -188,7 +197,7 @@ angular.module('games')
     		context.lineTo(x2, y2);
 
     		context.strokeColor = color;
-    		context.lineWidth = thick;
+    		context.lineWidth = 2*thick;
     		context.stroke();
     	}
     }
