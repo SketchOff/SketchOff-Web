@@ -8,6 +8,9 @@ var GameRooms = new Map();
 export function createGameRoom(players, public_game) {
     var game_room_id = generateID();
     GameRooms.set(game_room_id, new GameRoom(players, public_game, game_room_id));
+    players.forEach(function(player) {
+        console.log(player.request.user.username);
+    });
 }
 
 // remove a GameRoom from the GameRooms map
