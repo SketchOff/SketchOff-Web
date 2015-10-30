@@ -4,6 +4,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
     function($scope, Authentication, Socket, $uibModal, $timeout) {
         // This provides Authentication context.
         $scope.authentication = Authentication;
+        $scope.error = {};
 
         var modalInstance;
 
@@ -24,8 +25,14 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
             // }, 3000);
         };
 
-	$scope.startPrivateGame = function() {
-	};
+        $scope.startPrivateGame = function() {
+        };
+
+        Socket.on('already in game redirect', function() {
+            $scope.error.already_waiting = 'Your already waiting to join a game';
+            console.log("already wating");
+        });
+
 
     }
 ]);
