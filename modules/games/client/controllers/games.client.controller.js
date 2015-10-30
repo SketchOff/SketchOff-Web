@@ -25,7 +25,10 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
             });
         };
 
-        var getUserName = functon() {
+        $scope.getUserID = function() {
+            // console.log($scope.authentication.user);
+            // console.log();
+            // console.log($scope.authentication.user._id);
             return $scope.authentication.user._id;
         };
 
@@ -109,7 +112,13 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         $scope.broadcastCanvasData = function(data) {
             console.log('canvas data broadcasted');
             console.log('canvas type =' + data.sType);
-            Socket.emit('CLIENT_PLAYER_'+data.sType, data.data);
+            // TODO: b64 encode&decode
+            Socket.emit('CLIENT_P2S_'+data.sType, data.data);
+            console.log("socket emitted: " + 'CLIENT_P2S_'+data.sType); 
+        };
+
+        $scope.amJudge = function() {
+            return isJudge;
         };
     }
 

@@ -69,11 +69,16 @@ export default function(io, socket) {
         }
     });
 
-    socket.on('CLIENT_PLAYER_pSync', function() {
+    socket.on('CLIENT_P2S_pSync', function(data) {
         console.log('Client Player sync state message received');
+        //console.log(data);
     });
 
-    socket.on('CLIENT_PLAYER_pDiff', function() {
+    socket.on('CLIENT_P2S_pDiff', function(data) {
         console.log('Client Player image diff received');
+        //console.log(data);
+
+        var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
+        GameRoom.emitToEveryone('CLIENT_S2P_pDiff', data);
     });
 }

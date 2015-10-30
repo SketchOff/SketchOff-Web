@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('games')
-  	.directive('drawingPlayer', function () {
+  	.directive('drawingPlayer', ['Socket', function (Socket) {
   	return{
   		restrict: "A",
     	link: function(scope, element){
@@ -10,13 +10,13 @@ angular.module('games')
 
       // var ctx2 = element[1].getContext('2d');
 
-      // variable that indicates if in a gamestate where drawing s allowed
-      var canDraw = true;
+      // variable that indicates if in a gamestate where drawing is allowed
+      var canDraw = false;
       
       // variable that decides if something should be drawn on mousemove
       var drawing = false;
-      
-      var cID = scope.getUserName();
+
+      var cID = scope.getUserID();
 
       // the last coordinates before the current move
       var lastX;
@@ -44,6 +44,8 @@ angular.module('games')
 
       // On mousedown, gather all information that would be relevant for any kind of tool used.
       element.bind('mousedown', function(event){
+      	canDraw = !scope.amJudge();
+
       	anchorX = event.offsetX;
       	anchorY = event.offsetY;
 
@@ -173,6 +175,18 @@ angular.module('games')
       	// send data
       	socketSendMessage();
       }
+
+        Socket.on('CLIENT_S2P_pDiff', function(data) {
+            console.log('client_s2p_pdiff received');
+
+            // TODO: implement
+        });
+
+        Socket.on('CLIENT_S2P_pSync', function(data) {
+            console.log('client_s2p_psync received');
+
+            // TODO: implement
+        });
         
      	////////////////////////
     	// START DOWN TOOLS   //
@@ -224,4 +238,4 @@ angular.module('games')
     	}
     }
   };
- });
+ }]);

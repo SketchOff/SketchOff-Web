@@ -25,6 +25,38 @@ export default class GameRoom {
         this.finished_drawing_players = [];
         this.ready_for_new_game_players = [];
         this.winner = null;
+
+        // console.log(this.players);
+
+        // console.log(this.players[0].request.user);
+    }
+
+    // Emits _data_ to everyone
+    emitToEveryone(type, data) {
+        console.log('emitting data to everyone');
+        this.players.forEach(function (player) {
+            player.emit(type, data);
+        });
+    }
+
+    // Emits _data_ to player_id (Authentication.user._uid)
+    emitToPlayer(type, player_id, data) {
+        console.log('emitting data to specific player ' + player_id);
+        this.players.forEach(function (player) {
+            if(player.request.user._uid === player_id) {
+                player.emit(type, data);
+            }
+        });
+    }
+
+    // Emits _data_ to everyone except player_id (Authentication.user._uid)
+    emitToEveryoneExcept(type, player_id, data) {
+        console.log('emitting data to everyone except ' + player_id);
+        this.players.forEach(function (player) {
+            if(player.request.user._uid !== player_id) {
+                player.emit(type, data);
+            }
+        });
     }
 
     setState(State) {
