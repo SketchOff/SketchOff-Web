@@ -23,7 +23,8 @@ class Queue {
     }
 
     addPlayer(player) {
-        this.state.addPlayer(player);
+        this.players.push(player);
+        this.state.addPlayer();
     }
 
     numPlayers() {
