@@ -22,7 +22,10 @@ class Queue {
     }
 
     addPlayer(player) {
-        if(this.players.some(function(p) { return p.request.user.username === player.request.user.username; })) {
+        console.log(GameRoomManager.getGameRoomMap().values());
+        if(this.players.some(function(p) {
+            return p.request.user.username === player.request.user.username;
+        }) || isInAGame(player, GameRoomManager)) {
             console.log('player already waiting');
             player.emit('already waiting redirect');
 
@@ -107,6 +110,17 @@ class Queue {
         }
     }
 
+}
+
+
+function isInAGame(player, manager) {
+    var it = manager.getGameRoomMap().values();
+    var result = false;
+    for(var g of it) {
+        if (g.getPlayerUserNames().some(n => player.request.user.username === n))
+            result = true;
+    }
+    return result;
 }
 
 export var q = new Queue();
