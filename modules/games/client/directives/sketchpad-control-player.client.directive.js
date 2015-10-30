@@ -176,10 +176,13 @@ angular.module('games')
       	socketSendMessage();
       }
 
+      	// On recieved S2P_pDiff, if you are the judge, display the canvas wrt to id
         Socket.on('CLIENT_S2P_pDiff', function(data) {
             console.log('client_s2p_pdiff received');
 
-            // TODO: implement
+            if(!canDraw) {
+            	judgepDiff(data);
+            }
         });
 
         Socket.on('CLIENT_S2P_pSync', function(data) {
@@ -187,6 +190,58 @@ angular.module('games')
 
             // TODO: implement
         });
+
+        function judgepDiff(data) {
+        	// TODO: Find canvas with correct cID
+
+        	switch(data.diffTool) {
+        		case 0:
+        			judgeDiffToolDot(data.toolData);
+        			break;
+        		case 1: 
+        			// TODO:
+        			break;
+        		default:
+        			console.log('ERROR UNKNOWN TOOL ' + data.diffTool);
+        			break;
+        	}
+        }
+
+        function judgeDiffToolDot(toolData) {
+        	var cx, cy, lx, ly, color, thick;
+        	var temp = toolData.pop();
+        	cx = temp[0];
+        	cy = temp[1];
+        	color = temp[2];
+        	thick = temp[3];
+
+        	ctx.fillStyle = color;
+        	ctx.beginPath();
+        	ctx.arc(cx, cy, thick, 0, 2*Math.PI, true);
+        	ctx.fill();
+
+        	while(toolData.length > 0) {
+        		lx = cx;
+        		ly = cy;
+        		temp = toolData.pop();
+        		cx = temp[0];
+        		cy = temp[1];
+        		color = temp[2];
+        		thick = temp[3];
+
+        		ctx.beginPath();
+    			ctx.arc(cx, cy, thick, 0, 2*Math.PI, true);
+    			ctx.fill();
+
+        		ctx.beginPath();
+	    		ctx.moveTo(lx, ly);
+	    		ctx.lineTo(cx, cy);
+
+	    		ctx.strokeColor = color;
+	    		ctx.lineWidth = 2*thick;
+	    		ctx.stroke();
+        	}
+        }
         
      	////////////////////////
     	// START DOWN TOOLS   //
