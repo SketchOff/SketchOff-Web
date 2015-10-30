@@ -131,6 +131,13 @@ export default class GameRoom {
         return this.available;
     }
 
+    removePlayer(player) {
+        console.log(player.request.user.username, 'is requesting to leave game', this._id);
+        console.log(player.request.user);
+        delete player.game_room_id;
+        player.leave(GameRoom._id);
+    }
+
     // TODO: Add a cleanup function that unregisters all callbacks (methods of the Game object) that were registered on socket events.
 }
 

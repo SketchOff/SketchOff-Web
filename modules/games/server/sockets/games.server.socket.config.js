@@ -44,5 +44,9 @@ export default function(io, socket) {
         GameRoom.setState('Ending');
     });
 
+    socket.on('leave room', function() {
+        var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
+        GameRoom.removePlayer(socket);
+    });
     
 }

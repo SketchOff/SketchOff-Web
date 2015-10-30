@@ -1,8 +1,8 @@
 'use strict';
 
 // Games controller
-angular.module('games').controller('GamesController', ['$scope', 'Authentication', 'Socket', '$interval',
-    function($scope, Authentication, Socket, $interval) {
+angular.module('games').controller('GamesController', ['$scope', 'Authentication', 'Socket', '$state',
+    function($scope, Authentication, Socket, $state) {
         $scope.authentication = Authentication;
         $scope.GameRoom = {};
 
@@ -79,6 +79,11 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         $scope.setWinner = function(winner) {
             set_winner = true;
             Socket.emit('set winner', winner);
+        };
+
+        $scope.leaveGameRoom = function() {
+            Socket.emit('leave room');
+            $state.go('home');
         };
     }
 
