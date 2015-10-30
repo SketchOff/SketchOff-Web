@@ -33,9 +33,11 @@ class Queue {
     setState(state) {
         switch (state) {
             case 'NOT_ENOUGH':
+                console.log('q changed states to NOT_ENOUGH');
                 this.state = new QueueStates.NotEnough(this);
                 break;
             case 'AVAILABLE_GAMES':
+                console.log('q changed states to AVAILABLE_GAMES');
                 this.state = new QueueStates.AvailableGames(this);
                 break;
         }
@@ -61,7 +63,7 @@ class Queue {
     addAvailableGame(game_id) {
         console.log(game_id, 'added to available games');
         this.available_games.push(game_id);
-        this.setState('AVAILABLE_GAMES');
+        if(this.getStateName() !== 'AVAILABLE_GAMES') this.setState('AVAILABLE_GAMES');
     }
 
     removeAvailableGame(game_id) {

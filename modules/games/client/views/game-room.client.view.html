@@ -3,6 +3,7 @@
     <h3 style="color: red">Game Room Info
     <h4>ID: <i>{{GameRoom._id}}</i></h4>
     <h4>Players: <i>{{GameRoom.players.join(', ')}}</i></h4>
+    <h4 ng-if="GameRoom.players_waiting">Players Waiting: <i>{{GameRoom.players_waiting}}</i></h4>
     <h4>Judge: <i>{{GameRoom.judge}}</i></h4>
     <h4>State: <i>{{GameRoom.state}}</i></h4>
     <h4 ng-if="GameRoom.phrase">Phrase: <i>{{GameRoom.phrase}}</i></h4>

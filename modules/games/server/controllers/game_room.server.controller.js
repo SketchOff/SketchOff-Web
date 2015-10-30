@@ -2,6 +2,7 @@
 
 import * as PublicGameStates from './states/public_game.states.server.controller';
 import * as PrivateGameStates from './states/private_game.states.server.controller';
+import {getIO, q} from './queue.server.controller';
 
 // Set min and max players
 export var min_players = 2;
@@ -20,6 +21,7 @@ export default class GameRoom {
         // Set to true if judge leaves
         this.first_game = true;
         this.available = true;
+        this.waiting_players = [];
         this.State = new this.RoomStates.Establishing(this);
         this.judge = this.players[0];
         this.finished_drawing_players = [];
@@ -36,7 +38,8 @@ export default class GameRoom {
     }
 
     isFull() {
-        return this.players.length === max_players;
+        var num = this.players.length + this.waiting_players.length;
+        return num === max_players;
     }
 
     // When a player presses leave game
@@ -60,6 +63,12 @@ export default class GameRoom {
     addPlayer(player) {
         var index = getRandomIntInclusive(0, this.players.length - 1);
         this.players.splice(index, 0, player);
+    }
+
+    addWaitingPlayer(player) {
+        player.join(this._id);
+        this.waiting_players.push(player.request.user.username);
+        getIO().to(this._id).emit('player joined', this.waiting_players);
     }
 
     getPlayerUserNames() {

@@ -11,8 +11,8 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         var drawing_time = 5;
         var selecting_winner_time = 5;
         var new_game_time = 5;
-        var isJudge = false;
-        var setWinner = false;
+        var is_judge = false;
+        var set_winner = false;
 
         var startDrawingCountDown = function() {
             $scope.Drawing.countdown = drawing_time;
@@ -21,7 +21,7 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
                 $scope.Drawing.countdown--;
             }, 1000, drawing_time).then(function() {
                 console.log('Drawing Time Finished.');
-                if (!isJudge) Socket.emit('drawing times up');
+                if (!is_judge) Socket.emit('drawing times up');
             });
         };
 
@@ -31,10 +31,10 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
             $interval(function() {
                 $scope.SelectingWinner.countdown--;
             }, 1000, selecting_winner_time).then(function() {
-                if (isJudge && !setWinner) {
+                if (is_judge && !set_winner) {
                     console.log('Selecting Winner Time Finished.');
                     Socket.emit('selecting winner times up');
-                } else setWinner = false;
+                } else set_winner = false;
             });
         };
 
@@ -59,7 +59,7 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
             for (var key in msg) {
                 $scope.GameRoom[key] = msg[key];
             }
-            if ($scope.GameRoom.judge === $scope.authentication.user.username) isJudge = true;
+            if ($scope.GameRoom.judge === $scope.authentication.user.username) is_judge = true;
         });
 
         Socket.on('set phrases', function(msg) {
@@ -93,12 +93,16 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
             startNewGameCountDown();
         });
 
+        Socket.on('player joined', function(msg) {
+            alert(msg);
+        });
+
         $scope.setPhrase = function(phrase) {
             Socket.emit('set phrase', phrase);
         };
 
         $scope.setWinner = function(winner) {
-            setWinner = true;
+            set_winner = true;
             Socket.emit('set winner', winner);
         };
     }
