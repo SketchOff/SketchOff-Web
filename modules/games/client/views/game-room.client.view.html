@@ -10,7 +10,7 @@
     <h4 ng-if="GameRoom.winner">Winner: <i>{{GameRoom.winner}}</i></h4>
 
     <div id="choose-phrase" ng-if="authentication.user.username === GameRoom.judge && GameRoom.state === 'ESTABLISHING'">
-    	<h3 style="color:blue">Ur da judge. Choose a phrase.</h3>
+        <h3 style="color:blue">Ur da judge. Choose a phrase.</h3>
     <button class="btn btn-info" ng-repeat="phrase in GameRoom.phrases" style="margin-right: 8px" ng-click=setPhrase(phrase)>{{phrase}}</button>
     </div>
     <div class="countdown" ng-switch on="GameRoom.state">

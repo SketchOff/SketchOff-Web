@@ -9,7 +9,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         var modalInstance;
 
         // Make sure the Socket is connected
-        if (!Socket.socket) {
+        if (!Socket.socket && Authentication.user) {
             Socket.connect();
         }
 
@@ -20,9 +20,6 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
                 templateUrl: 'modules/core/client/views/waiting-for-game.client.modal.view.html',
                 controller: 'WaitingForGameCtrl'
             });
-            // $timeout(function() {
-            //     modalInstance.close();
-            // }, 3000);
         };
 
         $scope.startPrivateGame = function() {

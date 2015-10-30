@@ -40,6 +40,7 @@ export class AvailableGames {
     constructor(queue) {
         this.name = 'AVAILABLE_GAMES';
         this.queue = queue;
+        console.log(this.queue.players.length);
         if (this.queue.numPlayers()) {
             for (var player of this.queue.players) {
                 if (!this.queue.numPlayers()) break;

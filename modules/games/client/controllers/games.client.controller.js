@@ -56,6 +56,10 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
             $scope.GameRoom.winner = msg;
         });
 
+        Socket.on('TERMINATING', function() {
+            $state.go('games.terminated');
+        });
+
         Socket.on('player joined', function(msg) {
             $scope.GameRoom.waiting_players = msg;
         });
@@ -70,6 +74,16 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
 
         Socket.on('new game countdown', function(msg) {
             $scope.GameRoom.new_game_countdown = msg;
+        });
+
+        Socket.on('player left', function(msg) {
+            $scope.GameRoom.players = msg.players;
+            $scope.GameRoom.waiting_players = msg.waiting_players;
+        });
+
+        Socket.on('judge left', function(msg) {
+            $scope.GameRoom.players = msg.players;
+            $scope.GameRoom.waiting_players = msg.waiting_players;
         });
 
         $scope.setPhrase = function(phrase) {

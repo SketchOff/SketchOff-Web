@@ -105,9 +105,12 @@ export class Ending {
 
 export class Terminating {
     constructor(GameRoom) {
+        this.GameRoom = GameRoom;
         console.log('TERMINATING');
+        console.log(this.GameRoom.getPlayerUserNames());
         this.name = 'TERMINATING';
-        GameRoomManager.removeGameRoom(GameRoom._id);
+        getIO().to(this.GameRoom._id).emit('TERMINATING');
+        GameRoomManager.removeGameRoom(this.GameRoom._id);
     }
 
     getName() {

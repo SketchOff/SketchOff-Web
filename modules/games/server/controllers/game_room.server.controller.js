@@ -119,6 +119,10 @@ export default class GameRoom {
         return this.players.length;
     }
 
+    getNumAllPlayers() {
+        return this.players.length + this.waiting_players;
+    }
+
     noWinner() {
         this.winner = null;
     }
@@ -133,9 +137,39 @@ export default class GameRoom {
 
     removePlayer(player) {
         console.log(player.request.user.username, 'is requesting to leave game', this._id);
-        console.log(player.request.user);
+        if (this.players.indexOf(player) > -1) {
+            this.players.splice(this.players.indexOf(player), 1);
+        } else {
+            this.waiting_players.splice(this.waiting_players.indexOf(player), 1);
+        }
+
+        player.leave(this._id);
         delete player.game_room_id;
-        player.leave(GameRoom._id);
+        if (this.getNumAllPlayers() < min_players) {
+            this.setState('Terminating');
+        } else if (this.getNumPlayers() < min_players) {
+            if (this.getNumAllPlayers() >= min_players) {
+                // TODO: Let players know the game is being restarted 
+                // because not enough players to continue ---> restart state?
+                this.setState('Establishing');
+            } else {
+                this.setState('Terminating');
+            }
+        } else {
+            // emit message to update player info
+            if (player.rquest.user.username === this.judge.request.username) {
+                console.log('judge left');
+                getIO().to(this._id).emit('player left', {
+                    players: this.getPlayerUserNames(),
+                    waiting_players: this.getWaitingPlayerUserNames()
+                });
+            } else {
+                getIO().to(this._id).emit('judge left', {
+                    players: this.getPlayerUserNames(),
+                    waiting_players: this.getWaitingPlayerUserNames()
+                });
+            }
+        }
     }
 
     // TODO: Add a cleanup function that unregisters all callbacks (methods of the Game object) that were registered on socket events.
