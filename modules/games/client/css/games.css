@@ -1,0 +1,26 @@
+.sketchpad{
+	border-bottom: 1px solid rgba(0,0,0,0.3); 
+	background-color: #FFFFFF;
+	box-shadow: 0 9px 20px -5px rgba(0,0,0,0.8);
+	position: absolute;
+	z-index: 0;
+	padding-left: 0;
+	padding-right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+	width: 640px;
+	height: 480px;
+}
+
+.tempOverlay{
+	position: absolute;
+	z-index: 1;
+	padding-left: 0;
+	padding-right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+	width: 640px;
+	height: 480px;
+}
