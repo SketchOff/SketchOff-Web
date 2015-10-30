@@ -1,73 +1,104 @@
 'use strict';
 
 import * as GameRoomManager from '../game_room_manager.server.controller';
-
-var io = require('socket.io');
+import {
+    min_players, max_players
+}
+from '../game_room.server.controller';
+import {
+    getIO, q
+}
+from '../queue.server.controller';
 
 export class Establishing {
-	constructor(GameRoom) {
-		this.GameRoom = GameRoom;
-		console.log('ESTABLISHING', GameRoom._id);
-		this.state_name = 'ESTABLISHING';
-		GameRoom.players = shuffle(GameRoom.players);
-		GameRoom.judge = GameRoom.players[0];
-		this.connectPlayers();
-		// TODO: show phrases to judge
-		// changes to drawing state when judge selects a phrase <--- handled by GameSocketManager
-	}
+    constructor(GameRoom) {
+        this.GameRoom = GameRoom;
+        console.log('ESTABLISHING', GameRoom._id);
+        this.name = 'ESTABLISHING';
+        this.GameRoom.players = shuffle(GameRoom.players);
+        this.GameRoom.judge = GameRoom.players[0];
+        if (this.GameRoom.first_game) {
+            this.connectPlayers();
+            console.log('connecting players');
+            getIO().to(this.GameRoom._id).emit('ESTABLISHED');
+        } else {
+            console.log('emmitted establishing');
+            getIO().to(this.GameRoom._id).emit('ESTABLISHING');
+            q.removeAvailableGame(this.GameRoom._id);
+        }
+    }
 
-	connectPlayers() {
-		var player_names = [];
-		this.GameRoom.players.forEach(function(player) {
-			player_names.push(player.request.user.username);
-		});
-		console.log('players', player_names);
-		this.GameRoom.players.forEach(function(player) {
-			player.join(this.GameRoom._id);
-			// player.broadcast.to(this.GameRoom._id).emit('update game', 'SERVER', player + ' has connected to this room');
-		}, this);
-	}
+    getName() {
+        return this.name;
+    }
+
+    connectPlayers() {
+
+        this.GameRoom.players.forEach(function(player) {
+            player.join(this.GameRoom._id);
+            player.game_room_id = this.GameRoom._id;
+        }, this);
+    }
+
 }
 
 export class Drawing {
-	constructor(GameRoom) {
-		console.log('DRAWING');
-		this.state_name = 'DRAWING';
-		this.GameRoom = GameRoom;
-	}
+    constructor(GameRoom) {
+        console.log('DRAWING');
+        this.name = 'DRAWING';
+        this.GameRoom = GameRoom;
+        getIO().to(this.GameRoom._id).emit('DRAWING', this.GameRoom.getPhrase());
+    }
+
+    getName() {
+        return this.name;
+    }
 }
 
 export class SelectingWinner {
-	constructor(GameRoom) {
-		console.log('SELECTING_WINNER');
-		this.state_name = 'SELECTING_WINNER';
+    constructor(GameRoom) {
+        console.log('SELECTING_WINNER');
+        this.name = 'SELECTING_WINNER';
+        this.GameRoom = GameRoom;
+        getIO().to(this.GameRoom._id).emit('SELECTING_WINNER');
+        if(!this.GameRoom.isFull()) q.addAvailableGame(this.GameRoom._id);
+    }
 
-		// Prompt judge to select winner
-
-		if (GameRoom.players.length < GameRoom.max_players) {
-			// Add game room id to Queue's available games array
-		}
-		// After winner selected, go to ending <== Handled by game socket manager
-	}
+    getName() {
+        return this.name;
+    }
 }
 
 export class Ending {
-	constructor(GameRoom) {
-		console.log('ENDING');
-		this.state_name = 'ENDING';
+    constructor(GameRoom) {
+        console.log('ENDING');
+        this.name = 'ENDING';
+        this.GameRoom = GameRoom;
+        this.GameRoom.first_game = false;
+        this.GameRoom.finished_drawing_players = [];
+        this.GameRoom.ready_for_new_game_players = [];
+        getIO().to(this.GameRoom._id).emit('ENDING', this.GameRoom.winner);
 
-		// display results
-		// save game info to game history schema
-		// go to establishing after 15s
-	}
+        // display results
+        // save game info to game history schema
+        // go to establishing after 15s
+    }
+
+    getName() {
+        return this.name;
+    }
 }
 
 export class Terminating {
-	constructor(GameRoom) {
-		console.log('TERMINATING');
-		this.state_name = 'TERMINATING';
-		GameRoomManager.removeGameRoom(GameRoom._id);
-	}
+    constructor(GameRoom) {
+        console.log('TERMINATING');
+        this.name = 'TERMINATING';
+        GameRoomManager.removeGameRoom(GameRoom._id);
+    }
+
+    getName() {
+        return this.name;
+    }
 }
 
 /**
