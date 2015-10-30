@@ -151,6 +151,23 @@ angular.module('games')
       	// TODO: Implement
       	flushSocketQueueData();
       }
+
+      // Sends sync image
+      function socketSendSync() {
+      	socketQueue = {
+      		sType:'sState',
+      		data:{
+      			clientID: 1, //TODO:
+      			imageData: ''
+      		}
+      	};
+      	// convert b64 image
+      	var dt = element[0].toDataURL('image/png');
+      	socketQueue.data.imageData = dt;
+
+      	// send data
+      	socketSendMessage();
+      }
         
      	////////////////////////
     	// START DOWN TOOLS   //
