@@ -6,7 +6,7 @@ angular.module('games')
   		restrict: "A",
     	link: function(scope, element){
     		console.log(element);
-      var ctx = element[0].getContext('2d');
+      	var ctx = element[0].getContext('2d');
 
       // var ctx2 = element[1].getContext('2d');
 
@@ -16,6 +16,8 @@ angular.module('games')
       // variable that decides if something should be drawn on mousemove
       var drawing = false;
       
+      var cID = 1;
+
       // the last coordinates before the current move
       var lastX;
       var lastY;
@@ -134,7 +136,7 @@ angular.module('games')
       	socketQueue = {
       		sType:'pDiff',
       		data: {
-      			clientID:0,
+      			clientID: cID,
       			diffTool:tool, 
       			toolData:[tdata]
       		}
@@ -148,6 +150,9 @@ angular.module('games')
 
       // Sends socket message
       function socketSendMessage() {
+      	console.log('Attempting to send socketQueue ' + JSON.stringify(socketQueue));
+
+      	scope.broadcastCanvasData(socketQueue);
       	// TODO: Implement
       	flushSocketQueueData();
       }
@@ -155,9 +160,9 @@ angular.module('games')
       // Sends sync image
       function socketSendSync() {
       	socketQueue = {
-      		sType:'sState',
+      		sType:'pSync',
       		data:{
-      			clientID: 1, //TODO:
+      			clientID: cID, //TODO:
       			imageData: ''
       		}
       	};
@@ -174,7 +179,7 @@ angular.module('games')
     	////////////////////////
     	    
     	function drawDownDot(downX, downY, color, thick) {
-    		console.log('mousedown at ' + downX + ',' + downY);
+    		// console.log('mousedown at ' + downX + ',' + downY);
 
     		ctx.fillStyle = color;
     		ctx.beginPath();

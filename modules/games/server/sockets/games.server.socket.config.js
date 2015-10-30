@@ -68,4 +68,12 @@ export default function(io, socket) {
             GameRoom.setState('Establishing');
         }
     });
+
+    socket.on('CLIENT_PLAYER_pSync', function() {
+        console.log('Client Player sync state message received');
+    });
+
+    socket.on('CLIENT_PLAYER_pDiff', function() {
+        console.log('Client Player image diff received');
+    });
 }

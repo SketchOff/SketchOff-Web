@@ -101,6 +101,12 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
             setWinner = true;
             Socket.emit('set winner', winner);
         };
+
+        $scope.broadcastCanvasData = function(data) {
+            console.log('canvas data broadcasted');
+            console.log('canvas type =' + data.sType);
+            Socket.emit('CLIENT_PLAYER_'+data.sType, data.data);
+        };
     }
 
 ]);
