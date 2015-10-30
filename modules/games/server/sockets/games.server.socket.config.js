@@ -27,23 +27,18 @@ export default function(io, socket) {
             players_waiting: GameRoom.getWaitingPlayerUserNames(),
             state: GameRoom.getStateName(),
             judge: GameRoom.getJudgeUserName(),
-            phrases: GameRoom.getPhrases()
+            phrases: GameRoom.getPhrases(), 
+            choose_phrase_time: GameRoom.choose_phrase_time,
+            drawing_time: GameRoom.drawing_time,
+            winner_selection_time: GameRoom.winner_selection_time,
+            new_game_time: GameRoom.new_game_time
         });
     });
 
     socket.on('set phrase', function(msg) {
         var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
-        console.log('dis nigga chose the following phrase', msg);
+        console.log('dis judge chose the following phrase', msg);
         GameRoom.setPhrase(msg);
-    });
-
-    socket.on('drawing times up', function() {
-        var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
-        GameRoom.finished_drawing_players.push(socket.request.user.username);
-        if (GameRoom.allPlayersFinishedDrawing()) {
-            console.log('ALL PLAYERS TIME ENDED... SWITCH STATE');
-            GameRoom.setState('SelectingWinner');
-        }
     });
 
     socket.on('set winner', function(msg) {
@@ -53,19 +48,5 @@ export default function(io, socket) {
         GameRoom.setState('Ending');
     });
 
-    socket.on('selecting winner times up', function() {
-        console.log('selecting winner times up');
-        var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
-        GameRoom.noWinner();
-        GameRoom.setState('Ending');
-    });
-
-    socket.on('start new game', function() {
-        var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
-        GameRoom.ready_for_new_game_players.push(socket.request.user.username);
-        if (GameRoom.everyoneIsReadyForNewGame()) {
-            console.log('ALL PLAYERS READY FOR NEW GAME... RESTARTING');
-            GameRoom.setState('Establishing');
-        }
-    });
+    
 }

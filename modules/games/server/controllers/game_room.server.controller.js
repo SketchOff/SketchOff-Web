@@ -25,11 +25,12 @@ export default class GameRoom {
         this.first_game = true;
         this.available = true;
         this.waiting_players = [];
-        this.State = new this.RoomStates.Establishing(this);
-        this.judge = this.players[0];
-        this.finished_drawing_players = [];
-        this.ready_for_new_game_players = [];
+        this.choose_phrase_time = 5;
+        this.drawing_time = 5;
+        this.winner_selection_time = 5;
+        this.new_game_time = 5;
         this.winner = null;
+        this.State = new this.RoomStates.Establishing(this);
     }
 
     setState(State) {
@@ -116,14 +117,6 @@ export default class GameRoom {
 
     setWinner(winner) {
         this.winner = winner;
-    }
-
-    allPlayersFinishedDrawing() {
-        return (this.finished_drawing_players.length === this.getNumPlayers() - 1);
-    }
-
-    everyoneIsReadyForNewGame() {
-        return (this.ready_for_new_game_players.length === this.getNumPlayers());
     }
 
     isAvailable() {

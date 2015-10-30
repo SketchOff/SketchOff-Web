@@ -9,6 +9,7 @@ import {
     getIO, q
 }
 from '../queue.server.controller';
+import * as Timers from '../timers.server.controller';
 
 export class Establishing {
     constructor(GameRoom) {
@@ -17,6 +18,7 @@ export class Establishing {
         this.name = 'ESTABLISHING';
         this.GameRoom.players = shuffle(this.GameRoom.players);
         this.GameRoom.judge = this.GameRoom.players[0];
+        this.GameRoom.winner = null;
         if (this.GameRoom.first_game) {
             this.connectPlayers();
             console.log('connecting players');
@@ -51,6 +53,7 @@ export class Drawing {
         this.name = 'DRAWING';
         this.GameRoom = GameRoom;
         getIO().to(this.GameRoom._id).emit('DRAWING', this.GameRoom.getPhrase());
+        Timers.countdownFactory(this.GameRoom, 'drawing_time', 'SelectingWinner', 'drawing countdown');
     }
 
     getName() {
@@ -65,6 +68,7 @@ export class SelectingWinner {
         this.GameRoom = GameRoom;
         getIO().to(this.GameRoom._id).emit('SELECTING_WINNER');
         if (!this.GameRoom.isFull()) q.addAvailableGame(this.GameRoom._id);
+        Timers.countdownFactory(this.GameRoom, 'winner_selection_time', 'Ending', 'selecting winner countdown');
     }
 
     getName() {
@@ -78,8 +82,6 @@ export class Ending {
         this.name = 'ENDING';
         this.GameRoom = GameRoom;
         this.GameRoom.first_game = false;
-        this.GameRoom.finished_drawing_players = [];
-        this.GameRoom.ready_for_new_game_players = [];
         getIO().to(this.GameRoom._id).emit('ENDING', this.GameRoom.winner);
 
         // display results
