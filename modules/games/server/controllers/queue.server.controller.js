@@ -22,13 +22,9 @@ class Queue {
     }
 
     addPlayer(player) {
-
-        // check if already in
-        // if in. emit to socket
         if(this.players.some(function(p) { return p.request.user.username === player.request.user.username; })) {
-            console.log('player already in game');
-            console.log(this.players);
-            player.emit('already in game redirect');
+            console.log('player already waiting');
+            player.emit('already waiting redirect');
 
         } else {
             console.log(this.players.map(p => p.request.user.username));
@@ -85,6 +81,32 @@ class Queue {
         if (available_game_index > -1) this.available_games.splice(available_game_index, 1);
         if (this.available_games < 1) this.setState('NOT_ENOUGH');
     }
+
+    removePlayer(player) {
+        var index = -1;
+        for(var i = 0; i < this.players.length; i++) {
+            if(this.players[i].request.user.username === player.request.user.username) {
+                index = i;
+            }
+        }
+        if(index > -1){
+            this.players = this.players.splice(i,1);
+        }
+    }
+
+    removePlayerBySocket(player) {
+        var index = -1;
+        for(var i = 0; i < this.players.length; i++) {
+            if(this.players[i] === player) {
+                index = i;
+            }
+
+        }
+        if(index > -1){
+            this.players = this.players.splice(i,1);
+        }
+    }
+
 }
 
 export var q = new Queue();

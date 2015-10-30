@@ -44,5 +44,8 @@ export default function(io, socket) {
         GameRoom.setState('Ending');
     });
 
-    
+    socket.on('leaving waiting modal', function() {
+        q.removePlayerBySocket(socket);
+        console.log("removing player from queue");
+    });
 }

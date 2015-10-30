@@ -28,7 +28,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         $scope.startPrivateGame = function() {
         };
 
-        Socket.on('already in game redirect', function() {
+        Socket.on('already waiting redirect', function() {
             $scope.error.already_waiting = 'Your already waiting to join a game';
             console.log("already wating");
         });

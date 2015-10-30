@@ -4,12 +4,13 @@ angular.module('core').controller('WaitingForGameCtrl', ['$scope', 'Authenticati
     function($scope, Authentication, $modalInstance, Socket, $state) {
         // This provides Authentication context.
         $scope.authentication = Authentication;
-        
+
         // Send a request to server
         Socket.emit('join public game');
 
 
         $scope.cancel = function() {
+            Socket.emit('leaving waiting modal');
             $modalInstance.dismiss('cancel');
         };
 
