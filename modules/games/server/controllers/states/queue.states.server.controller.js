@@ -47,12 +47,13 @@ export class AvailableGames {
                 GameRoom.addWaitingPlayer(player);
                 added = true;
                 if (GameRoom.isFull()) this.queue.removeAvailableGame(id);
+                player.emit('ESTABLISHED');
                 break;
             } else {
                 GameRoomManager.removeGameRoom(id);
             }
         }
-        // go through available games list until you find an available game
-        // if you dont find one then change state to not enough and call add player again
+
+        //TODO: If available game rooms is empty change state to not enough and add player again
     }
 }

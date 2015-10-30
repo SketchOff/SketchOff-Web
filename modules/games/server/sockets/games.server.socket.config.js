@@ -24,6 +24,7 @@ export default function(io, socket) {
         socket.emit('game info response', {
             _id: GameRoom._id,
             players: GameRoom.getPlayerUserNames(),
+            players_waiting: GameRoom.getWaitingPlayerUserNames(),
             state: GameRoom.getStateName(),
             judge: GameRoom.getJudgeUserName(),
             phrases: GameRoom.getPhrases()

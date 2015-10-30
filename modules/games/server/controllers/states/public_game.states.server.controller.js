@@ -13,17 +13,20 @@ from '../queue.server.controller';
 export class Establishing {
     constructor(GameRoom) {
         this.GameRoom = GameRoom;
-        console.log('ESTABLISHING', GameRoom._id);
+        console.log('ESTABLISHING', this.GameRoom._id);
         this.name = 'ESTABLISHING';
-        this.GameRoom.players = shuffle(GameRoom.players);
-        this.GameRoom.judge = GameRoom.players[0];
+        this.GameRoom.players = shuffle(this.GameRoom.players);
+        this.GameRoom.judge = this.GameRoom.players[0];
         if (this.GameRoom.first_game) {
             this.connectPlayers();
             console.log('connecting players');
             getIO().to(this.GameRoom._id).emit('ESTABLISHED');
         } else {
+            var x = this.GameRoom.players.shift();
+            this.GameRoom.players.push(x);
+            this.GameRoom.judge = this.GameRoom.players[0];
             console.log('emmitted establishing');
-            getIO().to(this.GameRoom._id).emit('ESTABLISHING');
+            getIO().to(this.GameRoom._id).emit('ESTABLISHING', this.GameRoom.judge.request.user.username);
             q.removeAvailableGame(this.GameRoom._id);
         }
     }
@@ -61,7 +64,7 @@ export class SelectingWinner {
         this.name = 'SELECTING_WINNER';
         this.GameRoom = GameRoom;
         getIO().to(this.GameRoom._id).emit('SELECTING_WINNER');
-        if(!this.GameRoom.isFull()) q.addAvailableGame(this.GameRoom._id);
+        if (!this.GameRoom.isFull()) q.addAvailableGame(this.GameRoom._id);
     }
 
     getName() {

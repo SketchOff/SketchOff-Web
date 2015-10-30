@@ -2,7 +2,10 @@
 
 import * as PublicGameStates from './states/public_game.states.server.controller';
 import * as PrivateGameStates from './states/private_game.states.server.controller';
-import {getIO, q} from './queue.server.controller';
+import {
+    getIO, q
+}
+from './queue.server.controller';
 
 // Set min and max players
 export var min_players = 2;
@@ -67,8 +70,10 @@ export default class GameRoom {
 
     addWaitingPlayer(player) {
         player.join(this._id);
-        this.waiting_players.push(player.request.user.username);
-        getIO().to(this._id).emit('player joined', this.waiting_players);
+        player.game_room_id = this._id;
+        console.log('rooms of player', player.rooms);
+        this.waiting_players.push(player);
+        getIO().to(this._id).emit('player joined', this.getWaitingPlayerUserNames());
     }
 
     getPlayerUserNames() {
@@ -124,6 +129,15 @@ export default class GameRoom {
     isAvailable() {
         return this.available;
     }
+
+    getWaitingPlayerUserNames() {
+        var waiting_player_names = [];
+        this.waiting_players.forEach(function(player) {
+            waiting_player_names.push(player.request.user.username);
+        });
+        return waiting_player_names;
+    }
+
 
     // TODO: Add a cleanup function that unregisters all callbacks (methods of the Game object) that were registered on socket events.
 }

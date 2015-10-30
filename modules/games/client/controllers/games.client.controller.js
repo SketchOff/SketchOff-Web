@@ -67,10 +67,11 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
             $scope.GameRoom.phrases = msg;
         });
 
-        Socket.on('ESTABLISHING', function() {
+        Socket.on('ESTABLISHING', function(msg) {
             $scope.GameRoom.state = 'ESTABLISHING';
             $scope.GameRoom.phrase = undefined;
             $scope.GameRoom.winner = undefined;
+            $scope.GameRoom.judge = msg;
             // TODO: Give judge a countdown to select phrase, otherwise kick judge
         });
 
@@ -94,7 +95,7 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         });
 
         Socket.on('player joined', function(msg) {
-            alert(msg);
+            $scope.GameRoom.players_waiting = msg;
         });
 
         $scope.setPhrase = function(phrase) {
