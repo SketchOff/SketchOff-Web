@@ -8,8 +8,8 @@ angular.module('games.admin.routes').config(['$stateProvider',
                 url: '/queue-info',
                 templateUrl: 'modules/games/client/views/admin/queue-info.client.view.html'
             })
-            .state('admin.game-room-info', {
-                url: '/game-room-info',
-                templateUrl: 'modules/games/client/views/admin/game-room-info.client.view.html'            });
+            .state('admin.game-rooms-info', {
+                url: '/game-rooms-info',
+                templateUrl: 'modules/games/client/views/admin/game-rooms-info.client.view.html'            });
     }
 ]);
