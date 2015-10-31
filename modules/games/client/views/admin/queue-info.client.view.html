@@ -1,3 +1,24 @@
 <section ng-controller="QueueInfoCtrl">
-	<h1>Queue Info</h1>
+    <h1>Queue Info</h1>
+    <br>
+    <h3>Current State: {queue.state}</h3>
+    <hr>
+    <div class="available-rooms" ng-if="Queue.state === AVAILABLE_GAMES">
+        <div class="row">
+            <div class="col-md-4">
+                <h3>Available Rooms</h3>
+            </div>
+            <div class="col-md-4" style="margin-top: 2em">
+                <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="figureOutItemsToDisplay()" />
+            </div>
+        </div>
+        <div class="list-group">
+            <a ng-repeat="room in Queue.available_rooms" ui-sref="admin.game_room({room_id: room._id})" class="list-group-item">
+                <h4 class="list-group-item-heading" ng-bind="room._id"></h4>
+                <p class="list-group-item-text pull-right small" ng-bind="room.state"></p>
+                <p class="list-group-item-text" ng-bind="room.players"></p>
+                <p class="list-group-item-text" ng-bind="room.players_waiting"></p>
+            </a>
+        </div>
+    </div>
 </section>
