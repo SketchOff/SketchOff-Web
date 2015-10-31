@@ -1,7 +1,7 @@
 'use strict';
 
 // Setting up route
-angular.module('games.routes').config(['$stateProvider',
+angular.module('games').config(['$stateProvider',
   function ($stateProvider) {
     // Articles state routing
     $stateProvider
