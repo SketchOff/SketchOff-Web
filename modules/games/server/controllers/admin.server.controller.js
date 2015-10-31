@@ -8,9 +8,9 @@ var path = require('path'),
 
 
 exports.queueInfo = function (req, res) {
-  res.send('this queue is a bitch');
+  res.json({msg: 'this queue is a bitch'});
 };
 
 exports.roomsInfo = function (req, res) {
-  res.send('these rooms cool doe');
+  res.json({msg: 'these rooms cool doe'});
 };

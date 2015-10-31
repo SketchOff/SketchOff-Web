@@ -1,7 +1,8 @@
 <section ng-controller="QueueInfoCtrl">
     <h1>Queue Info</h1>
     <br>
-    <h3>Current State: {queue.state}</h3>
+    <h3>Current State: {{Queue.state}}</h3>
+    <h4>{{Queue}}</h4>
     <hr>
     <div class="available-rooms" ng-if="Queue.state === AVAILABLE_GAMES">
         <div class="row">
