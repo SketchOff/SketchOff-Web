@@ -15,6 +15,8 @@ export function createGameRoom(players, public_game) {
 
 // remove a GameRoom from the GameRooms map
 export function removeGameRoom(game_room_id) {
+    var Room = GameRooms.get(game_room_id);
+    Room.disconnectAllPlayers();
     GameRooms.delete(game_room_id);
 }
 

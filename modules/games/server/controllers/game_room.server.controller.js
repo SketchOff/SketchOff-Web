@@ -39,6 +39,7 @@ export default class GameRoom {
         if (this.is_public) return 'public';
         return 'private';
     }
+
     setState(State) {
         this.State = new this.RoomStates[State](this);
         if (this.hasAdminSubscribers()) {
@@ -209,6 +210,15 @@ export default class GameRoom {
 
     hasAdminSubscribers() {
         return (!!getIO().sockets.adapter.rooms.admin_updates);
+    }
+
+    disconnectAllPlayers() {
+        this.waiting_players.forEach(function(player) {
+            player.leave(this._id);
+        }, this);
+        this.players.forEach(function(player) {
+            player.leave(this._id);
+        }, this);
     }
 
     // TODO: Add a cleanup function that unregisters all callbacks (methods of the Game object) that were registered on socket events.
