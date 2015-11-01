@@ -60,23 +60,6 @@ export default class GameRoom {
         return num === max_players;
     }
 
-    // // When a player presses leave game
-    // playerExits(player) {
-    //     // Delete player from players array
-    //     this.players.splice(this.players.indexOf(player), 1);
-
-    //     // If theres not enough players to continue, terminate game
-    //     if (this.players.length < min_players) {
-    //         this.CurrState = this.is_public_room ? new PublicGameStates.Terminating(this).state_name : new PrivateGameStates.Terminating(this).state_name;
-    //     }
-    //     // Enough players to keep game open
-    //     else {
-    //         // The judge left the game, no winner can be determined
-    //         // TODO: Flag judge for leaving mid-game!
-    //         if (player === this.judge) this.winner = null;
-    //     }
-    // }
-
     // Add a player to the game
     addPlayer(player) {
         var index = getRandomIntInclusive(0, this.players.length - 1);
@@ -160,6 +143,8 @@ export default class GameRoom {
         return this.available;
     }
 
+    // TODO: If the game needs to be re-established, let players know the reason
+    // TODO: Flag player for leaving mid game
     removePlayer(player) {
         console.log(player.request.user.username, 'is requesting to leave game', this._id);
         console.log('judge=', this.judge.request.user.username);
@@ -168,22 +153,20 @@ export default class GameRoom {
         } else {
             this.waiting_players.splice(this.waiting_players.indexOf(player), 1);
         }
-
         player.leave(this._id);
         delete player.game_room_id;
+        
         if (this.getNumAllPlayers() < min_players) {
             console.log('Terminating because not enough total players');
             this.setState('Terminating');
         } else if (this.getNumPlayers() < min_players) {
-            // TODO: Let players know the game is being restarted 
-            // because not enough players to continue ---> restart state?
             console.log('not enough playing player but enough total players');
             this.setState('Establishing');
         } else {
-            // emit message to update player info
             if (player.request.user.username === this.judge.request.username) {
                 console.log('judge left, restablishing game');
-                getIO().to(this._id).emit('judge left');
+                // getIO().to(this._id).emit('judge left');
+                this.setState('Establishing');
             } else {
                 console.log('player left but doesnt effect game play');
                 getIO().to(this._id).emit('player left', {
@@ -221,8 +204,6 @@ export default class GameRoom {
             delete player.game_room_id;
         }, this);
     }
-
-    // TODO: Add a cleanup function that unregisters all callbacks (methods of the Game object) that were registered on socket events.
 }
 
 // Returns a random integer between min (included) and max (included)
