@@ -21,6 +21,7 @@ export class NotEnough {
                 this.queue.createGame();
             }
         }
+        this.queue.updateAdmin();
     }
 }
 
@@ -67,6 +68,7 @@ export class AvailableGames {
         }
 
         if (!added) this.queue.setState('NOT_ENOUGH');
+        this.queue.updateAdmin();
         //TODO: If available game rooms is empty change state to not enough and add player again
     }
 }

@@ -36,9 +36,6 @@ class Queue {
             this.players.push(player);
             this.state.addPlayer();
         }
-
-        if(this.hasAdminSubscribers()) _io.to('admin_updates').emit('queue players update', this.getPlayerUsernames());
-
     }
 
     numPlayers() {
@@ -117,6 +114,10 @@ class Queue {
 
     hasAdminSubscribers() {
         return (!!_io.sockets.adapter.rooms.admin_updates);
+    }
+
+    updateAdmin() {
+        if(this.hasAdminSubscribers()) _io.to('admin_updates').emit('queue players update', this.getPlayerUsernames());
     }
 }
 

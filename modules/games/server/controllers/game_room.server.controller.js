@@ -180,7 +180,7 @@ export default class GameRoom {
             }
         } else {
             // emit message to update player info
-            if (player.rquest.user.username === this.judge.request.username) {
+            if (player.request.user.username === this.judge.request.username) {
                 console.log('judge left');
                 getIO().to(this._id).emit('player left', {
                     players: this.getPlayerUserNames(),
