@@ -34,8 +34,10 @@ class Queue {
             console.log(this.players.map(p => p.request.user.username));
             console.log("adding " + player.request.user.username);
             this.players.push(player);
-            this.state.addPlayer(player);
+            this.state.addPlayer();
         }
+
+        if(this.hasAdminSubscribers()) _io.to('admin_queue_updates').emit('queue players update', this.getPlayerUsernames());
 
     }
 
@@ -54,6 +56,7 @@ class Queue {
                 this.state = new QueueStates.AvailableGames(this);
                 break;
         }
+        if(this.hasAdminSubscribers()) _io.to('admin_queue_updates').emit('queue state update', this.getStateName());
         console.log(this.getStateName());
     }
 
@@ -76,6 +79,7 @@ class Queue {
     addAvailableGame(game_id) {
         console.log(game_id, 'added to available games');
         this.available_games.push(game_id);
+        if(this.hasAdminSubscribers()) _io.to('admin_queue_updates').emit('available games update', this.available_games);
         if(this.getStateName() !== 'AVAILABLE_GAMES') this.setState('AVAILABLE_GAMES');
     }
 
@@ -83,7 +87,36 @@ class Queue {
         console.log(game_id, 'removed from available games');
         var available_game_index = this.available_games.indexOf(game_id);
         if (available_game_index > -1) this.available_games.splice(available_game_index, 1);
+        if(this.hasAdminSubscribers()) _io.to('admin_queue_updates').emit('available games update', this.available_games);
         if (this.available_games < 1) this.setState('NOT_ENOUGH');
+    }
+
+    getPlayerUsernames() {
+        var usernames = [];
+        this.players.forEach(function(player) {
+            usernames.push(player.request.user.username);
+        });
+        return usernames;
+    }
+
+    getNumPlayers() {
+        return this.players.length;
+    }
+
+    getAvailableGameIds() {
+        return this.available_games;
+    }
+
+    getInfo() {
+        var queue_info = {};
+        queue_info.state = this.getStateName();
+        queue_info.players = this.getPlayerUsernames();
+        queue_info.available_games = this.getAvailableGameIds();
+        return queue_info;
+    }
+
+    hasAdminSubscribers() {
+        return (!!_io.sockets.adapter.rooms.admin_queue_updates);
     }
 }
 

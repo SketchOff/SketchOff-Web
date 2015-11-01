@@ -9,6 +9,7 @@ import * as GameRooms from '../controllers/game_room_manager.server.controller';
 var setSocket = false;
 // Create the game socket.io configuration
 export default function(io, socket) {
+
     if (!setSocket) {
         setSocket = true;
         q.setIO(io);
@@ -47,6 +48,11 @@ export default function(io, socket) {
     socket.on('leave room', function() {
         var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
         GameRoom.removePlayer(socket);
+    });
+
+    socket.on('admin queue updates subscribe', function() {
+        socket.join('admin_queue_updates');
+        socket.emit('initial queue info', q.getInfo());
     });
     
 }

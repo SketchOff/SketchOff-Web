@@ -4,7 +4,7 @@
     <h3>Current State: {{Queue.state}}</h3>
     <h4>{{Queue}}</h4>
     <hr>
-    <div class="available-rooms" ng-if="Queue.state === AVAILABLE_GAMES">
+    <div class="available-rooms" ng-if="Queue && Queue.state === AVAILABLE_GAMES">
         <div class="row">
             <div class="col-md-4">
                 <h3>Available Rooms</h3>
