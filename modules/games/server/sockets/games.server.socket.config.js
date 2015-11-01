@@ -34,12 +34,10 @@ export default function(io, socket) {
 
     socket.on('set phrase', function(msg) {
         var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
-        console.log('dis judge chose the following phrase', msg);
         GameRoom.setPhrase(msg);
     });
 
     socket.on('set winner', function(msg) {
-        console.log('winner selected:', msg);
         var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
         GameRoom.setWinner(msg);
         GameRoom.setState('Ending');

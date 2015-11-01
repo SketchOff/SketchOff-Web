@@ -26,13 +26,9 @@ class Queue {
         // check if already in
         // if in. emit to socket
         if(this.players.some(function(p) { return p.request.user.username === player.request.user.username; })) {
-            console.log('player already in game');
-            console.log(this.players);
             player.emit('already in game redirect');
 
         } else {
-            console.log(this.players.map(p => p.request.user.username));
-            console.log("adding " + player.request.user.username);
             this.players.push(player);
             this.state.addPlayer();
         }
@@ -45,16 +41,13 @@ class Queue {
     setState(state) {
         switch (state) {
             case 'NOT_ENOUGH':
-                console.log('q changed states to NOT_ENOUGH');
                 this.state = new QueueStates.NotEnough(this);
                 break;
             case 'AVAILABLE_GAMES':
-                console.log('q changed states to AVAILABLE_GAMES');
                 this.state = new QueueStates.AvailableGames(this);
                 break;
         }
         if(this.hasAdminSubscribers()) _io.to('admin_updates').emit('queue state update', this.getStateName());
-        console.log(this.getStateName());
     }
 
     getStateName() {
@@ -74,14 +67,12 @@ class Queue {
     }
 
     addAvailableGame(game_id) {
-        console.log(game_id, 'added to available games');
         this.available_games.push(game_id);
         if(this.hasAdminSubscribers()) _io.to('admin_updates').emit('available games update', this.available_games);
         if(this.getStateName() !== 'AVAILABLE_GAMES') this.setState('AVAILABLE_GAMES');
     }
 
     removeAvailableGame(game_id) {
-        console.log(game_id, 'removed from available games');
         var available_game_index = this.available_games.indexOf(game_id);
         if (available_game_index > -1) this.available_games.splice(available_game_index, 1);
         if(this.hasAdminSubscribers()) _io.to('admin_updates').emit('available games update', this.available_games);
@@ -122,30 +113,3 @@ class Queue {
 }
 
 export var q = new Queue();
-
-
-// export function addPlayer(player) {
-//     // add player to queue
-//     queue.push(player);
-
-//     // available game rooms, start filling
-//     var count = 0;
-//     while (availableGameRooms.length) {
-//              var CurrRoom = availableGameRooms[count];
-
-//         // remove game room if its not in selecting winner or ending state or is full
-//         if (CurrRoom.getStateName() !== 'SELECTING_WINNER' || CurrRoom.getStateName() !== 'ENDING' || CurrRoom.isFull) {
-//              availableGameRooms.splice(count, 1);
-//         }
-//         // add player to game room
-//         else {
-//             availableGameRooms[count].addPlayer(queue.pop());
-//         }
-//         count++;
-//     }
-
-//     // if queue has enough players,
-//     if (queue.length >= min_players) {
-
-//     }
-// }

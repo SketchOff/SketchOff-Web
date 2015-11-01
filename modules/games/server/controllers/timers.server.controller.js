@@ -5,9 +5,11 @@ import {
 }
 from './queue.server.controller';
 
+var interval;
+
 export var countdownFactory = function(GameRoom, time, NextState, emit_msg) {
 	var time_left = GameRoom[time];
-    var interval = setInterval(function() {
+    interval = setInterval(function() {
     	getIO().to(GameRoom._id).emit(emit_msg, time_left);
     	decrementTime();
         if (time === 'winner_selection_time' && GameRoom.winner !== null) clearInterval(this);
@@ -22,4 +24,6 @@ export var countdownFactory = function(GameRoom, time, NextState, emit_msg) {
     }
 };
 
-
+export var cancelCurrCountdown = function() {
+    clearInterval(interval);
+};

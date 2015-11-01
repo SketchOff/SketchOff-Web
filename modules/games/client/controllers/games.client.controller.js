@@ -11,7 +11,6 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
 
         var getGameInfo = function() {
             Socket.emit('get game info');
-            console.log('game info emitted');
         };
         getGameInfo();
 
@@ -23,7 +22,6 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         });
 
         Socket.on('set phrases', function(msg) {
-            console.log(msg);
             $scope.GameRoom.phrases = msg;
         });
 
@@ -50,7 +48,6 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         });
 
         Socket.on('ENDING', function(msg) {
-            console.log('ending');
             $scope.GameRoom.state = 'ENDING';
             if (msg === null) msg = 'No winner';
             $scope.GameRoom.winner = msg;

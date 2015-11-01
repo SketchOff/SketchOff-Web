@@ -6,6 +6,7 @@ import {
     getIO, q
 }
 from './queue.server.controller';
+import * as Timers from './timers.server.controller';
 
 // Set min and max players
 export var min_players = 2;
@@ -41,6 +42,8 @@ export default class GameRoom {
     }
 
     setState(State) {
+        console.log(this._id, 'is changing states to', State);
+        Timers.cancelCurrCountdown();
         this.State = new this.RoomStates[State](this);
         if (this.hasAdminSubscribers()) {
             if (State === 'Terminating') getIO().to('admin_updates').emit('room termination', this.getRoomId());
@@ -83,7 +86,6 @@ export default class GameRoom {
     addWaitingPlayer(player) {
         player.join(this._id);
         player.game_room_id = this._id;
-        console.log('rooms of player', player.rooms);
         this.waiting_players.push(player);
         getIO().to(this._id).emit('player joined', this.getWaitingPlayerUserNames());
         if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
@@ -160,6 +162,7 @@ export default class GameRoom {
 
     removePlayer(player) {
         console.log(player.request.user.username, 'is requesting to leave game', this._id);
+        console.log('judge=', this.judge.request.user.username);
         if (this.players.indexOf(player) > -1) {
             this.players.splice(this.players.indexOf(player), 1);
         } else {
@@ -169,25 +172,21 @@ export default class GameRoom {
         player.leave(this._id);
         delete player.game_room_id;
         if (this.getNumAllPlayers() < min_players) {
+            console.log('Terminating because not enough total players');
             this.setState('Terminating');
         } else if (this.getNumPlayers() < min_players) {
-            if (this.getNumAllPlayers() >= min_players) {
-                // TODO: Let players know the game is being restarted 
-                // because not enough players to continue ---> restart state?
-                this.setState('Establishing');
-            } else {
-                this.setState('Terminating');
-            }
+            // TODO: Let players know the game is being restarted 
+            // because not enough players to continue ---> restart state?
+            console.log('not enough playing player but enough total players');
+            this.setState('Establishing');
         } else {
             // emit message to update player info
             if (player.request.user.username === this.judge.request.username) {
-                console.log('judge left');
-                getIO().to(this._id).emit('player left', {
-                    players: this.getPlayerUserNames(),
-                    waiting_players: this.getWaitingPlayerUserNames()
-                });
+                console.log('judge left, restablishing game');
+                getIO().to(this._id).emit('judge left');
             } else {
-                getIO().to(this._id).emit('judge left', {
+                console.log('player left but doesnt effect game play');
+                getIO().to(this._id).emit('player left', {
                     players: this.getPlayerUserNames(),
                     waiting_players: this.getWaitingPlayerUserNames()
                 });
@@ -215,9 +214,11 @@ export default class GameRoom {
     disconnectAllPlayers() {
         this.waiting_players.forEach(function(player) {
             player.leave(this._id);
+            delete player.game_room_id;
         }, this);
         this.players.forEach(function(player) {
             player.leave(this._id);
+            delete player.game_room_id;
         }, this);
     }
 
