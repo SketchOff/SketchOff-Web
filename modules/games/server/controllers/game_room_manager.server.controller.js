@@ -23,10 +23,8 @@ export function getGameRoom(game_room_id) {
 }
 
 export function getInfo() {
-    console.log(' get rooms info');
     var RoomsInfo = {};
     GameRooms.forEach(function(GameRoom, id) {
-        console.log(GameRoom.getInfo());
         RoomsInfo[id] = GameRoom.getInfo();
     });
     return RoomsInfo;

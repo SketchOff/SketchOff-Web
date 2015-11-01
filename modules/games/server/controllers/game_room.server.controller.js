@@ -32,6 +32,7 @@ export default class GameRoom {
         this.new_game_time = 5;
         this.winner = null;
         this.State = new this.RoomStates.Establishing(this);
+        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
     }
 
     getRoomType() {
@@ -40,6 +41,10 @@ export default class GameRoom {
     }
     setState(State) {
         this.State = new this.RoomStates[State](this);
+        if (this.hasAdminSubscribers()) {
+            if (State === 'Terminating') getIO().to('admin_updates').emit('room termination', this.getRoomId());
+            else getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
+        }
     }
 
     getStateName() {
@@ -51,22 +56,22 @@ export default class GameRoom {
         return num === max_players;
     }
 
-    // When a player presses leave game
-    playerExits(player) {
-        // Delete player from players array
-        this.players.splice(this.players.indexOf(player), 1);
+    // // When a player presses leave game
+    // playerExits(player) {
+    //     // Delete player from players array
+    //     this.players.splice(this.players.indexOf(player), 1);
 
-        // If theres not enough players to continue, terminate game
-        if (this.players.length < min_players) {
-            this.CurrState = this.is_public_room ? new PublicGameStates.Terminating(this).state_name : new PrivateGameStates.Terminating(this).state_name;
-        }
-        // Enough players to keep game open
-        else {
-            // The judge left the game, no winner can be determined
-            // TODO: Flag judge for leaving mid-game!
-            if (player === this.judge) this.winner = null;
-        }
-    }
+    //     // If theres not enough players to continue, terminate game
+    //     if (this.players.length < min_players) {
+    //         this.CurrState = this.is_public_room ? new PublicGameStates.Terminating(this).state_name : new PrivateGameStates.Terminating(this).state_name;
+    //     }
+    //     // Enough players to keep game open
+    //     else {
+    //         // The judge left the game, no winner can be determined
+    //         // TODO: Flag judge for leaving mid-game!
+    //         if (player === this.judge) this.winner = null;
+    //     }
+    // }
 
     // Add a player to the game
     addPlayer(player) {
@@ -80,6 +85,7 @@ export default class GameRoom {
         console.log('rooms of player', player.rooms);
         this.waiting_players.push(player);
         getIO().to(this._id).emit('player joined', this.getWaitingPlayerUserNames());
+        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
     }
 
     getPlayerUserNames() {
@@ -106,6 +112,10 @@ export default class GameRoom {
         return this.judge;
     }
 
+    getRoomId() {
+        return this._id;
+    }
+
     getPhrases() {
         var phrases = ['pregnant pencils', 'tall people', 'smelly clothes', 'pesty pelicans'];
         return phrases;
@@ -117,7 +127,8 @@ export default class GameRoom {
     }
 
     getPhrase() {
-        return this.phrase;
+        if (this.phrase) return this.phrase;
+        return 'Not chosen yet';
     }
 
     getNumPlayers() {
@@ -138,7 +149,8 @@ export default class GameRoom {
 
     getWinner() {
         if (this.getStateName() !== 'ENDING') return 'No winner yet';
-        return this.winner;
+        if (this.winner) return this.winner;
+        return 'No winner';
     }
 
     isAvailable() {
@@ -179,6 +191,7 @@ export default class GameRoom {
                     waiting_players: this.getWaitingPlayerUserNames()
                 });
             }
+            if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
         }
     }
 
@@ -189,9 +202,13 @@ export default class GameRoom {
         RoomInfo.players = this.getPlayerUserNames();
         RoomInfo.waiting_players = this.getWaitingPlayerUserNames();
         RoomInfo.judge = this.getJudgeUserName();
-        RoomInfo.phrase = this.getPhrase() ? this.getPhrase(): 'not chosen yet';
-        RoomInfo.winner = this.getWinner() ? this.getWinner(): 'no winner';
+        RoomInfo.phrase = this.getPhrase();
+        RoomInfo.winner = this.getWinner();
         return RoomInfo;
+    }
+
+    hasAdminSubscribers() {
+        return (!!getIO().sockets.adapter.rooms.admin_updates);
     }
 
     // TODO: Add a cleanup function that unregisters all callbacks (methods of the Game object) that were registered on socket events.

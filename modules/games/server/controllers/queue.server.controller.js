@@ -37,7 +37,7 @@ class Queue {
             this.state.addPlayer();
         }
 
-        if(this.hasAdminSubscribers()) _io.to('admin_queue_updates').emit('queue players update', this.getPlayerUsernames());
+        if(this.hasAdminSubscribers()) _io.to('admin_updates').emit('queue players update', this.getPlayerUsernames());
 
     }
 
@@ -56,7 +56,7 @@ class Queue {
                 this.state = new QueueStates.AvailableGames(this);
                 break;
         }
-        if(this.hasAdminSubscribers()) _io.to('admin_queue_updates').emit('queue state update', this.getStateName());
+        if(this.hasAdminSubscribers()) _io.to('admin_updates').emit('queue state update', this.getStateName());
         console.log(this.getStateName());
     }
 
@@ -79,7 +79,7 @@ class Queue {
     addAvailableGame(game_id) {
         console.log(game_id, 'added to available games');
         this.available_games.push(game_id);
-        if(this.hasAdminSubscribers()) _io.to('admin_queue_updates').emit('available games update', this.available_games);
+        if(this.hasAdminSubscribers()) _io.to('admin_updates').emit('available games update', this.available_games);
         if(this.getStateName() !== 'AVAILABLE_GAMES') this.setState('AVAILABLE_GAMES');
     }
 
@@ -87,7 +87,7 @@ class Queue {
         console.log(game_id, 'removed from available games');
         var available_game_index = this.available_games.indexOf(game_id);
         if (available_game_index > -1) this.available_games.splice(available_game_index, 1);
-        if(this.hasAdminSubscribers()) _io.to('admin_queue_updates').emit('available games update', this.available_games);
+        if(this.hasAdminSubscribers()) _io.to('admin_updates').emit('available games update', this.available_games);
         if (this.available_games < 1) this.setState('NOT_ENOUGH');
     }
 
@@ -116,7 +116,7 @@ class Queue {
     }
 
     hasAdminSubscribers() {
-        return (!!_io.sockets.adapter.rooms.admin_queue_updates);
+        return (!!_io.sockets.adapter.rooms.admin_updates);
     }
 }
 
