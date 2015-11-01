@@ -5,7 +5,7 @@ angular.module('games.admin').run(['Menus',
   function (Menus) {
     Menus.addSubMenuItem('topbar', 'admin', {
       title: 'Queue Rooms Info',
-      state: 'admin.queue-info'
+      state: 'admin.queue-rooms-info'
     });
   }
 ]);

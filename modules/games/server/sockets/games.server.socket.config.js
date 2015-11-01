@@ -50,9 +50,10 @@ export default function(io, socket) {
         GameRoom.removePlayer(socket);
     });
 
-    socket.on('admin queue updates subscribe', function() {
-        socket.join('admin_queue_updates');
+    socket.on('admin updates subscribe', function() {
+        socket.join('admin_updates');
         socket.emit('initial queue info', q.getInfo());
+        socket.emit('initial rooms info', GameRooms.getInfo());
     });
     
 }

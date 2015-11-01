@@ -19,6 +19,7 @@ export default class GameRoom {
         else throw 'Attempted to create game without correct players param';
         // Set the game_id generated from the game_rooms controller
         this._id = game_id;
+        this.is_public = is_public_room;
         // Is game public, if not then game is private
         this.RoomStates = is_public_room ? PublicGameStates : PrivateGameStates;
         // Set to true if judge leaves
@@ -33,6 +34,10 @@ export default class GameRoom {
         this.State = new this.RoomStates.Establishing(this);
     }
 
+    getRoomType() {
+        if (this.is_public) return 'public';
+        return 'private';
+    }
     setState(State) {
         this.State = new this.RoomStates[State](this);
     }
@@ -131,6 +136,11 @@ export default class GameRoom {
         this.winner = winner;
     }
 
+    getWinner() {
+        if (this.getStateName() !== 'ENDING') return 'No winner yet';
+        return this.winner;
+    }
+
     isAvailable() {
         return this.available;
     }
@@ -170,6 +180,18 @@ export default class GameRoom {
                 });
             }
         }
+    }
+
+    getInfo() {
+        var RoomInfo = {};
+        RoomInfo.room_type = this.getRoomType();
+        RoomInfo.state = this.getStateName();
+        RoomInfo.players = this.getPlayerUserNames();
+        RoomInfo.waiting_players = this.getWaitingPlayerUserNames();
+        RoomInfo.judge = this.getJudgeUserName();
+        RoomInfo.phrase = this.getPhrase() ? this.getPhrase(): 'not chosen yet';
+        RoomInfo.winner = this.getWinner() ? this.getWinner(): 'no winner';
+        return RoomInfo;
     }
 
     // TODO: Add a cleanup function that unregisters all callbacks (methods of the Game object) that were registered on socket events.

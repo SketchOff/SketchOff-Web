@@ -15,11 +15,21 @@ export function createGameRoom(players, public_game) {
 
 // remove a GameRoom from the GameRooms map
 export function removeGameRoom(game_room_id) {
-	GameRooms.delete(game_room_id);
+    GameRooms.delete(game_room_id);
 }
 
 export function getGameRoom(game_room_id) {
     return GameRooms.get(game_room_id);
+}
+
+export function getInfo() {
+    console.log(' get rooms info');
+    var RoomsInfo = {};
+    GameRooms.forEach(function(GameRoom, id) {
+        console.log(GameRoom.getInfo());
+        RoomsInfo[id] = GameRoom.getInfo();
+    });
+    return RoomsInfo;
 }
 
 /**
