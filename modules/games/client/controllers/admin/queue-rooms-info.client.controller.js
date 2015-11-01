@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('games.admin').controller('QueueInfoCtrl', ['$scope', 'Socket',
+angular.module('games.admin').controller('QueueRoomsInfoCtrl', ['$scope', 'Socket',
     function($scope, Socket) {
         var ready_for_updates = false;
         Socket.emit('admin queue updates subscribe');
