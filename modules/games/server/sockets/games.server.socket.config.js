@@ -53,5 +53,14 @@ export default function(io, socket) {
         socket.emit('initial queue info', q.getInfo());
         socket.emit('initial rooms info', GameRooms.getInfo());
     });
-    
+
+    socket.on('disconnect', function() {
+        if (socket.request.user.username) {
+            console.log(socket.request.user.username, 'has disconnected');
+            if (socket.game_room_id) {
+                var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
+                GameRoom.removePlayer(socket);
+            }
+        }
+    });
 }
