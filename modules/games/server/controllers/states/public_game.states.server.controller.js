@@ -85,23 +85,26 @@ export class SelectingWinner {
 
 export class Ending {
     constructor(GameRoom, reason) {
+        var message = {};
         this.name = 'ENDING';
         this.GameRoom = GameRoom;
 
-        var message = {};
+        if (this.GameRoom.winner.localeCompare('No winner yet') === 0) {
+            this.GameRoom.noWinner();
+            if (!reason) {
+                message.judge_didnt_pick = true;
+                // Judge failed to pick winning player in allotted time
+                // TODO: kick judge
+            }
+        }
+
         if (reason) {
             message.reason = reason;
-            this.GameRoom.noWinner();
         }
         message.winner = this.GameRoom.getWinner();
-
         getIO().to(this.GameRoom._id).emit('ENDING', message);
         Timers.countdownFactory(this.GameRoom, 'new_game_time', 'Establishing', 'new game countdown');
-
-
-        // display results
-        // save game info to game history schema
-        // go to establishing after 15s
+        // TODO: save game info to game history schema
     }
 
     getName() {
