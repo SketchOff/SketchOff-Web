@@ -1,7 +1,7 @@
 'use strict';
 
 // Games controller
-angular.module('games').controller('GamesController', ['$rootScope', '$scope', 'Authentication', 'Socket', '$state',
+angular.module('games').controller('GameRoomController', ['$rootScope', '$scope', 'Authentication', 'Socket', '$state',
     function($rootScope, $scope, Authentication, Socket, $state) {
 
         $scope.authentication = Authentication;
