@@ -32,6 +32,7 @@ export default class GameRoom {
         this.winner_selection_time = 5;
         this.new_game_time = 5;
         this.winner = null;
+        this.interval = null;
         this.State = new this.RoomStates.Establishing(this);
         if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
     }
@@ -43,7 +44,7 @@ export default class GameRoom {
 
     setState(State, reason) {
         console.log(this._id, 'is changing states to', State);
-        Timers.cancelCurrCountdown();
+        this.cancelCurrCountdown();
         this.State = new this.RoomStates[State](this, reason);
         if (this.hasAdminSubscribers()) {
             if (State === 'Terminating') getIO().to('admin_updates').emit('room termination', this.getRoomId());
@@ -126,7 +127,11 @@ export default class GameRoom {
     }
 
     noWinner() {
-        this.winner = null;
+        this.winner = 'No winner';
+    }
+
+    hasWinner() {
+        return (this.winner.localeCompare('No winner') !== 0);
     }
 
     setWinner(winner) {
@@ -134,9 +139,7 @@ export default class GameRoom {
     }
 
     getWinner() {
-        if (this.getStateName() !== 'ENDING') return 'No winner yet';
-        if (this.winner) return this.winner;
-        return 'No winner';
+        return this.winner;
     }
 
     isAvailable() {
@@ -202,6 +205,10 @@ export default class GameRoom {
             player.leave(this._id);
             delete player.game_room_id;
         }, this);
+    }
+
+    cancelCurrCountdown() {
+        clearInterval(this.interval);
     }
 }
 

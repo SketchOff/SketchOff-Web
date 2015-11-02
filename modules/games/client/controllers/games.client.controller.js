@@ -34,9 +34,10 @@ angular.module('games').controller('GamesController', ['$rootScope', '$scope', '
             $scope.GameRoom.judge = msg.judge;
             $scope.GameRoom.players = msg.players;
             $scope.GameRoom.waiting_players = msg.waiting_players;
-            $scope.GameRoom.drawing_countdown = null;
-            $scope.GameRoom.winner_selection_countdown = null;
-            $scope.GameRoom.new_game_countdown = null;
+            $scope.GameRoom.drawing_countdown = undefined;
+            $scope.GameRoom.winner_selection_countdown = undefined;
+            $scope.GameRoom.new_game_countdown = undefined;
+            $scope.GameRoom.early_end_reason = undefined;
             // TODO: Give judge a countdown to select phrase, otherwise kick judge
         });
 
@@ -53,7 +54,7 @@ angular.module('games').controller('GamesController', ['$rootScope', '$scope', '
             $scope.GameRoom.state = 'ENDING';
             $scope.GameRoom.winner = msg.winner;
             if (msg.reason) {
-                console.log(msg.reason);
+                $scope.GameRoom.early_end_reason = msg.reason;
             }
         });
 

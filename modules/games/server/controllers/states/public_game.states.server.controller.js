@@ -17,7 +17,7 @@ export class Establishing {
         this.name = 'ESTABLISHING';
         this.GameRoom.players = shuffle(this.GameRoom.players);
         this.GameRoom.judge = this.GameRoom.players[0];
-        this.GameRoom.winner = null;
+        this.GameRoom.winner = 'No winner yet';
         if (this.GameRoom.first_game) {
             this.connectPlayers();
             getIO().to(this.GameRoom._id).emit('ESTABLISHED');
@@ -91,10 +91,10 @@ export class Ending {
         var message = {};
         if (reason) {
             message.reason = reason;
-            this.GameRoom.setWinner('No winner');
+            this.GameRoom.noWinner();
         }
         message.winner = this.GameRoom.getWinner();
-        
+
         getIO().to(this.GameRoom._id).emit('ENDING', message);
         Timers.countdownFactory(this.GameRoom, 'new_game_time', 'Establishing', 'new game countdown');
 
