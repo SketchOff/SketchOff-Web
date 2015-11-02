@@ -41,10 +41,10 @@ export default class GameRoom {
         return 'private';
     }
 
-    setState(State) {
+    setState(State, reason) {
         console.log(this._id, 'is changing states to', State);
         Timers.cancelCurrCountdown();
-        this.State = new this.RoomStates[State](this);
+        this.State = new this.RoomStates[State](this, reason);
         if (this.hasAdminSubscribers()) {
             if (State === 'Terminating') getIO().to('admin_updates').emit('room termination', this.getRoomId());
             else getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
@@ -146,8 +146,7 @@ export default class GameRoom {
     // TODO: If the game needs to be re-established, let players know the reason
     // TODO: Flag player for leaving mid game
     removePlayer(player) {
-        console.log(player.request.user.username, 'is requesting to leave game', this._id);
-        console.log('judge=', this.judge.request.user.username);
+
         if (this.players.indexOf(player) > -1) {
             this.players.splice(this.players.indexOf(player), 1);
         } else {
@@ -161,12 +160,12 @@ export default class GameRoom {
             this.setState('Terminating');
         } else if (this.getNumPlayers() < min_players) {
             console.log('not enough playing player but enough total players');
-            this.setState('Establishing');
+            this.setState('Ending', 'Not enough active players to continue.');
         } else {
-            if (player.request.user.username === this.judge.request.username) {
+            if (player.request.user.username.localeCompare(this.judge.request.username)) {
                 console.log('judge left, restablishing game');
                 // getIO().to(this._id).emit('judge left');
-                this.setState('Establishing');
+                this.setState('Ending', 'The judge left the game.');
             } else {
                 console.log('player left but doesnt effect game play');
                 getIO().to(this._id).emit('player left', {

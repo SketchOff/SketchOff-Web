@@ -51,8 +51,10 @@ angular.module('games').controller('GamesController', ['$rootScope', '$scope', '
 
         Socket.on('ENDING', function(msg) {
             $scope.GameRoom.state = 'ENDING';
-            if (msg === null) msg = 'No winner';
-            $scope.GameRoom.winner = msg;
+            $scope.GameRoom.winner = msg.winner;
+            if (msg.reason) {
+                console.log(msg.reason);
+            }
         });
 
         Socket.on('TERMINATING', function() {

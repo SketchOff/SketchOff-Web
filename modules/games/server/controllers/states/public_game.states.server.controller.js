@@ -84,10 +84,18 @@ export class SelectingWinner {
 }
 
 export class Ending {
-    constructor(GameRoom) {
+    constructor(GameRoom, reason) {
         this.name = 'ENDING';
         this.GameRoom = GameRoom;
-        getIO().to(this.GameRoom._id).emit('ENDING', this.GameRoom.winner);
+
+        var message = {};
+        if (reason) {
+            message.reason = reason;
+            this.GameRoom.setWinner('No winner');
+        }
+        message.winner = this.GameRoom.getWinner();
+        
+        getIO().to(this.GameRoom._id).emit('ENDING', message);
         Timers.countdownFactory(this.GameRoom, 'new_game_time', 'Establishing', 'new game countdown');
 
 
