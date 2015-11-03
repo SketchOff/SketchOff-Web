@@ -71,7 +71,7 @@ export default class GameRoom {
         player.join(this._id);
         player.game_room_id = this._id;
         this.waiting_players.push(player);
-        getIO().to(this._id).emit('player joined', this.getWaitingPlayerUserNames());
+        getIO().to(this._id).emit('player joining', this.getWaitingPlayerUserNames());
         if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
     }
 
@@ -166,12 +166,10 @@ export default class GameRoom {
             this.setState('Ending', 'Not enough active players to continue.');
         } else {
             if (player.request.user.username.localeCompare(this.judge.request.username)) {
-                console.log('judge left, restablishing game');
-                // getIO().to(this._id).emit('judge left');
                 this.setState('Ending', 'The judge left the game.');
             } else {
                 console.log('player left but doesnt effect game play');
-                getIO().to(this._id).emit('player left', {
+                getIO().to(this._id).emit('player leaving', {
                     players: this.getPlayerUserNames(),
                     waiting_players: this.getWaitingPlayerUserNames()
                 });

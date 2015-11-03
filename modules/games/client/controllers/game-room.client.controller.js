@@ -16,21 +16,21 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         };
         getGameInfo();
 
-        Socket.on('game info response', function(msg) {
+        /* START Socket Event Functions */
+
+        var gameInfoResponse = function(msg) {
             for (var key in msg) {
                 $scope.GameRoom[key] = msg[key];
             }
             if ($scope.GameRoom.judge === $scope.authentication.user.username) is_judge = true;
-        });
+        };
 
-        Socket.on('set phrases', function(msg) {
-            $scope.GameRoom.phrases = msg;
-        });
+        // var setPhrases = function(msg) {
+        //     $scope.GameRoom.phrases = msg;
+        // };
 
-        Socket.on('ESTABLISHING', function(msg) {
+        var establish = function(msg) {
             $scope.GameRoom.state = 'ESTABLISHING';
-            $scope.GameRoom.phrase = undefined;
-            $scope.GameRoom.winner = undefined;
             $scope.GameRoom.judge = msg.judge;
             $scope.GameRoom.players = msg.players;
             $scope.GameRoom.waiting_players = msg.waiting_players;
@@ -39,60 +39,86 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             $scope.GameRoom.new_game_countdown = undefined;
             $scope.GameRoom.early_end_reason = undefined;
             $scope.GameRoom.judge_didnt_pick = undefined;
+            $scope.GameRoom.phrase = undefined;
+            $scope.GameRoom.winner = undefined;
             // TODO: Give judge a countdown to select phrase, otherwise kick judge
-        });
+        };
 
-        Socket.on('DRAWING', function(msg) {
+        var draw = function(msg) {
             $scope.GameRoom.state = 'DRAWING';
             $scope.GameRoom.phrase = msg;
-        });
+        };
 
-        Socket.on('SELECTING_WINNER', function() {
+        var selectWinner = function(msg) {
             $scope.GameRoom.state = 'SELECTING_WINNER';
-        });
+        };
 
-        Socket.on('ENDING', function(msg) {
+        var end = function(msg) {
             $scope.GameRoom.state = 'ENDING';
-            console.log(msg.winner);
             $scope.GameRoom.winner = msg.winner;
             if (msg.reason) {
                 $scope.GameRoom.early_end_reason = msg.reason;
-            } 
+            }
             if (msg.judge_didnt_pick) {
                 $scope.GameRoom.judge_didnt_pick = true;
             }
-        });
+        };
 
-        Socket.on('TERMINATING', function() {
+        var terminate = function(msg) {
             $state.go('games.terminated');
-        });
+        };
 
-        Socket.on('player joined', function(msg) {
+        var playerJoin = function(msg) {
             $scope.GameRoom.waiting_players = msg;
-        });
+        };
 
-        Socket.on('drawing countdown', function(msg) {
+        var drawCountdown = function(msg) {
             $scope.GameRoom.drawing_countdown = msg;
-        });
+        };
 
-        Socket.on('selecting winner countdown', function(msg) {
+        var selectWinnerCountdown = function(msg) {
             $scope.GameRoom.winner_selection_countdown = msg;
-        });
+        };
 
-        Socket.on('new game countdown', function(msg) {
+        var startNewGameCountdown = function(msg) {
             $scope.GameRoom.new_game_countdown = msg;
-        });
+        };
 
-        Socket.on('player left', function(msg) {
+        var playerLeft = function(msg) {
             $scope.GameRoom.players = msg.players;
             $scope.GameRoom.waiting_players = msg.waiting_players;
-        });
+        };
 
-        Socket.on('judge left', function(msg) {
-            $scope.GameRoom.players = msg.players;
-            $scope.GameRoom.waiting_players = msg.waiting_players;
-        });
+        /* END Socket Event Functions */
 
+        /* Socket Event Listeners */
+        Socket.on('game info responding', gameInfoResponse);
+
+        // Socket.on('setting phrases', setPhrases);
+
+        Socket.on('ESTABLISHING', establish);
+
+        Socket.on('DRAWING', draw);
+
+        Socket.on('SELECTING_WINNER', selectWinner);
+
+        Socket.on('ENDING', end);
+
+        Socket.on('TERMINATING', terminate);
+
+        Socket.on('player joining', playerJoin);
+
+        Socket.on('drawing countdown', drawCountdown);
+
+        Socket.on('selecting winner countdown', selectWinnerCountdown);
+
+        Socket.on('starting new game countdown', startNewGameCountdown);
+
+        Socket.on('player leaving', playerLeft);
+
+        /* END Socket Event Listeners */
+
+        /* START Button Functions */
         $scope.setPhrase = function(phrase) {
             Socket.emit('set phrase', phrase);
         };
@@ -107,6 +133,8 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             pressed_leave_room = true;
             $state.go('home');
         };
+        /* END Button Functions */
+
 
         $rootScope.$on('$stateChangeStart',
             function(event, toState, toParams, fromState, fromParams) {
