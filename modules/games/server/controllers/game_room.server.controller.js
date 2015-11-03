@@ -38,6 +38,8 @@ export default class GameRoom {
         this.new_game_time = 5;
         this.winner = null;
         this.interval = null;
+        this.winner_points = 100;
+        this.participation_points = 10;
         this.State = new this.RoomStates.Establishing(this);
         if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
     }
