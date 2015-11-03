@@ -230,7 +230,7 @@ export default class GameRoom {
         var winner_user_object;
         for (var player of this.players) {
             if (player.request.user.username.localeCompare(this.winner) === 0) {
-                winner_user_object = player;
+                winner_user_object = player.request.user;
                 break;
             }
         }
@@ -238,9 +238,10 @@ export default class GameRoom {
     }
 
     saveGame() {
+        var _id = this._id;
         var _game = {
             players: this.getPlayerUsers(),
-            judge: this.getJudgeUser(), 
+            judge: this.getJudgeUser(),
             winner: this.getWinnerUser()
         };
         var game = new Game(_game);
@@ -248,7 +249,8 @@ export default class GameRoom {
         game.save(function(err) {
             if (err) {
                 console.log('error saving game');
-                return getIO().to(this._id).emit('game save failure', {
+                console.log(err);
+                return getIO().to(_id).emit('game save failure', {
                     message: errorHandler.getErrorMessage(err)
                 });
             }
