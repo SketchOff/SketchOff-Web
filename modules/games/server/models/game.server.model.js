@@ -14,10 +14,6 @@ var GameSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  ended_early: {
-    type: Boolean,
-    default: true
-  },
   drawings: [{
     type: Schema.ObjectId,
     ref: 'Drawing'

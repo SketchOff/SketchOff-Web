@@ -8,6 +8,11 @@ import {
 from './queue.server.controller';
 import * as Timers from './timers.server.controller';
 
+var path = require('path'),
+    mongoose = require('mongoose'),
+    Game = mongoose.model('Game'),
+    errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+
 // Set min and max players
 export var min_players = 2;
 export var max_players = 7;
@@ -83,6 +88,14 @@ export default class GameRoom {
         return player_names;
     }
 
+    getPlayerUsers() {
+        var player_users = [];
+        this.players.forEach(function(player) {
+            player_users.push(player.request.user);
+        });
+        return player_users;
+    }
+
     getWaitingPlayerUserNames() {
         var waiting_player_names = [];
         this.waiting_players.forEach(function(player) {
@@ -93,6 +106,10 @@ export default class GameRoom {
 
     getJudgeUserName() {
         return this.judge.request.user.username;
+    }
+
+    getJudgeUser() {
+        return this.judge.request.user;
     }
 
     getJudge() {
@@ -131,7 +148,7 @@ export default class GameRoom {
     }
 
     hasWinner() {
-        return (this.winner.localeCompare('No winner') !== 0);
+        return (this.winner.localeCompare('No winner') !== 0 && this.GameRoom.winner.localeCompare('No winner yet') !== 0);
     }
 
     setWinner(winner) {
@@ -157,7 +174,7 @@ export default class GameRoom {
         }
         player.leave(this._id);
         delete player.game_room_id;
-        
+
         if (this.getNumAllPlayers() < min_players) {
             console.log('Terminating because not enough total players');
             this.setState('Terminating');
@@ -207,6 +224,35 @@ export default class GameRoom {
 
     cancelCurrCountdown() {
         clearInterval(this.interval);
+    }
+
+    getWinnerUser() {
+        var winner_user_object;
+        for (var player of this.players) {
+            if (player.request.user.username.localeCompare(this.winner) === 0) {
+                winner_user_object = player;
+                break;
+            }
+        }
+        return winner_user_object;
+    }
+
+    saveGame() {
+        var _game = {
+            players: this.getPlayerUsers(),
+            judge: this.getJudgeUser(), 
+            winner: this.getWinnerUser()
+        };
+        var game = new Game(_game);
+
+        game.save(function(err) {
+            if (err) {
+                console.log('error saving game');
+                return getIO().to(this._id).emit('game save failure', {
+                    message: errorHandler.getErrorMessage(err)
+                });
+            }
+        });
     }
 }
 

@@ -104,6 +104,7 @@ export class Ending {
         message.winner = this.GameRoom.getWinner();
         getIO().to(this.GameRoom._id).emit('ENDING', message);
         Timers.countdownFactory(this.GameRoom, 'new_game_time', 'Establishing', 'new game countdown');
+        this.GameRoom.saveGame();
         // TODO: save game info to game history schema
     }
 
