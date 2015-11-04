@@ -1,5 +1,6 @@
 <section ng-controller="GameRoomController">
-    <h1>Welcome To The Game Room</h1>
+    <h1>Hello {{authentication.user.username}}</h1>
+    <h2>Welcome To The Game Room</h2>
     <h3 style="color: red">Game Room Info
     <h4>ID: <i>{{GameRoom._id}}</i></h4>
     <h4>Players: <i>{{GameRoom.players.join(', ')}}</i></h4>
