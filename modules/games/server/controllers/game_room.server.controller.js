@@ -262,7 +262,6 @@ export default class GameRoom {
     }
 
     awardPoints() {
-        console.log('game has winner', this.hasWinner());
         if (this.hasWinner()) {
             var winner = this.getWinnerUser();
             if (winner.xp) winner.xp += this.winner_points;
