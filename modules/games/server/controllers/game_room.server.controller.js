@@ -1,7 +1,6 @@
 'use strict';
 
-import * as PublicGameStates from './states/public_game.states.server.controller';
-import * as PrivateGameStates from './states/private_game.states.server.controller';
+import * as GameRoomStates from './states/game_room.states.server.controller';
 import {
     getIO, q
 }
@@ -27,8 +26,6 @@ export default class GameRoom {
         // Set the game_id generated from the game_rooms controller
         this._id = game_id;
         this.is_public = is_public_room;
-        // Is game public, if not then game is private
-        this.RoomStates = is_public_room ? PublicGameStates : PrivateGameStates;
         // Set to true if judge leaves
         this.first_game = true;
         this.available = true;
@@ -41,7 +38,7 @@ export default class GameRoom {
         this.interval = null;
         this.winner_points = 100;
         this.participation_points = 10;
-        this.State = new this.RoomStates.Establishing(this);
+        this.State = new GameRoomStates.Establishing(this);
         if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
     }
 
@@ -53,7 +50,7 @@ export default class GameRoom {
     setState(State, reason) {
         console.log(this._id, 'is changing states to', State);
         this.cancelCurrCountdown();
-        this.State = new this.RoomStates[State](this, reason);
+        this.State = new GameRoomStates[State](this, reason);
         if (this.hasAdminSubscribers()) {
             if (State === 'Terminating') getIO().to('admin_updates').emit('room termination', this.getRoomId());
             else getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
