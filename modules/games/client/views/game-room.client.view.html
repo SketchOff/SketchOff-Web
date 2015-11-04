@@ -9,7 +9,8 @@
     <h4 ng-if="GameRoom.phrase">Phrase: <i>{{GameRoom.phrase}}</i></h4>
     <h4 ng-if="GameRoom.winner">Winner: <i>{{GameRoom.winner}}</i></h4>
     <h4 ng-if="GameRoom.early_end_reason">Early End Reason: <i>{{GameRoom.early_end_reason}}</i></h4>
-    <h4 ng-if="GameRoom.judge_didnt_pick">The judge didn't pick a winner.</i></h4>
+    <h4 ng-if="GameRoom.early_end_reason">Heres 10xp for participating</h4>
+    <h4 ng-if="GameRoom.judge_didnt_pick">The judge didn't pick a winner. You get 10xp for participating.</i></h4>
 
     <div id="choose-phrase" ng-if="authentication.user.username === GameRoom.judge && GameRoom.state === 'ESTABLISHING'">
         <h3 style="color:blue">Ur da judge. Choose a phrase.</h3>

@@ -11,6 +11,7 @@ import * as Timers from './timers.server.controller';
 var path = require('path'),
     mongoose = require('mongoose'),
     Game = mongoose.model('Game'),
+    User = mongoose.model('User'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
 // Set min and max players
@@ -150,7 +151,7 @@ export default class GameRoom {
     }
 
     hasWinner() {
-        return (this.winner.localeCompare('No winner') !== 0 && this.GameRoom.winner.localeCompare('No winner yet') !== 0);
+        return (this.winner && this.winner.localeCompare('No winner') !== 0 && this.winner.localeCompare('No winner yet') !== 0);
     }
 
     setWinner(winner) {
@@ -241,6 +242,7 @@ export default class GameRoom {
 
     saveGame() {
         var _id = this._id;
+
         var _game = {
             players: this.getPlayerUsers(),
             judge: this.getJudgeUser(),
@@ -252,11 +254,40 @@ export default class GameRoom {
             if (err) {
                 console.log('error saving game');
                 console.log(err);
-                return getIO().to(_id).emit('game save failure', {
+                getIO().to(_id).emit('game save failure', {
                     message: errorHandler.getErrorMessage(err)
                 });
             }
         });
+    }
+
+    awardPoints() {
+        console.log('game has winner', this.hasWinner());
+        if (this.hasWinner()) {
+            var winner = this.getWinnerUser();
+            if (winner.xp) winner.xp += this.winner_points;
+            else winner.xp = this.winner_points;
+
+            winner.save(function(err) {
+                if (err) {
+                    console.log('error awarding winner points');
+                    console.log(err);
+                }
+            });
+        } else {
+            var saveCallback = function(err) {
+                if (err) {
+                    console.log('error participation points');
+                    console.log(err);
+                }
+            };
+
+            for (let player of this.players) {
+                if (player.request.user.xp) player.request.user.xp += this.participation_points;
+                else player.request.user.xp = this.participation_points;
+                player.request.user.save(saveCallback);
+            }
+        }
     }
 }
 
