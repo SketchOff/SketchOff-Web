@@ -28,7 +28,7 @@
          var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
          ConnectedPlayer.num_connections++;
      }
-     console.log(socket.request.user.username, 'connected', GameRoomManager.ConnectedPlayers.get(socket.request.user.username));
+     console.log(socket.request.user.username, 'connected');
 
 
      socket.on('join public game', function() {
@@ -43,7 +43,6 @@
 
              ConnectedPlayer.in_queue = true;
              GameRoomManager.ConnectedPlayers.set(socket.request.user.username, ConnectedPlayer);
-             console.log(ConnectedPlayer);
          }
      });
 
@@ -59,10 +58,10 @@
          });
 
          for (let username of GameRoom.getPlayerUserNames()) {
-             var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
+             var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(username);
              ConnectedPlayer.in_queue = false;
              ConnectedPlayer.in_game = true;
-             GameRoomManager.ConnectedPlayers.set(socket.request.user.username, ConnectedPlayer);
+             GameRoomManager.ConnectedPlayers.set(username, ConnectedPlayer);
          }
      });
 
@@ -104,25 +103,38 @@
      });
 
      socket.on('disconnect', function() {
+         var GameRoom;
+
          if (socket.request.user.username) {
              console.log(socket.request.user.username, 'has disconnected');
 
              var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
-             if (ConnectedPlayer && ConnectedPlayer.in_queue) {
-                 q.removePlayer(socket.request.user.username);
-             }
+
              if (ConnectedPlayer && ConnectedPlayer.num_connections === 1) {
+                console.log('only connection for user');
                  GameRoomManager.ConnectedPlayers.delete(socket.request.user.username);
+                 if (ConnectedPlayer && ConnectedPlayer.in_queue) {
+                     q.removePlayer(socket.request.user.username);
+                 }
+
+                 if (socket.game_room_id) {
+                     GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
+                     GameRoom.removePlayer(socket);
+                 }
              } else {
                  ConnectedPlayer.num_connections--;
-             }
+                 if (socket.active_user) {
+                    console.log('multiple connections but this was the active one');
+                     if (ConnectedPlayer && ConnectedPlayer.in_queue) {
+                         q.removePlayer(socket.request.user.username);
+                     }
 
-             if (socket.game_room_id) {
-                 var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
-                 GameRoom.removePlayer(socket);
+                     if (socket.game_room_id) {
+                         GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
+                         GameRoom.removePlayer(socket);
+                     }
+                 }
              }
-             console.log(socket.request.user.username, 'disconnected', GameRoomManager.ConnectedPlayers.get(socket.request.user.username));
-
          }
      });
  }

@@ -22,6 +22,7 @@ class Queue {
     }
 
     addPlayer(player) {
+        player.active_user = true;
         this.players.push(player);
         this.state.addPlayer();
     }
@@ -30,6 +31,12 @@ class Queue {
         var index = 0;
         for (let player of this.players) {
             if (player.request.user.username.localeCompare(username) === 0) {
+                player.active_user = false;
+                var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
+                ConnectedPlayer.in_queue = false;
+                ConnectedPlayer.in_game = false;
+                GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
+                
                 this.players.splice(index, 1);
                 this.updateAdmin();
                 break;

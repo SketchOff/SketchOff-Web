@@ -171,6 +171,10 @@ export default class GameRoom {
     // TODO: If the game needs to be re-established, let players know the reason
     // TODO: Flag player for leaving mid game
     removePlayer(player) {
+        player.active_user = false;
+        var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
+        ConnectedPlayer.in_game = false;
+        GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
 
         if (this.players.indexOf(player) > -1) {
             this.players.splice(this.players.indexOf(player), 1);
@@ -221,15 +225,18 @@ export default class GameRoom {
             player.leave(this._id);
             delete player.game_room_id;
 
+            player.active_user = false;
             var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
             ConnectedPlayer.in_queue = false;
             ConnectedPlayer.in_game = false;
             GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
         }, this);
+
         this.players.forEach(function(player) {
             player.leave(this._id);
             delete player.game_room_id;
 
+            player.active_user = false;
             var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
             ConnectedPlayer.in_queue = false;
             ConnectedPlayer.in_game = false;
