@@ -22,14 +22,18 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
             });
         };
 
-        $scope.startPrivateGame = function() {
-        };
-
         Socket.on('already in game redirect', function() {
-            $scope.error.already_waiting = 'Your already waiting to join a game';
+            $scope.error.already_waiting = 'Youre already waiting to join a game';
             console.log("already wating");
         });
 
+	$scope.startPrivateGame = function() {
+            $scope.animationsEnabled = true;
+            modalInstance = $uibModal.open({
+                animation: $scope.animationsEnabled,
+                templateUrl: 'modules/core/client/views/waiting-for-game.client.modal.view.html',
+                controller: 'WaitingForPrivateGameCtrl'
 
+        });
     }
 ]);

@@ -1,0 +1,24 @@
+'use strict';
+
+angular.module('core').controller('InvitePlayersCtrl', ['$scope', 'Authentication', '$modalInstance', 'Socket',
+    function($scope, Authentication, $modalInstance, Socket) {
+        // This provides Authentication context.
+        $scope.authentication = Authentication;
+
+
+        $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+        };
+
+        $scope.invite = function() {
+            });
+            // $timeout(function() {
+            //     modalInstance.close();
+            // }, 3000);
+        };
+
+
+    }
+]);
+
+
