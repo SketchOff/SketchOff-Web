@@ -12,12 +12,12 @@ angular.module('core').controller('WaitingForGameCtrl', ['$scope', 'Authenticati
 
 
         $scope.cancel = function() {
+            Socket.emit('leave queue');
             $modalInstance.dismiss('cancel');
         };
 
         // Add an event listener to the 'ESTABLISHED' event
         Socket.on('ESTABLISHED', function(msg) {
-            console.log('WaitingForGameCtrl says: game established');
             $modalInstance.close();
             $state.go('games.room');
         });

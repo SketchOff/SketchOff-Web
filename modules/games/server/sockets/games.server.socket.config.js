@@ -28,9 +28,9 @@
          var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
 
          if (ConnectedPlayer.in_queue) {
-            socket.emit('already in queue');
+             socket.emit('already in queue');
          } else if (ConnectedPlayer.in_game) {
-            socket.emit('already in game');
+             socket.emit('already in game');
          } else {
              q.addPlayer(socket);
 
@@ -80,6 +80,15 @@
          }
      });
 
+     socket.on('leave queue', function() {
+         console.log(socket.request.user.username, 'has left the queue');
+         q.removePlayer(socket.request.user.username);
+
+         var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
+         ConnectedPlayer.in_queue = false;
+         GameRoomManager.ConnectedPlayers.set(socket.request.user.username, ConnectedPlayer);
+     });
+
      socket.on('admin updates subscribe', function() {
          socket.join('admin_updates');
          socket.emit('initial queue info', q.getInfo());
@@ -92,6 +101,11 @@
              if (socket.game_room_id) {
                  var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
                  GameRoom.removePlayer(socket);
+             }
+             
+             var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
+             if (ConnectedPlayer.in_queue) {
+                q.removePlayer(socket.request.user.username);
              }
 
              GameRoomManager.ConnectedPlayers.delete(socket.request.user.username);

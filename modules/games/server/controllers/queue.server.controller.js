@@ -22,15 +22,19 @@ class Queue {
     }
 
     addPlayer(player) {
+        this.players.push(player);
+        this.state.addPlayer();
+    }
 
-        // check if already in
-        // if in. emit to socket
-        if(this.players.some(function(p) { return p.request.user.username === player.request.user.username; })) {
-            player.emit('already in game redirect');
-
-        } else {
-            this.players.push(player);
-            this.state.addPlayer();
+    removePlayer(username) {
+        var index = 0;
+        for (let player of this.players) {
+            if (player.request.user.username.localeCompare(username) === 0) {
+                this.players.splice(index, 1);
+                this.updateAdmin();
+                break;
+            }
+            index++;
         }
     }
 
@@ -47,7 +51,7 @@ class Queue {
                 this.state = new QueueStates.AvailableGames(this);
                 break;
         }
-        if(this.hasAdminSubscribers()) _io.to('admin_updates').emit('queue state update', this.getStateName());
+        if (this.hasAdminSubscribers()) _io.to('admin_updates').emit('queue state update', this.getStateName());
     }
 
     getStateName() {
@@ -68,14 +72,14 @@ class Queue {
 
     addAvailableGame(game_id) {
         this.available_games.push(game_id);
-        if(this.hasAdminSubscribers()) _io.to('admin_updates').emit('available games update', this.available_games);
-        if(this.getStateName() !== 'AVAILABLE_GAMES') this.setState('AVAILABLE_GAMES');
+        if (this.hasAdminSubscribers()) _io.to('admin_updates').emit('available games update', this.available_games);
+        if (this.getStateName() !== 'AVAILABLE_GAMES') this.setState('AVAILABLE_GAMES');
     }
 
     removeAvailableGame(game_id) {
         var available_game_index = this.available_games.indexOf(game_id);
         if (available_game_index > -1) this.available_games.splice(available_game_index, 1);
-        if(this.hasAdminSubscribers()) _io.to('admin_updates').emit('available games update', this.available_games);
+        if (this.hasAdminSubscribers()) _io.to('admin_updates').emit('available games update', this.available_games);
         if (this.available_games < 1) this.setState('NOT_ENOUGH');
     }
 
@@ -108,7 +112,7 @@ class Queue {
     }
 
     updateAdmin() {
-        if(this.hasAdminSubscribers()) _io.to('admin_updates').emit('queue players update', this.getPlayerUsernames());
+        if (this.hasAdminSubscribers()) _io.to('admin_updates').emit('queue players update', this.getPlayerUsernames());
     }
 }
 
