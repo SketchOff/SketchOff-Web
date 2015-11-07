@@ -1,4 +1,4 @@
-'use strict';
+ 'use strict';
 
 import {
     q
@@ -44,8 +44,10 @@ export default function(io, socket) {
     });
 
     socket.on('leave room', function() {
-        var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
-        GameRoom.removePlayer(socket);
+        if (socket.game_room_id) {
+            var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
+            GameRoom.removePlayer(socket);
+        }
     });
 
     socket.on('admin updates subscribe', function() {
