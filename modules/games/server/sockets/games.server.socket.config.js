@@ -1,13 +1,12 @@
  'use strict';
 
  import {
-     q
+     q, ConnectedPlayers
  }
  from '../controllers/queue.server.controller';
  import * as GameRooms from '../controllers/game_room_manager.server.controller';
 
  var setSocket = false;
- var ConnectedPlayers = new Map();
 
  // Create the game socket.io configuration
  export default function(io, socket) {
@@ -17,7 +16,7 @@
          q.setIO(io);
      }
 
-     console.log(socket.id, 'connected');
+     console.log(socket.request.user.username, 'connected');
      ConnectedPlayers.set(socket.request.user.username, {
          in_queue: false,
          in_game: false,
@@ -28,9 +27,9 @@
          var ConnectedPlayer = ConnectedPlayers.get(socket.request.user.username);
 
          if (ConnectedPlayer.in_queue) {
-            socket.emit('already waiting for a game');
+            socket.emit('already in queue');
          } else if (ConnectedPlayer.in_game) {
-            socket.emit('already in a game');
+            socket.emit('already in game');
          } else {
              q.addPlayer(socket);
 
