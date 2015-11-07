@@ -16,13 +16,20 @@
          q.setIO(io);
      }
 
-     console.log(socket.request.user.username, 'connected');
-     GameRoomManager.ConnectedPlayers.set(socket.request.user.username, {
-         in_queue: false,
-         in_game: false,
-         in_lobby: false,
-         socket_id: socket.id
-     });
+     if (!GameRoomManager.ConnectedPlayers.has(socket.request.user.username)) {
+         GameRoomManager.ConnectedPlayers.set(socket.request.user.username, {
+             in_queue: false,
+             in_game: false,
+             in_lobby: false,
+             num_connections: 1,
+             socket_id: socket.id
+         });
+     } else {
+         var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
+         ConnectedPlayer.num_connections++;
+     }
+     console.log(socket.request.user.username, 'connected', GameRoomManager.ConnectedPlayers.get(socket.request.user.username));
+
 
      socket.on('join public game', function() {
          var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
@@ -36,6 +43,7 @@
 
              ConnectedPlayer.in_queue = true;
              GameRoomManager.ConnectedPlayers.set(socket.request.user.username, ConnectedPlayer);
+             console.log(ConnectedPlayer);
          }
      });
 
@@ -100,15 +108,21 @@
              console.log(socket.request.user.username, 'has disconnected');
 
              var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
-             if (ConnectedPlayer.in_queue) {
+             if (ConnectedPlayer && ConnectedPlayer.in_queue) {
                  q.removePlayer(socket.request.user.username);
              }
-             GameRoomManager.ConnectedPlayers.delete(socket.request.user.username);
+             if (ConnectedPlayer && ConnectedPlayer.num_connections === 1) {
+                 GameRoomManager.ConnectedPlayers.delete(socket.request.user.username);
+             } else {
+                 ConnectedPlayer.num_connections--;
+             }
 
              if (socket.game_room_id) {
                  var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
                  GameRoom.removePlayer(socket);
              }
+             console.log(socket.request.user.username, 'disconnected', GameRoomManager.ConnectedPlayers.get(socket.request.user.username));
+
          }
      });
  }

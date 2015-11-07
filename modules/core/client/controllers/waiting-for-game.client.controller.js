@@ -16,6 +16,10 @@ angular.module('core').controller('WaitingForGameCtrl', ['$scope', 'Authenticati
             $modalInstance.dismiss('cancel');
         };
 
+        $scope.ok = function() {
+            $modalInstance.dismiss('cancel');
+        };
+
         // Add an event listener to the 'ESTABLISHED' event
         Socket.on('ESTABLISHED', function(msg) {
             $modalInstance.close();
