@@ -25,12 +25,18 @@
      });
 
      socket.on('join public game', function() {
-         // TODO: Check if a user is already playing a game before adding them to the queue
-         q.addPlayer(socket);
-
          var ConnectedPlayer = ConnectedPlayers.get(socket.request.user.username);
-         ConnectedPlayer.in_queue = true;
-         ConnectedPlayers.set(socket.request.user.username, ConnectedPlayer);
+
+         if (ConnectedPlayer.in_queue) {
+            socket.emit('already waiting for a game');
+         } else if (ConnectedPlayer.in_game) {
+            socket.emit('already in a game');
+         } else {
+             q.addPlayer(socket);
+
+             ConnectedPlayer.in_queue = true;
+             ConnectedPlayers.set(socket.request.user.username, ConnectedPlayer);
+         }
      });
 
      socket.on('get game info', function() {
