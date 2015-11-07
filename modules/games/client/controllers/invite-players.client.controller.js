@@ -25,10 +25,9 @@ angular.module('games').controller('InvitePlayersCtrl', ['$scope', 'Authenticati
            $modalInstance.dismiss('cancel');
         };
 
-        $scope.invite = function() {
-            // $timeout(function() {
-            //     modalInstance.close();
-            // }, 3000);
+        $scope.invite = function(player) {
+	    console.log(player);
+            //do not know how to notify of invite
         };
 
 

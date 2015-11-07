@@ -21,19 +21,6 @@ angular.module('games').controller('GamesController', ['$scope', 'Authentication
         	$scope.GameRoom = msg;
         });
 
-	$scope.invitePlayers = function() {
-            $scope.animationsEnabled = true;
-            modalInstance = $uibModal.open({
-                animation: $scope.animationsEnabled,
-                templateUrl: 'modules/games/client/views/invite-friends.client.modal.view.html',
-                controller: 'InvitePlayersCtrl'
-            });
-            // $timeout(function() {
-            //     modalInstance.close();
-            // }, 3000);
-        };
-
-
     }
 
 ]);

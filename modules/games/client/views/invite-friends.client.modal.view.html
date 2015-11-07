@@ -9,7 +9,7 @@
 
       <tr ng-repeat="player in Test | filter:paginate | filter:searchbar">
         <td>{{ player.player }} </td>
-        <td><a class="btn btn-primary btn-lg" href="" ng-click="invite()">Invite</a></td>
+        <td><a class="btn btn-primary btn-lg" href="" ng-click="invite(player.player)">Invite</a></td>
       </tr>
 	
     </table>
