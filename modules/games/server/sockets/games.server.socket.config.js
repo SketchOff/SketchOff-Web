@@ -20,6 +20,7 @@
      GameRoomManager.ConnectedPlayers.set(socket.request.user.username, {
          in_queue: false,
          in_game: false,
+         in_lobby: false,
          socket_id: socket.id
      });
 
