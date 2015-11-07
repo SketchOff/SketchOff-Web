@@ -1,68 +1,94 @@
  'use strict';
 
-import {
-    q
-}
-from '../controllers/queue.server.controller';
-import * as GameRooms from '../controllers/game_room_manager.server.controller';
+ import {
+     q
+ }
+ from '../controllers/queue.server.controller';
+ import * as GameRooms from '../controllers/game_room_manager.server.controller';
 
-var setSocket = false;
-// Create the game socket.io configuration
-export default function(io, socket) {
+ var setSocket = false;
+ var ConnectedPlayers = new Map();
 
-    if (!setSocket) {
-        setSocket = true;
-        q.setIO(io);
-    }
+ // Create the game socket.io configuration
+ export default function(io, socket) {
 
-    socket.on('join public game', function() {
-        // TODO: Check if a user is already playing a game before adding them to the queue
-        q.addPlayer(socket);
-    });
+     if (!setSocket) {
+         setSocket = true;
+         q.setIO(io);
+     }
 
-    socket.on('get game info', function() {
-        var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
-        socket.emit('game info responding', {
-            _id: GameRoom._id,
-            players: GameRoom.getPlayerUserNames(),
-            waiting_players: GameRoom.getWaitingPlayerUserNames(),
-            state: GameRoom.getStateName(),
-            judge: GameRoom.getJudgeUserName(),
-            phrases: GameRoom.getPhrases()
-        });
-    });
+     console.log(socket.id, 'connected');
+     ConnectedPlayers.set(socket.request.user.username, {
+         in_queue: false,
+         in_game: false,
+         socket_id: socket.id
+     });
 
-    socket.on('set phrase', function(msg) {
-        var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
-        GameRoom.setPhrase(msg);
-    });
+     socket.on('join public game', function() {
+         // TODO: Check if a user is already playing a game before adding them to the queue
+         q.addPlayer(socket);
 
-    socket.on('set winner', function(msg) {
-        var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
-        GameRoom.setWinner(msg);
-        GameRoom.setState('Ending');
-    });
+         var ConnectedPlayer = ConnectedPlayers.get(socket.request.user.username);
+         ConnectedPlayer.in_queue = true;
+         ConnectedPlayers.set(socket.request.user.username, ConnectedPlayer);
+     });
 
-    socket.on('leave room', function() {
-        if (socket.game_room_id) {
-            var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
-            GameRoom.removePlayer(socket);
-        }
-    });
+     socket.on('get game info', function() {
+         var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
+         socket.emit('game info responding', {
+             _id: GameRoom._id,
+             players: GameRoom.getPlayerUserNames(),
+             waiting_players: GameRoom.getWaitingPlayerUserNames(),
+             state: GameRoom.getStateName(),
+             judge: GameRoom.getJudgeUserName(),
+             phrases: GameRoom.getPhrases()
+         });
 
-    socket.on('admin updates subscribe', function() {
-        socket.join('admin_updates');
-        socket.emit('initial queue info', q.getInfo());
-        socket.emit('initial rooms info', GameRooms.getInfo());
-    });
+         for (let username of GameRoom.getPlayerUserNames()) {
+             var ConnectedPlayer = ConnectedPlayers.get(socket.request.user.username);
+             ConnectedPlayer.in_queue = false;
+             ConnectedPlayer.in_game = true;
+             ConnectedPlayers.set(socket.request.user.username, ConnectedPlayer);
+         }
+     });
 
-    socket.on('disconnect', function() {
-        if (socket.request.user.username) {
-            console.log(socket.request.user.username, 'has disconnected');
-            if (socket.game_room_id) {
-                var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
-                GameRoom.removePlayer(socket);
-            }
-        }
-    });
-}
+     socket.on('set phrase', function(msg) {
+         var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
+         GameRoom.setPhrase(msg);
+     });
+
+     socket.on('set winner', function(msg) {
+         var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
+         GameRoom.setWinner(msg);
+         GameRoom.setState('Ending');
+     });
+
+     socket.on('leave room', function() {
+         if (socket.game_room_id) {
+             var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
+             GameRoom.removePlayer(socket);
+
+             var ConnectedPlayer = ConnectedPlayers.get(socket.request.user.username);
+             ConnectedPlayer.in_game = false;
+             ConnectedPlayers.set(socket.request.user.username, ConnectedPlayer);
+         }
+     });
+
+     socket.on('admin updates subscribe', function() {
+         socket.join('admin_updates');
+         socket.emit('initial queue info', q.getInfo());
+         socket.emit('initial rooms info', GameRooms.getInfo());
+     });
+
+     socket.on('disconnect', function() {
+         if (socket.request.user.username) {
+             console.log(socket.request.user.username, 'has disconnected');
+             if (socket.game_room_id) {
+                 var GameRoom = GameRooms.getGameRoom(socket.game_room_id);
+                 GameRoom.removePlayer(socket);
+             }
+
+             ConnectedPlayers.delete(socket.request.user.username);
+         }
+     });
+ }
