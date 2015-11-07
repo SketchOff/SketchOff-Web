@@ -32,7 +32,7 @@ export class Establishing {
                 players: this.GameRoom.getPlayerUserNames(),
                 waiting_players: this.GameRoom.getWaitingPlayerUserNames()
             });
-            q.removeAvailableGame(this.GameRoom._id);
+            if (this.GameRoom.isPublic()) q.removeAvailableGame(this.GameRoom._id);
         }
         // TODO: Add timer for choosing phrase
         // Timers.countdownFactory(this.GameRoom, 'choose_phrase_time', 'Drawing', 'choosing phrase countdown');
@@ -74,7 +74,7 @@ export class SelectingWinner {
         this.name = 'SELECTING_WINNER';
         this.GameRoom = GameRoom;
         getIO().to(this.GameRoom._id).emit('SELECTING_WINNER');
-        if (!this.GameRoom.isFull()) q.addAvailableGame(this.GameRoom._id);
+        if (!this.GameRoom.isFull() && this.GameRoom.isPublic()) q.addAvailableGame(this.GameRoom._id);
         Timers.countdownFactory(this.GameRoom, 'winner_selection_time', 'Ending', 'selecting winner countdown');
     }
 

@@ -47,6 +47,10 @@ export default class GameRoom {
         return 'private';
     }
 
+    isPublic() {
+        return this.is_public;
+    }
+
     setState(State, reason) {
         console.log(this._id, 'is changing states to', State);
         this.cancelCurrCountdown();
