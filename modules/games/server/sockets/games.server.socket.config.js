@@ -98,17 +98,17 @@
      socket.on('disconnect', function() {
          if (socket.request.user.username) {
              console.log(socket.request.user.username, 'has disconnected');
+
+             var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
+             if (ConnectedPlayer.in_queue) {
+                 q.removePlayer(socket.request.user.username);
+             }
+             GameRoomManager.ConnectedPlayers.delete(socket.request.user.username);
+
              if (socket.game_room_id) {
                  var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
                  GameRoom.removePlayer(socket);
              }
-             
-             var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
-             if (ConnectedPlayer.in_queue) {
-                q.removePlayer(socket.request.user.username);
-             }
-
-             GameRoomManager.ConnectedPlayers.delete(socket.request.user.username);
          }
      });
  }
