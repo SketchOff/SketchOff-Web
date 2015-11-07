@@ -14,8 +14,6 @@ export function getIO() {
     return _io;
 }
 
-export var ConnectedPlayers = new Map();
-
 class Queue {
     constructor() {
         this.players = [];

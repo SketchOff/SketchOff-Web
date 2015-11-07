@@ -2,10 +2,11 @@
 
 import * as GameRoomStates from './states/game_room.states.server.controller';
 import {
-    getIO, q, ConnectedPlayers
+    getIO, q
 }
 from './queue.server.controller';
 import * as Timers from './timers.server.controller';
+import * as GameRoomManager from '../controllers/game_room_manager.server.controller';
 
 var path = require('path'),
     mongoose = require('mongoose'),
@@ -220,19 +221,19 @@ export default class GameRoom {
             player.leave(this._id);
             delete player.game_room_id;
 
-            var ConnectedPlayer = ConnectedPlayers.get(player.request.user.username);
+            var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
             ConnectedPlayer.in_queue = false;
             ConnectedPlayer.in_game = false;
-            ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
+            GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
         }, this);
         this.players.forEach(function(player) {
             player.leave(this._id);
             delete player.game_room_id;
 
-            var ConnectedPlayer = ConnectedPlayers.get(player.request.user.username);
+            var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
             ConnectedPlayer.in_queue = false;
             ConnectedPlayer.in_game = false;
-            ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
+            GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
         }, this);
     }
 

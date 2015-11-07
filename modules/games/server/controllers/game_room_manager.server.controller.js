@@ -3,6 +3,7 @@
 import GameRoom from './game_room.server.controller.js';
 
 var GameRooms = new Map();
+export var ConnectedPlayers = new Map();
 
 // Create a new game room and add it to the GameRooms map
 export function createGameRoom(players, public_game) {
