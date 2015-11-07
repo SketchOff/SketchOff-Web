@@ -11,7 +11,7 @@
                 Challenge your friends, family, coworkers <span style="font-style:italic;font-size:14px;vertical-align:super;color:#C2C2C2">(maybe not)</span> to draw a series of kooky objects!
             </p>
         </div>
-        <div class="row">
+        <div ng-if="authentication.user == false" class="row">
             <p>
                 <a ui-sref="authentication.signup" class="btn btn-primary btn-lg" href="#" target="_blank">Create an Account!</a>
             </p>
