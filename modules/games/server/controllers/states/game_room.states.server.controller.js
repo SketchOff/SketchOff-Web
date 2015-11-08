@@ -46,6 +46,11 @@ export class Establishing {
         this.GameRoom.players.forEach(function(player) {
             player.join(this.GameRoom._id);
             player.game_room_id = this.GameRoom._id;
+
+            var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
+             ConnectedPlayer.in_queue = false;
+             ConnectedPlayer.in_game = true;
+             GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
         }, this);
     }
 

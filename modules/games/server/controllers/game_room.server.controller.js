@@ -71,13 +71,12 @@ export default class GameRoom {
         return num === max_players;
     }
 
-    // Add a player to the game
-    addPlayer(player) {
-        var index = getRandomIntInclusive(0, this.players.length - 1);
-        this.players.splice(index, 0, player);
-    }
-
     addWaitingPlayer(player) {
+        var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
+        ConnectedPlayer.in_queue = false;
+        ConnectedPlayer.in_game = true;
+        GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
+
         player.join(this._id);
         player.game_room_id = this._id;
         this.waiting_players.push(player);
@@ -168,9 +167,9 @@ export default class GameRoom {
         return this.available;
     }
 
-    // TODO: If the game needs to be re-established, let players know the reason
     // TODO: Flag player for leaving mid game
     removePlayer(player) {
+        console.log('removing', player.request.user.username, 'from', this._id);
         player.active_user = false;
         var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
         ConnectedPlayer.in_game = false;
@@ -191,7 +190,8 @@ export default class GameRoom {
             console.log('not enough playing player but enough total players');
             this.setState('Ending', 'Not enough active players to continue.');
         } else {
-            if (player.request.user.username.localeCompare(this.judge.request.username)) {
+            if (player.request.user.username.localeCompare(this.judge.request.username) === 0) {
+                console.log('The judge left the game.');
                 this.setState('Ending', 'The judge left the game.');
             } else {
                 console.log('player left but doesnt effect game play');
@@ -295,7 +295,7 @@ export default class GameRoom {
         } else {
             var saveCallback = function(err) {
                 if (err) {
-                    console.log('error participation points');
+                    console.log('error awarding participation points');
                     console.log(err);
                 }
             };

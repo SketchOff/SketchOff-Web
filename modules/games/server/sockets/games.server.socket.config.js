@@ -111,8 +111,7 @@
              var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
 
              if (ConnectedPlayer && ConnectedPlayer.num_connections === 1) {
-                console.log('only connection for user');
-                 GameRoomManager.ConnectedPlayers.delete(socket.request.user.username);
+                 console.log('only connection for user');
                  if (ConnectedPlayer && ConnectedPlayer.in_queue) {
                      q.removePlayer(socket.request.user.username);
                  }
@@ -121,10 +120,11 @@
                      GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
                      GameRoom.removePlayer(socket);
                  }
+                 GameRoomManager.ConnectedPlayers.delete(socket.request.user.username);
              } else {
                  ConnectedPlayer.num_connections--;
                  if (socket.active_user) {
-                    console.log('multiple connections but this was the active one');
+                     console.log('multiple connections but this was the active one');
                      if (ConnectedPlayer && ConnectedPlayer.in_queue) {
                          q.removePlayer(socket.request.user.username);
                      }
