@@ -48,8 +48,10 @@ export class Establishing {
             player.game_room_id = this.GameRoom._id;
 
             var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
-             ConnectedPlayer.in_queue = false;
-             ConnectedPlayer.in_game = true;
+             if (ConnectedPlayer) {
+                 ConnectedPlayer.in_queue = false;
+                 ConnectedPlayer.in_game = true;
+             }
              GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
         }, this);
     }
