@@ -30,26 +30,33 @@
     describe('Game Room States Tests', function() {
         // initialize a game room
 
-        describe('A. Public Game Room: Max Number of Player', function() {
+        describe('I. Public Game Room: Max Number of Player', function() {
             var TheGameRoom, players;
 
-            it('A1. Should be able to create a game room with max number of players', function(done) {
-            	players = getMockSockets(max_players);
-            	TheGameRoom = new GameRoom(players, true, 'randomly_generated_id');
-            	TheGameRoom.getNumPlayers().should.be.exactly(max_players);
-            	done();
-            });
+            describe('I-A. First Game', function() {
+                it('I-A1. Should be able to create a game room with max number of players', function(done) {
+                	players = getMockSockets(max_players);
+                	TheGameRoom = new GameRoom(players, true, 'randomly_generated_id');
+                	TheGameRoom.getNumPlayers().should.be.exactly(max_players);
+                	done();
+                });
 
-            it('A2. Should be in the ESTABLISHING state after GameRoom initialization', function(done) {
-                TheGameRoom.getStateName().should.be.exactly('ESTABLISHING');
-                done();
-            }); 
+                it('I-A2. Should be in the ESTABLISHING state after GameRoom initialization', function(done) {
+                    TheGameRoom.getStateName().should.be.exactly('ESTABLISHING');
+                    done();
+                }); 
 
-            it('A3. Should have a game_room_id property equal to the room\'s ID for every socket', function(done) {
-                for (let socket of players) {
-                    socket.game_room_id.should.be.exactly('randomly_generated_id');
-                }
-                done();
+                it('I-A3. Should have a game_room_id property equal to the room\'s ID for every socket', function(done) {
+                    for (let socket of players) {
+                        socket.game_room_id.should.be.exactly('randomly_generated_id');
+                    }
+                    done();
+                });
+
+                it('I-A4. Should not have a winner yet', function(done) {
+                    TheGameRoom.getWinner().should.be.exactly('No winner yet');
+                    done();
+                });
             });
         });
     });
