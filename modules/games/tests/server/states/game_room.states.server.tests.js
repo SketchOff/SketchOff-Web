@@ -37,7 +37,6 @@
             	players = getMockSockets(max_players);
             	TheGameRoom = new GameRoom(players, true, 'randomly_generated_id');
             	TheGameRoom.getNumPlayers().should.be.exactly(max_players);
-                console.log('statename = ',TheGameRoom.getStateName());
             	done();
             });
 
