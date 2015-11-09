@@ -29,8 +29,8 @@ export class Establishing {
             this.GameRoom.judge = this.GameRoom.players[0];
             getIO().to(this.GameRoom._id).emit('ESTABLISHING', {
                 judge: this.GameRoom.judge.request.user.username,
-                players: this.GameRoom.getPlayerUserNames(),
-                waiting_players: this.GameRoom.getWaitingPlayerUserNames()
+                players: this.GameRoom.getPlayerUsernames(),
+                waiting_players: this.GameRoom.getWaitingPlayerUsernames()
             });
             if (this.GameRoom.isPublic()) q.removeAvailableGame(this.GameRoom._id);
         }

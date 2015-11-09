@@ -33,7 +33,7 @@
         describe('I. Public Game Room: Max Number of Player', function() {
             var TheGameRoom, players;
 
-            describe('I-A. First Game', function() {
+            describe('I-A. First Game: Establishing State', function() {
                 it('I-A1. Should be able to create a game room with max number of players', function(done) {
                 	players = getMockSockets(max_players);
                 	TheGameRoom = new GameRoom(players, true, 'randomly_generated_id');
@@ -55,6 +55,13 @@
 
                 it('I-A4. Should not have a winner yet', function(done) {
                     TheGameRoom.getWinner().should.be.exactly('No winner yet');
+                    done();
+                });
+
+                it('I-A5. The judge should be the first player to join the room', function(done) {
+                    var first_player = players[0].request.user.username;
+                    var judge = TheGameRoom.getJudgeUsername();
+                    first_player.should.be.exactly(judge);
                     done();
                 });
             });

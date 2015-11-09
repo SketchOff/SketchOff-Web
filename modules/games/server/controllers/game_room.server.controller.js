@@ -80,11 +80,11 @@ export default class GameRoom {
         player.join(this._id);
         player.game_room_id = this._id;
         this.waiting_players.push(player);
-        getIO().to(this._id).emit('player joining', this.getWaitingPlayerUserNames());
+        getIO().to(this._id).emit('player joining', this.getWaitingPlayerUsernames());
         if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
     }
 
-    getPlayerUserNames() {
+    getPlayerUsernames() {
         var player_names = [];
         this.players.forEach(function(player) {
             player_names.push(player.request.user.username);
@@ -100,7 +100,7 @@ export default class GameRoom {
         return player_users;
     }
 
-    getWaitingPlayerUserNames() {
+    getWaitingPlayerUsernames() {
         var waiting_player_names = [];
         this.waiting_players.forEach(function(player) {
             waiting_player_names.push(player.request.user.username);
@@ -108,7 +108,7 @@ export default class GameRoom {
         return waiting_player_names;
     }
 
-    getJudgeUserName() {
+    getJudgeUsername() {
         return this.judge.request.user.username;
     }
 
@@ -196,8 +196,8 @@ export default class GameRoom {
             } else {
                 console.log('player left but doesnt effect game play');
                 getIO().to(this._id).emit('player leaving', {
-                    players: this.getPlayerUserNames(),
-                    waiting_players: this.getWaitingPlayerUserNames()
+                    players: this.getPlayerUsernames(),
+                    waiting_players: this.getWaitingPlayerUsernames()
                 });
             }
             if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
@@ -208,9 +208,9 @@ export default class GameRoom {
         var RoomInfo = {};
         RoomInfo.room_type = this.getRoomType();
         RoomInfo.state = this.getStateName();
-        RoomInfo.players = this.getPlayerUserNames();
-        RoomInfo.waiting_players = this.getWaitingPlayerUserNames();
-        RoomInfo.judge = this.getJudgeUserName();
+        RoomInfo.players = this.getPlayerUsernames();
+        RoomInfo.waiting_players = this.getWaitingPlayerUsernames();
+        RoomInfo.judge = this.getJudgeUsername();
         RoomInfo.phrase = this.getPhrase();
         RoomInfo.winner = this.getWinner();
         return RoomInfo;

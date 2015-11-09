@@ -50,14 +50,14 @@
          var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
          socket.emit('game info responding', {
              _id: GameRoom._id,
-             players: GameRoom.getPlayerUserNames(),
-             waiting_players: GameRoom.getWaitingPlayerUserNames(),
+             players: GameRoom.getPlayerUsernames(),
+             waiting_players: GameRoom.getWaitingPlayerUsernames(),
              state: GameRoom.getStateName(),
-             judge: GameRoom.getJudgeUserName(),
+             judge: GameRoom.getJudgeUsername(),
              phrases: GameRoom.getPhrases()
          });
 
-         for (let username of GameRoom.getPlayerUserNames()) {
+         for (let username of GameRoom.getPlayerUsernames()) {
              var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(username);
              ConnectedPlayer.in_queue = false;
              ConnectedPlayer.in_game = true;
