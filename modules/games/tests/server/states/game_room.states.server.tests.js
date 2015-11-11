@@ -37,14 +37,15 @@
         TestingCountdownTimes.winner_selection = 1;
         TestingCountdownTimes.new_game = 1;
 
-
+        // TODO: Move instantiation errors to game_room.server.tests
         describe('Public Game Room: Max Number of Player', function() {
             var players = getMockSockets(max_players);
             var TheGameRoom = new GameRoom(players, true, 'randomly_generated_id', TestingCountdownTimes);
 
-            describe('First Game: Instantiation and Establishing State', function() {
+            describe('Instantiation Errors', function() {
                 var TempCountdownTimes = TestingCountdownTimes;
 
+                // TODO: Move each test into its own it blocks
                 it('should not be able to create a game with incorrect or missing arguments', function(done) {
                     (function() {
                         new GameRoom(players, true, 'randomly_generated_id');
@@ -102,6 +103,14 @@
 
                     TempCountdownTimes.new_game = 1;
 
+                    done();
+                });
+            });
+
+            describe('First Game: ESTABLISHING State', function() {
+
+                it('should have correct values for CountdownTimes', function(done) {
+                    TheGameRoom.getCountdownTimes().should.be.eql(TestingCountdownTimes);
                     done();
                 });
 
