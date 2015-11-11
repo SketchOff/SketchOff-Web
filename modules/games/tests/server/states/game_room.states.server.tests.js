@@ -103,8 +103,32 @@
                     done();
                 });
 
-                it('should not be accepting new players', function(done) {
+                it('should be accepting new players', function(done) {
                     TheGameRoom.isAvailable().should.be.true // jshint ignore:line
+                    done();
+                });
+
+                it('should not have a phrase set', function(done) {
+                    TheGameRoom.getPhrase().should.be.exactly('Not chosen yet');
+                    done();
+                });
+            });
+
+            describe('First Game: Drawing State', function() {
+                var test_phrase = 'some phrase';
+                it('should change states after phrase selection', function(done) {
+                    TheGameRoom.setPhrase(test_phrase);
+                    TheGameRoom.getStateName().should.be.exactly('DRAWING');
+                    done();
+                });
+
+                it('should have the phrase set correctly', function(done) {
+                    TheGameRoom.getPhrase().should.be.exactly(test_phrase);
+                    done();
+                });
+
+                it('should not be accepting new players', function(done) {
+                    TheGameRoom.isAvailable().should.not.be.true; // jshint ignore:line
                     done();
                 });
             });
