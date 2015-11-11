@@ -21,10 +21,14 @@ export var max_players = 7;
 
 export default class GameRoom {
 
-    // TODO: Add countdown times and points objects to constructor parameter
+    // TODO: Add points objects to constructor parameter
+    // TODO: Create save-id which is game_id + game_num;
     constructor(players, is_public_room, game_id, CountdownTimes) {
         if (arguments.length !== 4) throw new Error('Missing arguments');
         if (!Array.isArray(players)) throw new Error('Players param is not an array');
+        players.forEach(function(player) {
+            if (typeof player !== 'object') throw new Error('Players array contains non-object values');
+        });
         if (players.length < min_players) throw new Error('Too few players');
         if (players.length > max_players) throw new Error('Too many players');
         if (typeof is_public_room !== 'boolean') throw new Error('is_public_room param must be a boolean');

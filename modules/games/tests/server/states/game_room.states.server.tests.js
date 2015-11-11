@@ -56,6 +56,10 @@
                     }).should.throw('Players param is not an array');
 
                     (function() {
+                        new GameRoom([1,2,3], true, 'randomly_generated_id', TempCountdownTimes);
+                    }).should.throw('Players array contains non-object values');
+
+                    (function() {
                         new GameRoom([], true, 'randomly_generated_id', TempCountdownTimes);
                     }).should.throw('Too few players');
 
