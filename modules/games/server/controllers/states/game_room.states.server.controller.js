@@ -18,7 +18,7 @@ export class Establishing {
         this.GameRoom.players = shuffle(this.GameRoom.players);
         this.GameRoom.judge = this.GameRoom.players[0];
         this.GameRoom.winner = 'No winner yet';
-        if (this.GameRoom.first_game) {
+        if (this.GameRoom.isFirstGame()) {
             this.connectPlayers();
             getIO().to(this.GameRoom._id).emit('ESTABLISHED');
         } else {
