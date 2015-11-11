@@ -21,7 +21,6 @@ export class Establishing {
         if (this.GameRoom.first_game) {
             this.connectPlayers();
             getIO().to(this.GameRoom._id).emit('ESTABLISHED');
-            this.GameRoom.first_game = false;
         } else {
             this.addWaitingPlayers();
             var x = this.GameRoom.players.shift();
@@ -113,7 +112,9 @@ export class Ending {
         Timers.countdownFactory(this.GameRoom, 'new_game_time', 'Establishing', 'starting new game countdown');
         this.GameRoom.saveGame();
         this.GameRoom.awardPoints();
-        // TODO: save game info to game history schema
+
+        if (this.GameRoom.isFirstGame()) this.GameRoom.first_game = false;
+
     }
 
     getName() {

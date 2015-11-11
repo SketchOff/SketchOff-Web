@@ -14,16 +14,23 @@ var path = require('path'),
     User = mongoose.model('User'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
-// Set min and max players
+// Default game properties
 export var min_players = 2;
 export var max_players = 7;
 
+
 export default class GameRoom {
 
+    // TODO: Add countdown times and points objects to constructor parameter
     constructor(players, is_public_room, game_id) {
-        // Set players prop, return error if not array
-        if (Array.isArray(players)) this.players = players;
-        else throw 'Attempted to create game without correct players param';
+        if (arguments.length !== 3) throw new Error('Missing arguments');
+        if (!Array.isArray(players)) throw new Error('Players param is not an array');
+        if (players.length < min_players) throw new Error('Too few players');
+        if (players.length > max_players) throw new Error('Too many players');
+        if (typeof is_public_room !== 'boolean') throw new Error('is_public_room param must be a boolean');
+        if (typeof game_id !== 'string') throw new Error('game_id param must be a string');
+
+        this.players = players;
         // Set the game_id generated from the game_rooms controller
         this._id = game_id;
         this.is_public = is_public_room;
@@ -40,7 +47,7 @@ export default class GameRoom {
         this.winner_points = 100;
         this.participation_points = 10;
         this.State = new GameRoomStates.Establishing(this);
-        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
+        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getInfo()]);
     }
 
     getRoomType() {
@@ -57,8 +64,8 @@ export default class GameRoom {
         this.cancelCurrCountdown();
         this.State = new GameRoomStates[State](this, reason);
         if (this.hasAdminSubscribers()) {
-            if (State === 'Terminating') getIO().to('admin_updates').emit('room termination', this.getRoomId());
-            else getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
+            if (State === 'Terminating') getIO().to('admin_updates').emit('room termination', this.getRoomID());
+            else getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getInfo()]);
         }
     }
 
@@ -81,7 +88,7 @@ export default class GameRoom {
         player.game_room_id = this._id;
         this.waiting_players.push(player);
         getIO().to(this._id).emit('player joining', this.getWaitingPlayerUsernames());
-        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
+        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getInfo()]);
     }
 
     getPlayerUsernames() {
@@ -120,7 +127,7 @@ export default class GameRoom {
         return this.judge;
     }
 
-    getRoomId() {
+    getRoomID() {
         return this._id;
     }
 
@@ -167,6 +174,10 @@ export default class GameRoom {
         return this.available;
     }
 
+    isFirstGame() {
+        return this.first_game;
+    }
+
     // TODO: Flag player for leaving mid game
     removePlayer(player) {
         console.log('removing', player.request.user.username, 'from', this._id);
@@ -200,7 +211,7 @@ export default class GameRoom {
                     waiting_players: this.getWaitingPlayerUsernames()
                 });
             }
-            if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
+            if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getInfo()]);
         }
     }
 
@@ -307,10 +318,4 @@ export default class GameRoom {
             }
         }
     }
-}
-
-// Returns a random integer between min (included) and max (included)
-// Using Math.round() will give you a non-uniform distribution!
-function getRandomIntInclusive(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
