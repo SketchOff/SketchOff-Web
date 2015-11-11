@@ -31,37 +31,81 @@
     };
 
     describe('Game Room States Tests', function() {
-        // initialize a game room
+        var TestingCountdownTimes = {};
+        TestingCountdownTimes.choose_phrase = 1;
+        TestingCountdownTimes.drawing = 1;
+        TestingCountdownTimes.winner_selection = 1;
+        TestingCountdownTimes.new_game = 1;
+
 
         describe('Public Game Room: Max Number of Player', function() {
-            var TheGameRoom, players;
+            var players = getMockSockets(max_players);
+            var TheGameRoom = new GameRoom(players, true, 'randomly_generated_id', TestingCountdownTimes);
 
             describe('First Game: Instantiation and Establishing State', function() {
+                var TempCountdownTimes = TestingCountdownTimes;
+
                 it('should not be able to create a game with incorrect or missing arguments', function(done) {
                     (function() {
-                        new GameRoom(players, true);
-                    }).should.throw();
+                        new GameRoom(players, true, 'randomly_generated_id');
+                    }).should.throw('Missing arguments');
+
                     (function() {
-                        new GameRoom('string', true, 'randomly_generated_id');
-                    }).should.throw();
+                        new GameRoom('string', true, 'randomly_generated_id', TempCountdownTimes);
+                    }).should.throw('Players param is not an array');
+
                     (function() {
-                        new GameRoom([], true, 'randomly_generated_id');
-                    }).should.throw();
+                        new GameRoom([], true, 'randomly_generated_id', TempCountdownTimes);
+                    }).should.throw('Too few players');
+
                     (function() {
-                        new GameRoom([players[0]], true, 'randomly_generated_id');
-                    }).should.throw();
+                        new GameRoom([players[0]], true, 'randomly_generated_id', TempCountdownTimes);
+                    }).should.throw('Too few players');
+
                     (function() {
-                        new GameRoom(players[0].concat(players), true, 'randomly_generated_id');
-                    }).should.throw();
+                        new GameRoom(players.concat([players[0]]), true, 'randomly_generated_id', TempCountdownTimes);
+                    }).should.throw('Too many players');
+
                     (function() {
-                        new GameRoom(players, 'string', 'randomly_generated_id');
-                    }).should.throw();
+                        new GameRoom(players, 'string', 'randomly_generated_id', TempCountdownTimes);
+                    }).should.throw('is_public_room param must be a boolean');
+
+                    (function() {
+                        new GameRoom(players, true, 1234, TempCountdownTimes);
+                    }).should.throw('game_id param must be a string');
+
+                    (function() {
+                        new GameRoom(players, true, 'randomly_generated_id', 'string');
+                    }).should.throw('CountdownTimes param must be an object');
+
+                    delete TempCountdownTimes.new_game;
+                    (function() {
+                        new GameRoom(players, true, 'randomly_generated_id', TempCountdownTimes);
+                    }).should.throw('Missing necessary countdown properties for the CountdownTimes param');
+
+                    TempCountdownTimes.new_game = 1;
+                    TempCountdownTimes.unnecessary_property = 1;
+                    (function() {
+                        new GameRoom(players, true, 'randomly_generated_id', TempCountdownTimes);
+                    }).should.throw('Unnecessary properties in CountdownTimes param');
+
+                    delete TempCountdownTimes.unnecessary_property;
+                    TempCountdownTimes.new_game = 'string';
+                    (function() {
+                        new GameRoom(players, true, 'randomly_generated_id', TempCountdownTimes);
+                    }).should.throw('All countdown values must be numbers');
+
+                    TempCountdownTimes.new_game = -1;
+                    (function() {
+                        new GameRoom(players, true, 'randomly_generated_id', TempCountdownTimes);
+                    }).should.throw('Countdown values cant be less than 0');
+
+                    TempCountdownTimes.new_game = 1;
+
                     done();
                 });
 
-                it('should be able to create a game room with max number of players', function(done) {
-                    players = getMockSockets(max_players);
-                    TheGameRoom = new GameRoom(players, true, 'randomly_generated_id');
+                it('should have max number of players', function(done) {
                     TheGameRoom.getRoomID().should.be.exactly('randomly_generated_id');
                     TheGameRoom.getNumPlayers().should.be.exactly(max_players);
                     TheGameRoom.isFull().should.be.true; // jshint ignore:line

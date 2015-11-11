@@ -6,9 +6,9 @@ import {
 from './queue.server.controller';
 
 export var countdownFactory = function(GameRoom, time, NextState, emit_msg) {
-	var time_left = GameRoom[time];
+	var time_left = time;
     GameRoom.interval = setInterval(function() {
-    	getIO().to(GameRoom._id).emit(emit_msg, time_left);
+    	getIO().to(GameRoom.getRoomID()).emit(emit_msg, time_left);
     	decrementTime();
     	if (time_left < 0) {
     		clearInterval(this);

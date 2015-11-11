@@ -67,7 +67,7 @@ export class Drawing {
         this.name = 'DRAWING';
         this.GameRoom = GameRoom;
         getIO().to(this.GameRoom._id).emit('DRAWING', this.GameRoom.getPhrase());
-        Timers.countdownFactory(this.GameRoom, 'drawing_time', 'SelectingWinner', 'drawing countdown');
+        Timers.countdownFactory(this.GameRoom, this.GameRoom.getDrawingTime(), 'SelectingWinner', 'drawing countdown');
     }
 
     getName() {
@@ -81,7 +81,7 @@ export class SelectingWinner {
         this.GameRoom = GameRoom;
         getIO().to(this.GameRoom._id).emit('SELECTING_WINNER');
         if (!this.GameRoom.isFull() && this.GameRoom.isPublic()) q.addAvailableGame(this.GameRoom._id);
-        Timers.countdownFactory(this.GameRoom, 'winner_selection_time', 'Ending', 'selecting winner countdown');
+        Timers.countdownFactory(this.GameRoom, this.GameRoom.getWinnerSelectionTime(), 'Ending', 'selecting winner countdown');
     }
 
     getName() {
@@ -109,7 +109,7 @@ export class Ending {
         }
         message.winner = this.GameRoom.getWinner();
         getIO().to(this.GameRoom._id).emit('ENDING', message);
-        Timers.countdownFactory(this.GameRoom, 'new_game_time', 'Establishing', 'starting new game countdown');
+        Timers.countdownFactory(this.GameRoom, this.GameRoom.getNewGameTime(), 'Establishing', 'starting new game countdown');
         this.GameRoom.saveGame();
         this.GameRoom.awardPoints();
 

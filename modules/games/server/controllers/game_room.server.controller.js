@@ -22,13 +22,26 @@ export var max_players = 7;
 export default class GameRoom {
 
     // TODO: Add countdown times and points objects to constructor parameter
-    constructor(players, is_public_room, game_id) {
-        if (arguments.length !== 3) throw new Error('Missing arguments');
+    constructor(players, is_public_room, game_id, CountdownTimes) {
+        if (arguments.length !== 4) throw new Error('Missing arguments');
         if (!Array.isArray(players)) throw new Error('Players param is not an array');
         if (players.length < min_players) throw new Error('Too few players');
         if (players.length > max_players) throw new Error('Too many players');
         if (typeof is_public_room !== 'boolean') throw new Error('is_public_room param must be a boolean');
         if (typeof game_id !== 'string') throw new Error('game_id param must be a string');
+        if (typeof CountdownTimes !== 'object') throw new Error('CountdownTimes param must be an object');
+        if (typeof CountdownTimes.choose_phrase === 'undefined' || typeof CountdownTimes.drawing === 'undefined' || typeof CountdownTimes.winner_selection === 'undefined' || typeof CountdownTimes.new_game === 'undefined') {
+            throw new Error('Missing necessary countdown properties for the CountdownTimes param');
+        }
+        if (Object.keys(CountdownTimes).length !== 4) {
+            throw new Error('Unnecessary properties in CountdownTimes param');
+        }
+        if (typeof CountdownTimes.choose_phrase !== 'number' || typeof CountdownTimes.drawing !== 'number' || typeof CountdownTimes.winner_selection !== 'number' || typeof CountdownTimes.new_game !== 'number') {
+            throw new Error('All countdown values must be numbers');
+        }
+        if (CountdownTimes.choose_phrase < 0 || CountdownTimes.drawing < 0 || CountdownTimes.winner_selection < 0 || CountdownTimes.new_game < 0) {
+            throw new Error('Countdown values cant be less than 0');
+        }
 
         this.players = players;
         // Set the game_id generated from the game_rooms controller
@@ -38,16 +51,33 @@ export default class GameRoom {
         this.first_game = true;
         this.available = true;
         this.waiting_players = [];
-        this.choose_phrase_time = 5;
-        this.drawing_time = 5;
-        this.winner_selection_time = 5;
-        this.new_game_time = 5;
+        this.CountdownTimes = CountdownTimes;
         this.winner = null;
         this.interval = null;
         this.winner_points = 100;
         this.participation_points = 10;
         this.State = new GameRoomStates.Establishing(this);
         if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getInfo()]);
+    }
+
+    getCountdownTimes() {
+        return this.CountdownTimes;
+    }
+
+    getWinnerSelectionTime() {
+        return this.CountdownTimes.winner_selection;
+    }
+
+    getDrawingTime() {
+        return this.CountdownTimes.drawing;
+    }
+
+    getChoosePhraseTime() {
+        return this.CountdownTimes.choose_phrase;
+    }
+
+    getNewGameTime() {
+        return this.CountdownTimes.new_game;
     }
 
     getRoomType() {
