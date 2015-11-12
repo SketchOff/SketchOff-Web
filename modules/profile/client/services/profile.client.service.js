@@ -8,6 +8,9 @@ angular.module('profile').factory('Profiles', ['$resource',
     }, {
       update: {
         method: 'PUT'
+      },
+      friendRequest: {
+      	method: 'POST'
       }
     });
   }

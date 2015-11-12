@@ -16,6 +16,12 @@ exports.read = function (req, res) {
   res.json(req.Profile);
 };
 
+exports.friendRequest = function(req,res) {
+  console.log("FRIEND REQUEST CALLED");
+  console.log(req.Profile);
+  console.log(req.user);
+  res.message("hello");
+};
 /**
  * List of Articles
  

@@ -84,6 +84,7 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
 
     $scope.sendFriendRequestFromProfile = function() {
       console.log("Send Friend Request Clicked");
+      $scope.message = Profiles.friendRequest();
       /*
           things to check:
             is user the same person?
