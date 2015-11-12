@@ -14,7 +14,7 @@ export function getIO() {
     return _io;
 }
 
-class Queue {
+ class Queue { // for testing purposes
     constructor() {
         this.players = [];
         this.available_games = [];
@@ -36,7 +36,7 @@ class Queue {
                 ConnectedPlayer.in_queue = false;
                 ConnectedPlayer.in_game = false;
                 GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
-                
+
                 this.players.splice(index, 1);
                 this.updateAdmin();
                 break;
