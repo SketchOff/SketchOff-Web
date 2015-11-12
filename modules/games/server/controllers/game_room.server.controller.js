@@ -5,7 +5,6 @@ import {
     getIO, q
 }
 from './queue.server.controller';
-import * as Timers from './timers.server.controller';
 import * as GameRoomManager from '../controllers/game_room_manager.server.controller';
 
 var path = require('path'),
@@ -364,5 +363,20 @@ export default class GameRoom {
                 player.request.user.save(saveCallback);
             }
         }
+    }
+
+    countdownFactory(time, NextState, emit_msg) {
+        var time_left = time;
+        var that = this;
+        getIO().to(this.getRoomID()).emit(emit_msg, time_left);
+
+        GameRoom.interval = setInterval(function() {
+            time_left--;
+            getIO().to(that.getRoomID()).emit(emit_msg, time_left);
+            if (time_left < 0) {
+                clearInterval(this);
+                that.setState(NextState);
+            }
+        }, 1000);
     }
 }

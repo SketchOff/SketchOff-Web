@@ -9,7 +9,6 @@ import {
     getIO, q
 }
 from '../queue.server.controller';
-import * as Timers from '../timers.server.controller';
 
 export class Establishing {
     constructor(GameRoom) {
@@ -68,7 +67,7 @@ export class Drawing {
         this.name = 'DRAWING';
         this.GameRoom = GameRoom;
         getIO().to(this.GameRoom.getRoomID()).emit('DRAWING', this.GameRoom.getPhrase());
-        Timers.countdownFactory(this.GameRoom, this.GameRoom.getDrawingTime(), 'SelectingWinner', 'drawing countdown');
+        this.GameRoom.countdownFactory(this.GameRoom.getDrawingTime(), 'SelectingWinner', 'drawing countdown');
     }
 
     getName() {
@@ -82,7 +81,7 @@ export class SelectingWinner {
         this.GameRoom = GameRoom;
         getIO().to(this.GameRoom.getRoomID()).emit('SELECTING_WINNER');
         if (!this.GameRoom.isFull() && this.GameRoom.isPublic()) q.addAvailableGame(this.GameRoom.getRoomID());
-        Timers.countdownFactory(this.GameRoom, this.GameRoom.getWinnerSelectionTime(), 'Ending', 'selecting winner countdown');
+        this.GameRoom.countdownFactory(this.GameRoom.getWinnerSelectionTime(), 'Ending', 'selecting winner countdown');
     }
 
     getName() {
@@ -110,7 +109,7 @@ export class Ending {
         }
         message.winner = this.GameRoom.getWinner();
         getIO().to(this.GameRoom.getRoomID()).emit('ENDING', message);
-        Timers.countdownFactory(this.GameRoom, this.GameRoom.getNewGameTime(), 'Establishing', 'starting new game countdown');
+        this.GameRoom.countdownFactory(this.GameRoom.getNewGameTime(), 'Establishing', 'starting new game countdown');
         this.GameRoom.saveGame();
         this.GameRoom.awardPoints();
 
