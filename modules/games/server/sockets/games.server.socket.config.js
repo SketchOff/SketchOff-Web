@@ -48,14 +48,7 @@
 
      socket.on('get game info', function() {
          var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
-         socket.emit('game info responding', {
-             _id: GameRoom._id,
-             players: GameRoom.getPlayerUsernames(),
-             waiting_players: GameRoom.getWaitingPlayerUsernames(),
-             state: GameRoom.getStateName(),
-             judge: GameRoom.getJudgeUsername(),
-             phrases: GameRoom.getPhrases()
-         });
+         socket.emit('game info responding', GameRoom.getGameInfo());
 
          for (let username of GameRoom.getPlayerUsernames()) {
              var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(username);

@@ -2,7 +2,7 @@
     <h1>Hello {{authentication.user.username}}</h1>
     <h2>Welcome To The Game Room</h2>
     <h3 style="color: red">Game Room Info
-    <h4>ID: <i>{{GameRoom._id}}</i></h4>
+    <h4>Game ID: <i>{{GameRoom.game_id}}</i></h4>
     <h4>Players: <i>{{GameRoom.players.join(', ')}}</i></h4>
     <h4 ng-if="GameRoom.waiting_players && GameRoom.waiting_players.length">Waiting Players: <i>{{GameRoom.waiting_players.join(', ')}}</i></h4>
     <h4>Judge: <i>{{GameRoom.judge}}</i></h4>
@@ -13,11 +13,10 @@
     <h4 ng-if="GameRoom.early_end_reason">Heres 10xp for participating</h4>
     <h4 ng-if="GameRoom.judge_didnt_pick">The judge didn't pick a winner. You get 10xp for participating.</i></h4>
 
-    <div id="choose-phrase" ng-if="authentication.user.username === GameRoom.judge && GameRoom.state === 'ESTABLISHING'">
-        <h3 style="color:blue">Ur da judge. Choose a phrase.</h3>
-    <button class="btn btn-info" ng-repeat="phrase in GameRoom.phrases" style="margin-right: 8px" ng-click=setPhrase(phrase)>{{phrase}}</button>
-    </div>
     <div class="countdown" ng-switch on="GameRoom.state">
+        <h5 id="selecting-phrase-countdown" ng-switch-when="ESTABLISHING" ng-if="GameRoom.phrase_selection_countdown > -1" style="color: green">
+            Select Phrase Countdown: {{GameRoom.phrase_selection_countdown}}
+        </h5>
         <h5 id="drawing-countdown" ng-switch-when="DRAWING" ng-if="GameRoom.drawing_countdown > -1" style="color: green">
             Drawing Countdown: {{GameRoom.drawing_countdown}}
         </h5>
@@ -28,6 +27,12 @@
             New Game Countdown: {{GameRoom.new_game_countdown}}
         </h5>
     </div>
+
+    <div id="choose-phrase" ng-if="authentication.user.username === GameRoom.judge && GameRoom.state === 'ESTABLISHING'">
+        <h3 style="color:blue">Ur da judge. Choose a phrase.</h3>
+    <button class="btn btn-info" ng-repeat="phrase in GameRoom.phrases" style="margin-right: 8px" ng-click=setPhrase(phrase)>{{phrase}}</button>
+    </div>
     <button class="btn btn-info" ng-repeat="player in GameRoom.players" style="margin-right: 8px" ng-click=setWinner(player) ng-if="GameRoom.state === 'SELECTING_WINNER' && authentication.user.username === GameRoom.judge && player !== GameRoom.judge">{{player}}</button>
-    <br><button class="btn btn-danger" ng-click="leaveGameRoom()" style="margin-top: 8px">Leave Game</button>
+    <br>
+    <button class="btn btn-danger" ng-click="leaveGameRoom()" style="margin-top: 8px">Leave Game</button>
 </section>

@@ -62,11 +62,15 @@ export default class GameRoom {
         this.winner_points = 100;
         this.participation_points = 10;
         this.State = new GameRoomStates.Establishing(this);
-        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getInfo()]);
+        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
     }
 
     getCountdownTimes() {
         return this.CountdownTimes;
+    }
+
+    getPhraseSelectionTime() {
+        return this.CountdownTimes.choose_phrase;
     }
 
     getWinnerSelectionTime() {
@@ -75,10 +79,6 @@ export default class GameRoom {
 
     getDrawingTime() {
         return this.CountdownTimes.drawing;
-    }
-
-    getChoosePhraseTime() {
-        return this.CountdownTimes.choose_phrase;
     }
 
     getNewGameTime() {
@@ -100,7 +100,7 @@ export default class GameRoom {
         this.State = new GameRoomStates[State](this, reason);
         if (this.hasAdminSubscribers()) {
             if (State === 'Terminating') getIO().to('admin_updates').emit('room termination', this.getRoomID());
-            else getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getInfo()]);
+            else getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
         }
     }
 
@@ -123,7 +123,7 @@ export default class GameRoom {
         player.game_room_id = this._id;
         this.waiting_players.push(player);
         getIO().to(this._id).emit('player joining', this.getWaitingPlayerUsernames());
-        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getInfo()]);
+        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
     }
 
     getPlayerUsernames() {
@@ -257,11 +257,11 @@ export default class GameRoom {
                     waiting_players: this.getWaitingPlayerUsernames()
                 });
             }
-            if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getInfo()]);
+            if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
         }
     }
 
-    getInfo() {
+    getRoomInfo() {
         var RoomInfo = {};
         RoomInfo.room_type = this.getRoomType();
         RoomInfo.state = this.getStateName();
@@ -271,6 +271,18 @@ export default class GameRoom {
         RoomInfo.phrase = this.getPhrase();
         RoomInfo.winner = this.getWinner();
         return RoomInfo;
+    }
+
+    getGameInfo() {
+        var GameInfo = {
+            game_id: this.getGameID(),
+            players: this.getPlayerUsernames(),
+            waiting_players: this.getWaitingPlayerUsernames(),
+            state: this.getStateName(),
+            judge: this.getJudgeUsername(),
+            phrases: this.getPhrases()
+        };
+        return GameInfo;
     }
 
     hasAdminSubscribers() {
@@ -370,12 +382,15 @@ export default class GameRoom {
         var that = this;
         getIO().to(this.getRoomID()).emit(emit_msg, time_left);
 
-        GameRoom.interval = setInterval(function() {
+        this.interval = setInterval(function() {
             time_left--;
             getIO().to(that.getRoomID()).emit(emit_msg, time_left);
             if (time_left < 0) {
                 clearInterval(this);
-                that.setState(NextState);
+                if (NextState === 'Ending') {
+                    // TODO: Kick/Flag Judge
+                    that.setState(NextState, 'Judge didn\'t pick a phrase');
+                } else that.setState(NextState);
             }
         }, 1000);
     }

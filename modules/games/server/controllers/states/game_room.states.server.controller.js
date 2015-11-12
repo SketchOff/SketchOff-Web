@@ -33,8 +33,7 @@ export class Establishing {
             });
             if (this.GameRoom.isPublic()) q.removeAvailableGame(this.GameRoom.getRoomID());
         }
-        // TODO: Add timer for choosing phrase
-        // Timers.countdownFactory(this.GameRoom, 'choose_phrase_time', 'Drawing', 'choosing phrase countdown');
+        this.GameRoom.countdownFactory(this.GameRoom.getPhraseSelectionTime(), 'Ending', 'selecting phrase countdown');
     }
 
     getName() {
@@ -99,8 +98,7 @@ export class Ending {
             this.GameRoom.noWinner();
             if (!reason) {
                 message.judge_didnt_pick = true;
-                // Judge failed to pick winning player in allotted time
-                // TODO: kick judge
+                // TODO: kick and flag judge
             }
         }
 

@@ -32,7 +32,7 @@ export function getGameRoom(game_room_id) {
 export function getInfo() {
     var RoomsInfo = {};
     GameRooms.forEach(function(GameRoom, id) {
-        RoomsInfo[id] = GameRoom.getInfo();
+        RoomsInfo[id] = GameRoom.getRoomInfo();
     });
     return RoomsInfo;
 }

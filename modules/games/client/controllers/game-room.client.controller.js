@@ -34,6 +34,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             $scope.GameRoom.judge = msg.judge;
             $scope.GameRoom.players = msg.players;
             $scope.GameRoom.waiting_players = msg.waiting_players;
+            $scope.GameRoom.phrase_selection_countdown = undefined;
             $scope.GameRoom.drawing_countdown = undefined;
             $scope.GameRoom.winner_selection_countdown = undefined;
             $scope.GameRoom.new_game_countdown = undefined;
@@ -72,6 +73,10 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             $scope.GameRoom.waiting_players = msg;
         };
 
+        var selectPhraseCountdown = function(msg) {
+            $scope.GameRoom.phrase_selection_countdown = msg;
+        };
+
         var drawCountdown = function(msg) {
             $scope.GameRoom.drawing_countdown = msg;
         };
@@ -107,6 +112,8 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         Socket.on('TERMINATING', terminate);
 
         Socket.on('player joining', playerJoin);
+
+        Socket.on('selecting phrase countdown', selectPhraseCountdown);
 
         Socket.on('drawing countdown', drawCountdown);
 
