@@ -13,8 +13,7 @@ var path = require('path'),
  * Show the current article
  */
 exports.read = function (req, res) {
-  console.log(req);
-  res.json(req.user);
+  res.json(req.Profile);
 };
 
 /**
@@ -49,12 +48,30 @@ exports.profileByID = function (req, res, next, id) {
   User.findById(id).populate('user', 'displayName').exec(function (err, user) {
     if (err) {
       return next(err);
-    } else if (!user) { //  user dne?
+    } else if (!user) { //  user dne
       return res.status(404).send({
         message: 'No profile with that identifier has been found'
       });
     }
-    req.user = user;
+    var strippedUser = {
+      _id:user._id,
+      displayName:user.displayName,
+      username:user.username,
+      profileImageURL:user.profileImageURL,
+      firstName:user.firstName,
+      lastName:user.lastName,
+      email:user.email,
+      friends:user.friends,
+      created:user.created,
+      provider:user.provider,
+      same:false
+    };
+    if (String(req.user._id) === id) {
+      strippedUser.pendingFriendRequests = user.pendingFriendRequests;
+      strippedUser.roles = user.roles;
+      strippedUser.same = true;
+    }
+    req.Profile = strippedUser;
     next();
   });
 };

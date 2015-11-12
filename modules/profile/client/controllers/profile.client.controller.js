@@ -74,17 +74,35 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
       $scope.articles = Articles.query();
     };
 */
+    $scope.inFriendsList = function() {
+      if (Authentication.user.friends.indexOf($scope.Profile.profileId) > -1) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    $scope.sendFriendRequestFromProfile = function() {
+      console.log("Send Friend Request Clicked");
+      /*
+          things to check:
+            is user the same person?
+            is user already friends?
+            is user banned/flagged?
+            does other friend/user actually exist? (resolve check)
+            ?max friend requests?
+
+      */
+    };
 
     // Find existing Article
     $scope.findOne = function () {
       if (!$stateParams.profileId) {
         $stateParams.profileId = Authentication.user._id;
       }
-      console.log($stateParams.profileId);
       $scope.Profile = Profiles.get({
         profileId: $stateParams.profileId
       });
-      console.log($scope.Profile);
     };
   }
 ]);
