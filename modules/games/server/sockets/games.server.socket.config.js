@@ -39,9 +39,20 @@
          }
      });
 
+     socket.on('join private lobby', function(msg) {
+	console.log('join private jobby');
+	console.log(msg);
+	//ADDING THE PLAYER ISNT WORKING I DONT KNOW WHY
+	GameRoomManager.getGameRoom(msg[0]).addPlayer(msg[1]);
+	console.log('added player');
+	console.log(GameRoomManager.getGameRoom(msg[0]).players);
+	io.to(msg[1]).emit('joined private lobby');
+	
+     });
+
      socket.on('create private game', function() {
          var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
-
+	 console.log('creating private game');
          if (ConnectedPlayer.in_queue) {
             socket.emit('already in queue');
 	    //remove from queue?
@@ -49,14 +60,31 @@
             socket.emit('already in game');
 	    //remove from game?
          } else {
-	     GameRoomManager.createGameRoom(socket, false);
+	     GameRoomManager.createGameRoom([socket], false);
 	     ConnectedPlayer.in_game = true;
          }
      });
 
+     socket.on('get all avaliable players', function(){	
+	 var avaliablePlayers = {};
+	 GameRoomManager.ConnectedPlayers.forEach(function(val, key){if( !val.in_game && !val.in_queue){avaliablePlayers[key]=val;}});
+	 console.log(avaliablePlayers);
+	 socket.emit('avaliable players responding', avaliablePlayers);
+     });
+    
+
+     socket.on('invite player', function(msg){
+	 console.log(socket.game_room_id);
+	 io.to(msg).emit('invite notification', [socket.game_room_id, socket.request.user.username, msg]); 
+     });
+
 
      socket.on('get game info', function() {
+	 console.log(socket.game_room_id);
          var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
+	 console.log('1');
+	 console.log(GameRoom);
+	 console.log('2');
          socket.emit('game info responding', {
              _id: GameRoom._id,
              players: GameRoom.getPlayerUserNames(),
@@ -72,6 +100,18 @@
              ConnectedPlayer.in_game = true;
              GameRoomManager.ConnectedPlayers.set(socket.request.user.username, ConnectedPlayer);
          }
+     });
+
+     socket.on('get lobby info', function(){
+	  console.log('hellolobby');
+	//THIS IS FAILING, HE ISNT PUT INTO THE GAME ROOM????
+          var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
+	  console.log(GameRoom);
+          socket.emit('lobby info responding', {
+	       _id: GameRoom._id,
+	       players: GameRoom.getPlayerUserNames(),
+	       state: GameRoom.getStateName()
+          });
      });
 
      socket.on('set phrase', function(msg) {

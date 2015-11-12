@@ -13,8 +13,10 @@ import * as Timers from '../timers.server.controller';
 
 export class Lobby {
     constructor(GameRoom){
+	console.log('made it to lobby');
 	this.GameRoom = GameRoom;
 	this.name = 'LOBBY';
+	this.connectPlayers();
     }
 
     connectPlayers() {

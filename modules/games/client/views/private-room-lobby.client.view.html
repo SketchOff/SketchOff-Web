@@ -21,7 +21,6 @@ table tr:nth-child(even) {
     <h3><style="color: red">Lobby Info</h3>
     <h4>ID: <i>{{GameRoom._id}}</i></h4>
     <h4>Current players: <i>{{GameRoom.players}}</i></h4>
-    <h4>Judge: <i>{{GameRoom.judge}}</i></h4>
     <h4>State: <i>{{GameRoom.state}}</i></h4>
 
 
@@ -30,10 +29,11 @@ table tr:nth-child(even) {
     <th>Connected Players</th>
   </tr>
 
-  <tr ng-repeat="player in Test.players">
+  <tr ng-repeat="player in GameRoom.players">
     <td>{{ player }} </td>
   </tr>
 </table>
+  <h4>Warning, Do not start the game with only one player in the lobby</h4>
   <a class="btn btn-primary btn-lg" href=""  ng-click="invitePlayers()">Invite Players</a>
   <a class="btn btn-primary btn-lg" href=""  ng-click="startGame()">Start Game</a>
 </div>

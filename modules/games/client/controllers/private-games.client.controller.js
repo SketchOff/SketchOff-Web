@@ -11,14 +11,16 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
 	$scope.Test.players = ['Player 1', 'Player A', 'Player !'];
 
 
-        var getGameInfo = function() {
-            Socket.emit('get game info');
+        var getLobbyInfo = function() {
+            Socket.emit('get lobby info');
             console.log('game info emitted');
         };
-   		getGameInfo();
+   	getLobbyInfo();
 
-        Socket.on('game info response', function(msg) {
+        Socket.on('lobby info responding', function(msg) {
         	$scope.GameRoom = msg;
+		console.log('hello');
+		console.log(msg);
         });
 
 	$scope.invitePlayers = function() {
