@@ -14,7 +14,7 @@ export function getIO() {
     return _io;
 }
 
- class Queue { // for testing purposes
+export class Queue { // for testing purposes
     constructor() {
         this.players = [];
         this.available_games = [];
