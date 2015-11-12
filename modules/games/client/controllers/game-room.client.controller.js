@@ -1,8 +1,8 @@
 'use strict';
 
 // Games controller
-angular.module('games').controller('GameRoomController', ['$rootScope', '$scope', 'Authentication', 'Socket', '$state',
-    function($rootScope, $scope, Authentication, Socket, $state) {
+angular.module('games').controller('GameRoomController', ['$rootScope', '$scope', 'Authentication', 'Socket', '$state', '$window',
+    function($rootScope, $scope, Authentication, Socket, $state, $window) {
 
         $scope.authentication = Authentication;
         $scope.GameRoom = {};
@@ -135,7 +135,13 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         };
 
         $scope.leaveGameRoom = function() {
-            $state.go('home');
+            if ($scope.GameRoom.state !== 'ENDING' && $scope.GameRoom.state !== 'TERMINATING') {
+                if (confirm('You will be flagged for leaving the game early') === true) {
+                    $state.go('home');
+                }
+            } else {
+                $state.go('home');
+            }
         };
         /* END Button Functions */
 
@@ -146,7 +152,6 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
                     Socket.emit('leave room');
                 }
             });
-
     }
 
 ]);
