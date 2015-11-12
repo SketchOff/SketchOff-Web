@@ -77,7 +77,7 @@
 
                     (function() {
                         new GameRoom(players, true, 1234, TempCountdownTimes);
-                    }).should.throw('game_id param must be a string');
+                    }).should.throw('room_id param must be a string');
 
                     (function() {
                         new GameRoom(players, true, 'randomly_generated_id', 'string');
@@ -140,6 +140,15 @@
                         socket.game_room_id.should.be.exactly('randomly_generated_id');
                     }
                     done();
+                });
+
+                it('should correctly set the room id', function(done) {
+                    TheGameRoom.getRoomID().should.be.exactly('randomly_generated_id');
+                    done();
+                });
+
+                it('should correctly set the id', function(done) {
+                    TheGameRoom.getGameID().should.be.exactly('randomly_generated_id#1');
                 });
 
                 it('should not have a winner yet', function(done) {

@@ -22,6 +22,7 @@ export class Establishing {
             this.connectPlayers();
             getIO().to(this.GameRoom._id).emit('ESTABLISHED');
         } else {
+            this.GameRoom.incrementGameID();
             this.addWaitingPlayers();
             var x = this.GameRoom.players.shift();
             this.GameRoom.players.push(x);
@@ -44,7 +45,7 @@ export class Establishing {
     connectPlayers() {
         this.GameRoom.players.forEach(function(player) {
             player.join(this.GameRoom._id);
-            player.game_room_id = this.GameRoom._id;
+            player.game_room_id = this.GameRoom.getRoomID();
 
             var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
              if (ConnectedPlayer) {

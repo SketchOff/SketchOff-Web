@@ -23,7 +23,7 @@ export default class GameRoom {
 
     // TODO: Add points objects to constructor parameter
     // TODO: Create save-id which is game_id + game_num;
-    constructor(players, is_public_room, game_id, CountdownTimes) {
+    constructor(players, is_public_room, room_id, CountdownTimes) {
         if (arguments.length !== 4) throw new Error('Missing arguments');
         if (!Array.isArray(players)) throw new Error('Players param is not an array');
         players.forEach(function(player) {
@@ -32,7 +32,8 @@ export default class GameRoom {
         if (players.length < min_players) throw new Error('Too few players');
         if (players.length > max_players) throw new Error('Too many players');
         if (typeof is_public_room !== 'boolean') throw new Error('is_public_room param must be a boolean');
-        if (typeof game_id !== 'string') throw new Error('game_id param must be a string');
+        if (typeof room_id === 'undefined') throw new Error('room_id is undefined');
+        if (typeof room_id !== 'string') throw new Error('room_id param must be a string');
         if (typeof CountdownTimes !== 'object') throw new Error('CountdownTimes param must be an object');
         if (typeof CountdownTimes.choose_phrase === 'undefined' || typeof CountdownTimes.drawing === 'undefined' || typeof CountdownTimes.winner_selection === 'undefined' || typeof CountdownTimes.new_game === 'undefined') {
             throw new Error('Missing necessary countdown properties for the CountdownTimes param');
@@ -48,8 +49,9 @@ export default class GameRoom {
         }
 
         this.players = players;
-        // Set the game_id generated from the game_rooms controller
-        this._id = game_id;
+        // Set the room_id generated from the game_rooms controller
+        this.room_id = room_id;
+        this._id = room_id + '#1';
         this.is_public = is_public_room;
         // Set to true if judge leaves
         this.first_game = true;
@@ -162,7 +164,18 @@ export default class GameRoom {
     }
 
     getRoomID() {
+        return this.room_id;
+    }
+
+    getGameID() {
         return this._id;
+    }
+
+    incrementGameID() {
+        var temp = this._id.split('#');
+        var game_num = parseInt(temp[1]);
+        game_num++;
+        this._id = this.room_id + '#' + game_num;
     }
 
     getPhrases() {
