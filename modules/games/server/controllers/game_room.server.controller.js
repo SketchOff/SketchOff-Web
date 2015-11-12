@@ -226,7 +226,8 @@ export default class GameRoom {
 
     // TODO: Flag player for leaving mid game
     removePlayer(player) {
-        console.log('removing', player.request.user.username, 'from', this._id);
+        console.log('removing', player.request.user.username, 'from', this.getRoomID());
+        player.leave(this.getRoomID());
         player.active_user = false;
         var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
         ConnectedPlayer.in_game = false;
@@ -237,7 +238,6 @@ export default class GameRoom {
         } else {
             this.waiting_players.splice(this.waiting_players.indexOf(player), 1);
         }
-        player.leave(this._id);
         delete player.game_room_id;
 
         if (this.getNumAllPlayers() < min_players) {

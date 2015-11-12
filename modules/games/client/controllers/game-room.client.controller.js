@@ -9,7 +9,6 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
 
         var is_judge = false;
         var set_winner = false;
-        var pressed_leave_room = false;
 
         var getGameInfo = function() {
             Socket.emit('get game info');
@@ -136,8 +135,6 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         };
 
         $scope.leaveGameRoom = function() {
-            Socket.emit('leave room');
-            pressed_leave_room = true;
             $state.go('home');
         };
         /* END Button Functions */
@@ -145,7 +142,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
 
         $rootScope.$on('$stateChangeStart',
             function(event, toState, toParams, fromState, fromParams) {
-                if (fromState.name === 'games.room' && !pressed_leave_room) {
+                if (fromState.name === 'games.room') {
                     Socket.emit('leave room');
                 }
             });
