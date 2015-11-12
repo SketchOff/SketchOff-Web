@@ -5,74 +5,21 @@
  */
 var path = require('path'),
   mongoose = require('mongoose'),
-  Article = mongoose.model('Article'),
+  User = mongoose.model('User'),
+  // Article = mongoose.model('Article'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
-
-/**
- * Create a article
- */
-exports.create = function (req, res) {
-  var article = new Article(req.body);
-  article.user = req.user;
-
-  article.save(function (err) {
-    if (err) {
-      return res.status(400).send({
-        message: errorHandler.getErrorMessage(err)
-      });
-    } else {
-      res.json(article);
-    }
-  });
-};
 
 /**
  * Show the current article
  */
 exports.read = function (req, res) {
-  res.json(req.article);
-};
-
-/**
- * Update a article
- */
-exports.update = function (req, res) {
-  var article = req.article;
-
-  article.title = req.body.title;
-  article.content = req.body.content;
-
-  article.save(function (err) {
-    if (err) {
-      return res.status(400).send({
-        message: errorHandler.getErrorMessage(err)
-      });
-    } else {
-      res.json(article);
-    }
-  });
-};
-
-/**
- * Delete an article
- */
-exports.delete = function (req, res) {
-  var article = req.article;
-
-  article.remove(function (err) {
-    if (err) {
-      return res.status(400).send({
-        message: errorHandler.getErrorMessage(err)
-      });
-    } else {
-      res.json(article);
-    }
-  });
+  console.log(req);
+  res.json(req.user);
 };
 
 /**
  * List of Articles
- */
+ 
 exports.list = function (req, res) {
   Article.find().sort('-created').populate('user', 'displayName').exec(function (err, articles) {
     if (err) {
@@ -85,26 +32,29 @@ exports.list = function (req, res) {
   });
 };
 
+*/
+
+
 /**
- * Article middleware
+ * Profile middleware
  */
-exports.articleByID = function (req, res, next, id) {
+exports.profileByID = function (req, res, next, id) {
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).send({
-      message: 'Article is invalid'
+      message: 'Profile is invalid'
     });
   }
 
-  Article.findById(id).populate('user', 'displayName').exec(function (err, article) {
+  User.findById(id).populate('user', 'displayName').exec(function (err, user) {
     if (err) {
       return next(err);
-    } else if (!article) {
+    } else if (!user) { //  user dne?
       return res.status(404).send({
-        message: 'No article with that identifier has been found'
+        message: 'No profile with that identifier has been found'
       });
     }
-    req.article = article;
+    req.user = user;
     next();
   });
 };
