@@ -14,6 +14,10 @@ module.exports = function (app) {
   app.route('/api/users')
     .get(adminPolicy.isAllowed, admin.list);
 
+  // Flagged users
+  app.route('/api/flags')
+    .get(adminPolicy.isAllowed, admin.flags);
+
   // Single user routes
   app.route('/api/users/:userId')
     .get(adminPolicy.isAllowed, admin.read)

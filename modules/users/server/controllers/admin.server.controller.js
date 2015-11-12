@@ -71,6 +71,21 @@ exports.list = function (req, res) {
 };
 
 /**
+ * List of flagged Users
+ */
+exports.flags = function (req, res) {
+  User.find({ flagged : true }, '-salt -password').sort('-created').populate('user', 'displayName').exec(function (err, users) {
+    if (err) {
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    }
+
+    res.json(users);
+  });
+};
+
+/**
  * User middleware
  */
 exports.userByID = function (req, res, next, id) {

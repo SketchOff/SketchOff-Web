@@ -34,7 +34,7 @@ angular.module('users.admin.routes').config(['$stateProvider',
         }
       })
       .state('admin.flags', {
-        url: '/users/flags',
+        url: '/flags',
 	templateUrl: 'modules/users/client/views/admin/review-flags.client.view.html',
 	controller: 'UserFlagsController'
       });
