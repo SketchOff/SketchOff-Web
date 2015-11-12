@@ -33,20 +33,16 @@ var getMockSockets = function(num_players) {
 };
 
 describe('Game Room Functional Tests', function() {
-    // initialize a game room
-    // var TheGameRoom, players;
-    // TheGameRoom = new GameRoom(players, true, 'randomly_generated_id'); // EST
-    // var test_phrase = 'some phrase';
-    // TheGameRoom.setPhrase(test_phrase); // DRAWING
-    // initialize a queue
-    describe('User Uniqueness Constraint', function() {
-        describe('In Queue', function() {
-            var players = getMockSockets(max_players);
-            it('should not allow players who are the same user', function(done) {
-                players.forEach(p => q.addPlayer(p));
-                (function () { q.addPlayer(players[0]); }).should.throw();
-                done();
-            });
+    describe('User Uniqueness Constraint  -- [[NOTE thowing error until function is written to get all users in all games]]', function() {
+        var players = getMockSockets(max_players);
+        it('should not allow players who are the same user', function(done) {
+            players.forEach(p => q.addPlayer(p));
+            var player_duplicate = new SocketMock();
+            player_duplicate.request = players[0].request;
+            duplicateUsernameExists(q.getPlayerUsernames()).should.be.false;  // jshint ignore:line
+            // see description
+            true.should.be.false;  // jshint ignore:line
+            //                done();
         });
     });
 
@@ -58,5 +54,38 @@ describe('Game Room Functional Tests', function() {
             done();
         });
     });
-
 });
+
+describe('Queue States. Something wrong here. Ask Dan |||| ', function() {
+    describe('NOT_ENOUGH --> AVAILABLE_GAMES', function() {
+        var players = getMockSockets(max_players - 1); // so game will not be full
+        it('should change state', function() {
+            q.getStateName().should.be.equal('NOT_ENOUGH');
+            players.forEach(p => q.addPlayer(p));
+            q.getStateName().should.be.equal('AVAILABLE_GAMES');
+            var players2 = getMockSockets(1);
+            q.addPlayer(players2[0]);
+        });
+    });
+    describe('AVAILABLE_GAMES --> NOT_ENOUGH', function() {
+        var players = getMockSockets(min_players-1); //insufficient
+        it('should change state', function() {
+            q.getStateName().should.be.equal('AVAILABLE_GAMES');
+            players.forEach(p => q.addPlayer(p));
+            q.getStateName().should.be.equal('NOT_ENOUGH');
+        });
+    });
+});
+
+
+function duplicateUsernameExists (usns) {
+    var counts = [];
+    for (var i = 0; i<= usns.length; i++) {
+        for (var j = 0; j<= usns.length; j++) {
+            if (i !== j && usns[i] === usns[j]) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
