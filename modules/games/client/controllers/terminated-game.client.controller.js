@@ -1,17 +1,14 @@
 'use strict';
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication', 'Socket', '$uibModal', '$timeout',
-    function($scope, Authentication, Socket, $uibModal, $timeout) {
-        // This provides Authentication context.
+// Games controller
+angular.module('games').controller('TerminatedGameCtrl', ['$scope', 'Authentication', '$state', '$uibModal',
+    function($scope, Authentication, $state, $uibModal) {
         $scope.authentication = Authentication;
-        $scope.error = {};
-
         var modalInstance;
 
-        // Make sure the Socket is connected
-        if (!Socket.socket && Authentication.user) {
-            Socket.connect();
-        }
+        $scope.goHome = function() {
+            $state.go('home');
+        };
 
         $scope.joinPublicGame = function() {
             $scope.animationsEnabled = true;
@@ -20,9 +17,6 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
                 templateUrl: 'modules/core/client/views/waiting-for-game.client.modal.view.html',
                 controller: 'WaitingForGameCtrl'
             });
-        };
-
-        $scope.startPrivateGame = function() {
         };
     }
 ]);

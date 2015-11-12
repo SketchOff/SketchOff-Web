@@ -1,6 +1,5 @@
 'use strict';
 
-// Player: { id: someid, socket: theirsocket, io: theirio, user: associateduser }
 
 import {
     min_players, max_players
@@ -23,7 +22,27 @@ class Queue {
     }
 
     addPlayer(player) {
-        this.state.addPlayer(player);
+        player.active_user = true;
+        this.players.push(player);
+        this.state.addPlayer();
+    }
+
+    removePlayer(username) {
+        var index = 0;
+        for (let player of this.players) {
+            if (player.request.user.username.localeCompare(username) === 0) {
+                player.active_user = false;
+                var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
+                ConnectedPlayer.in_queue = false;
+                ConnectedPlayer.in_game = false;
+                GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
+                
+                this.players.splice(index, 1);
+                this.updateAdmin();
+                break;
+            }
+            index++;
+        }
     }
 
     numPlayers() {
@@ -39,7 +58,7 @@ class Queue {
                 this.state = new QueueStates.AvailableGames(this);
                 break;
         }
-        console.log(this.getStateName());
+        if (this.hasAdminSubscribers()) _io.to('admin_updates').emit('queue state update', this.getStateName());
     }
 
     getStateName() {
@@ -59,44 +78,49 @@ class Queue {
     }
 
     addAvailableGame(game_id) {
-        console.log(game_id, 'added to available games');
         this.available_games.push(game_id);
-        this.setState('AVAILABLE_GAMES');
+        if (this.hasAdminSubscribers()) _io.to('admin_updates').emit('available games update', this.available_games);
+        if (this.getStateName() !== 'AVAILABLE_GAMES') this.setState('AVAILABLE_GAMES');
     }
 
     removeAvailableGame(game_id) {
-        console.log(game_id, 'removed from available games');
         var available_game_index = this.available_games.indexOf(game_id);
         if (available_game_index > -1) this.available_games.splice(available_game_index, 1);
+        if (this.hasAdminSubscribers()) _io.to('admin_updates').emit('available games update', this.available_games);
         if (this.available_games < 1) this.setState('NOT_ENOUGH');
+    }
+
+    getPlayerUsernames() {
+        var usernames = [];
+        this.players.forEach(function(player) {
+            usernames.push(player.request.user.username);
+        });
+        return usernames;
+    }
+
+    getNumPlayers() {
+        return this.players.length;
+    }
+
+    getAvailableGameIds() {
+        return this.available_games;
+    }
+
+    getInfo() {
+        var queue_info = {};
+        queue_info.state = this.getStateName();
+        queue_info.players = this.getPlayerUsernames();
+        queue_info.available_games = this.getAvailableGameIds();
+        return queue_info;
+    }
+
+    hasAdminSubscribers() {
+        return (!!_io.sockets.adapter.rooms.admin_updates);
+    }
+
+    updateAdmin() {
+        if (this.hasAdminSubscribers()) _io.to('admin_updates').emit('queue players update', this.getPlayerUsernames());
     }
 }
 
 export var q = new Queue();
-
-
-// export function addPlayer(player) {
-//     // add player to queue
-//     queue.push(player);
-
-//     // available game rooms, start filling
-//     var count = 0;
-//     while (availableGameRooms.length) {
-//              var CurrRoom = availableGameRooms[count];
-
-//         // remove game room if its not in selecting winner or ending state or is full
-//         if (CurrRoom.getStateName() !== 'SELECTING_WINNER' || CurrRoom.getStateName() !== 'ENDING' || CurrRoom.isFull) {
-//              availableGameRooms.splice(count, 1);
-//         }
-//         // add player to game room
-//         else {
-//             availableGameRooms[count].addPlayer(queue.pop());
-//         }
-//         count++;
-//     }
-
-//     // if queue has enough players,
-//     if (queue.length >= min_players) {
-
-//     }
-// }

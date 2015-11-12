@@ -13,6 +13,10 @@ angular.module('games').config(['$stateProvider',
       .state('games.room', {
         url: '',
         templateUrl: 'modules/games/client/views/game-room.client.view.html'
+      })
+      .state('games.terminated', {
+        url: '',
+        templateUrl: 'modules/games/client/views/terminated-game-room.client.view.html'
       });
   }
 ]);

@@ -1,0 +1,13 @@
+<section ng-controller="QueueRoomsInfoCtrl">
+    <h1>Queue and Rooms Info</h1>
+    <br>
+    <h3>Queue Info</h3>
+    <h4>{{Queue}}</h4>
+    <br>
+    <h3>Rooms Info</h3>
+    <h4 ng-show="isEmpty(Rooms)"><i>No game rooms</i></h4>
+
+    <section ng-show="!isEmpty(Rooms)">
+    	<pre pretty-json="Rooms" />
+    </section>
+</section>

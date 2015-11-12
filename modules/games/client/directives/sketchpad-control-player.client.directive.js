@@ -61,19 +61,19 @@ angular.module('games')
 	        // Determine correct socket data format (with socketPopulateDown) now.
 	        switch(activeTool) {
 	        	case 0:
-	        	socketPopulateDown(0, [currentX, currentY, toolColor, toolSize]);
-	        	drawDownDot(event.currentX, event.currentY, toolColor, toolSize);
-	        	break;
+  	        	socketPopulateDown(0, [currentX, currentY, toolColor, toolSize]);
+  	        	drawDownDot(currentX, currentY, toolColor, toolSize);
+  	        	break;
 	        	case 1:
-	        	break;
+	        	  break;
 	        	default:
 	        	console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +activeTool);
 
 	        }
 
 	        drawing = true;
-	    }
-	});
+	      }
+    	});
 
       element.bind('mousemove', function(event){
       	// Update needed variables
@@ -81,27 +81,24 @@ angular.module('games')
       	currentY = event.offsetY;
 
       	if(drawing){
-
-        // Switch behavior based on active tool
-        // Update socketQueue if needed by tool
-        switch(activeTool) {
-        	case 0:
-        	socketPushToolData([
-        		currentX, currentY, toolColor, toolSize
-        		]);
-        	drawMoveDot(currentX, currentY, lastX, lastY, toolColor, toolSize);
-        	break;
-        	case 1:
-        	break;
-        	default:
-        	console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +activeTool);
+          // Switch behavior based on active tool
+          // Update socketQueue if needed by tool
+          switch(activeTool) {
+          	case 0:
+            	socketPushToolData([
+            		currentX, currentY, toolColor, toolSize
+            		]);
+            	drawMoveDot(currentX, currentY, lastX, lastY, toolColor, toolSize);
+          	break;
+          	 case 1:
+          	break;
+          	 default:
+          	console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +activeTool);
+          }
         }
-
-    }
-
-    lastX = event.offsetX;
-    lastY = event.offsetY;
-});
+      lastX = event.offsetX;
+      lastY = event.offsetY;
+      });
 
       element.bind('mouseup', function(event){
       	// TODO: For non-array tools, add 2nd data point
@@ -110,23 +107,22 @@ angular.module('games')
       	if(drawing){
       		switch(activeTool) {
       			case 0:
-      			socketPushToolData([
-      				currentX, currentY, toolColor, toolSize
-      				]);
-      			drawUpDot(currentX, currentY, lastX, lastY, toolColor, toolSize);
-      			socketSendMessage();
+        			socketPushToolData([
+        				currentX, currentY, toolColor, toolSize
+        				]);
+        			drawUpDot(currentX, currentY, lastX, lastY, toolColor, toolSize);
+        			socketSendMessage();
       			break;
-      			case 1:
+      			 case 1:
       			break;
-      			default:
+      			 default:
       			console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +activeTool);
       		}
 
       	}
-
         // stop drawing
         drawing = false;
-    });
+      });
 
       function flushSocketQueueData() {
       	socketQueue = [];
@@ -196,52 +192,52 @@ angular.module('games')
 
         	switch(data.diffTool) {
         		case 0:
-        		judgeDiffToolDot(data.toolData);
-        		break;
+        		  judgeDiffToolDot(data.toolData);
+        		  break;
         		case 1: 
         			// TODO:
         			break;
-        			default:
+        		default:
         			console.log('ERROR UNKNOWN TOOL ' + data.diffTool);
         			break;
         		}
         	}
 
-        	function judgeDiffToolDot(toolData) {
-        		var cx, cy, lx, ly, color, thick;
-        		var temp = toolData.pop();
-        		cx = temp[0];
-        		cy = temp[1];
-        		color = temp[2];
-        		thick = temp[3];
+        function judgeDiffToolDot(toolData) {
+      		var cx, cy, lx, ly, color, thick;
+      		var temp = toolData.pop();
+      		cx = temp[0];
+      		cy = temp[1];
+      		color = temp[2];
+      		thick = temp[3];
 
-        		ctx.fillStyle = color;
-        		ctx.beginPath();
-        		ctx.arc(cx, cy, thick, 0, 2*Math.PI, true);
-        		ctx.fill();
+      		ctx.fillStyle = color;
+      		ctx.beginPath();
+      		ctx.arc(cx, cy, thick, 0, 2*Math.PI, true);
+      		ctx.fill();
 
-        		while(toolData.length > 0) {
-        			lx = cx;
-        			ly = cy;
-        			temp = toolData.pop();
-        			cx = temp[0];
-        			cy = temp[1];
-        			color = temp[2];
-        			thick = temp[3];
+      		while(toolData.length > 0) {
+      			lx = cx;
+      			ly = cy;
+      			temp = toolData.pop();
+      			cx = temp[0];
+      			cy = temp[1];
+      			color = temp[2];
+      			thick = temp[3];
 
-        			ctx.beginPath();
-        			ctx.arc(cx, cy, thick, 0, 2*Math.PI, true);
-        			ctx.fill();
+      			ctx.beginPath();
+      			ctx.arc(cx, cy, thick, 0, 2*Math.PI, true);
+      			ctx.fill();
 
-        			ctx.beginPath();
-        			ctx.moveTo(lx, ly);
-        			ctx.lineTo(cx, cy);
+      			ctx.beginPath();
+      			ctx.moveTo(lx, ly);
+      			ctx.lineTo(cx, cy);
 
-        			ctx.strokeColor = color;
-        			ctx.lineWidth = 2*thick;
-        			ctx.stroke();
-        		}
-        	}
+      			ctx.strokeColor = color;
+      			ctx.lineWidth = 2*thick;
+      			ctx.stroke();
+      		}
+      	}
 
      	////////////////////////
     	// START DOWN TOOLS   //

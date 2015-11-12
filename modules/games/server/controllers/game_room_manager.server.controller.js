@@ -3,6 +3,7 @@
 import GameRoom from './game_room.server.controller.js';
 
 var GameRooms = new Map();
+export var ConnectedPlayers = new Map();
 
 // Create a new game room and add it to the GameRooms map
 export function createGameRoom(players, public_game) {
@@ -12,11 +13,21 @@ export function createGameRoom(players, public_game) {
 
 // remove a GameRoom from the GameRooms map
 export function removeGameRoom(game_room_id) {
-	GameRooms.delete(game_room_id);
+    var Room = GameRooms.get(game_room_id);
+    Room.disconnectAllPlayers();
+    GameRooms.delete(game_room_id);
 }
 
 export function getGameRoom(game_room_id) {
     return GameRooms.get(game_room_id);
+}
+
+export function getInfo() {
+    var RoomsInfo = {};
+    GameRooms.forEach(function(GameRoom, id) {
+        RoomsInfo[id] = GameRoom.getInfo();
+    });
+    return RoomsInfo;
 }
 
 /**

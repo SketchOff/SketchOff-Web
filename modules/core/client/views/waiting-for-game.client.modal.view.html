@@ -1,12 +1,20 @@
 <div style="text-align: center">
-    <h1>WAITING FOR NEW GAME</h1>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <span us-spinner></span>
-    <button class="btn btn-warning" style="margin-bottom: 12px" ng-click="cancel()">Cancel</button>
+    <div ng-if="!Error.exists">
+        <h1>WAITING FOR NEW GAME</h1>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <span us-spinner></span>
+        <button class="btn btn-warning" style="margin-bottom: 12px" ng-click="cancel()">Cancel</button>
+    </div>
+    <div ng-if="Error.exists">
+        <h1>{{Error.in_game + Error.in_queue}}</h1>
+        <br>
+        <br>
+        <button class="btn btn-success" style="margin-bottom: 12px" ng-click="ok()">OK</button>
+    </div>
 </div>

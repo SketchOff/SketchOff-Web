@@ -5,7 +5,8 @@ module.exports = {
     lib: {
       css: [
         'public/lib/bootstrap/dist/css/bootstrap.css',
-        'public/lib/bootstrap/dist/css/bootstrap-theme.css'
+        'public/lib/bootstrap/dist/css/bootstrap-theme.css',
+        'public/lib/ng-prettyjson/dist/ng-prettyjson.min.css'
       ],
       js: [
         'public/lib/angular/angular.js',
@@ -18,7 +19,8 @@ module.exports = {
         'public/lib/angular-file-upload/angular-file-upload.js',
         'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
         'public/lib/spin.js/spin.js',
-        'public/lib/angular-spinner/angular-spinner.js'
+        'public/lib/angular-spinner/angular-spinner.js',
+        'public/lib/ng-prettyjson/dist/ng-prettyjson.min.js'
       ],
       tests: ['public/lib/angular-mocks/angular-mocks.js']
     },
