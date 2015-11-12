@@ -11,6 +11,24 @@ import {
 from '../queue.server.controller';
 import * as Timers from '../timers.server.controller';
 
+export class Lobby {
+    constructor(GameRoom){
+	this.GameRoom = GameRoom;
+	this.name = 'LOBBY';
+    }
+
+    connectPlayers() {
+        this.GameRoom.players.forEach(function(player) {
+            player.join(this.GameRoom._id);
+            player.game_room_id = this.GameRoom._id;
+        }, this);
+    }
+
+    getName(){
+        return this.name;
+    }
+}
+
 export class Establishing {
     constructor(GameRoom) {
         this.GameRoom = GameRoom;

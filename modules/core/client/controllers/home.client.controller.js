@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication', 'Socket', '$uibModal', '$timeout',
-    function($scope, Authentication, Socket, $uibModal, $timeout) {
+angular.module('core').controller('HomeController', ['$scope', 'Authentication', 'Socket', '$uibModal', '$timeout', '$state',
+    function($scope, Authentication, Socket, $uibModal, $timeout, $state) {
         // This provides Authentication context.
         $scope.authentication = Authentication;
         $scope.error = {};
@@ -28,12 +28,8 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         });
 
 	$scope.startPrivateGame = function() {
-            $scope.animationsEnabled = true;
-            modalInstance = $uibModal.open({
-                animation: $scope.animationsEnabled,
-                templateUrl: 'modules/core/client/views/waiting-for-game.client.modal.view.html',
-                controller: 'WaitingForPrivateGameCtrl'
-
-        });
+		Socket.emit('create private game');
+		$state.go('games.private-lobby');
+        };
     }
 ]);

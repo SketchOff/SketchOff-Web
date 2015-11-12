@@ -39,7 +39,11 @@ export default class GameRoom {
         this.interval = null;
         this.winner_points = 100;
         this.participation_points = 10;
-        this.State = new GameRoomStates.Establishing(this);
+	if (this.is_public){
+            this.State = new GameRoomStates.Establishing(this);
+        } else {
+	    this.State = new GameRoomStates.Lobby(this);
+	}
         if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
     }
 

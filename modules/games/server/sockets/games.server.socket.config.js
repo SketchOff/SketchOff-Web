@@ -39,6 +39,22 @@
          }
      });
 
+     socket.on('create private game', function() {
+         var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
+
+         if (ConnectedPlayer.in_queue) {
+            socket.emit('already in queue');
+	    //remove from queue?
+         } else if (ConnectedPlayer.in_game) {
+            socket.emit('already in game');
+	    //remove from game?
+         } else {
+	     GameRoomManager.createGameRoom(socket, false);
+	     ConnectedPlayer.in_game = true;
+         }
+     });
+
+
      socket.on('get game info', function() {
          var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
          socket.emit('game info responding', {
