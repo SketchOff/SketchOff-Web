@@ -5,8 +5,9 @@ angular.module('games')
 	return{
 		restrict: "A",
 		link: function(scope, element){
-    	//console.log(element);
-    	var ctx = element[0].getContext('2d');
+    	console.log(element);
+    	var ctx = element.children()[0].getContext('2d');
+      var ctxtemp = element.children()[1].getContext('2d');
 
       // var ctx2 = element[1].getContext('2d');
 

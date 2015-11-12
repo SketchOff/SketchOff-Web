@@ -2,14 +2,16 @@
     <h1>Hello {{authentication.user.username}}</h1>
     <h2>Welcome To The Game Room</h2>
     <div id="d">
-    <canvas width="640" height="480" class="sketchpad" id="canvas" drawing-player>
-        Your browser does not support HTML5 Canvas
-    </canvas>
-      <!--
-      <canvas width="640" height="480" class="tempOverlay" id="canvasTempLayer" drawing-player>
-        Your browser does not support HTML5 Canvas
-      </canvas>
-      -->
+    <div drawing-player>
+        <canvas width="640" height="480" class="sketchpad" id="canvas">
+            Your browser does not support HTML5 Canvas
+        </canvas>
+          <!--
+          <canvas width="640" height="480" class="tempOverlay" id="canvasTempLayer" drawing-player>
+            Your browser does not support HTML5 Canvas
+          </canvas>
+          -->
+        <canvas width="640" height="480" class="tempOverlay" id="canvasTempLayer">
     </div>
     <h3 style="color: red">Game Room Info
     <h4>ID: <i>{{GameRoom._id}}</i></h4>
