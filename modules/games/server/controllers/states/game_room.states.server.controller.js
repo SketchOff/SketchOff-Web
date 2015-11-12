@@ -20,19 +20,19 @@ export class Establishing {
         this.GameRoom.winner = 'No winner yet';
         if (this.GameRoom.isFirstGame()) {
             this.connectPlayers();
-            getIO().to(this.GameRoom._id).emit('ESTABLISHED');
+            getIO().to(this.GameRoom.getRoomID()).emit('ESTABLISHED');
         } else {
             this.GameRoom.incrementGameID();
             this.addWaitingPlayers();
             var x = this.GameRoom.players.shift();
             this.GameRoom.players.push(x);
             this.GameRoom.judge = this.GameRoom.players[0];
-            getIO().to(this.GameRoom._id).emit('ESTABLISHING', {
+            getIO().to(this.GameRoom.getRoomID()).emit('ESTABLISHING', {
                 judge: this.GameRoom.judge.request.user.username,
                 players: this.GameRoom.getPlayerUsernames(),
                 waiting_players: this.GameRoom.getWaitingPlayerUsernames()
             });
-            if (this.GameRoom.isPublic()) q.removeAvailableGame(this.GameRoom._id);
+            if (this.GameRoom.isPublic()) q.removeAvailableGame(this.GameRoom.getRoomID());
         }
         // TODO: Add timer for choosing phrase
         // Timers.countdownFactory(this.GameRoom, 'choose_phrase_time', 'Drawing', 'choosing phrase countdown');
@@ -44,7 +44,7 @@ export class Establishing {
 
     connectPlayers() {
         this.GameRoom.players.forEach(function(player) {
-            player.join(this.GameRoom._id);
+            player.join(this.GameRoom.getRoomID());
             player.game_room_id = this.GameRoom.getRoomID();
 
             var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
@@ -67,7 +67,7 @@ export class Drawing {
     constructor(GameRoom) {
         this.name = 'DRAWING';
         this.GameRoom = GameRoom;
-        getIO().to(this.GameRoom._id).emit('DRAWING', this.GameRoom.getPhrase());
+        getIO().to(this.GameRoom.getRoomID()).emit('DRAWING', this.GameRoom.getPhrase());
         Timers.countdownFactory(this.GameRoom, this.GameRoom.getDrawingTime(), 'SelectingWinner', 'drawing countdown');
     }
 
@@ -80,8 +80,8 @@ export class SelectingWinner {
     constructor(GameRoom) {
         this.name = 'SELECTING_WINNER';
         this.GameRoom = GameRoom;
-        getIO().to(this.GameRoom._id).emit('SELECTING_WINNER');
-        if (!this.GameRoom.isFull() && this.GameRoom.isPublic()) q.addAvailableGame(this.GameRoom._id);
+        getIO().to(this.GameRoom.getRoomID()).emit('SELECTING_WINNER');
+        if (!this.GameRoom.isFull() && this.GameRoom.isPublic()) q.addAvailableGame(this.GameRoom.getRoomID());
         Timers.countdownFactory(this.GameRoom, this.GameRoom.getWinnerSelectionTime(), 'Ending', 'selecting winner countdown');
     }
 
@@ -109,7 +109,7 @@ export class Ending {
             message.reason = reason;
         }
         message.winner = this.GameRoom.getWinner();
-        getIO().to(this.GameRoom._id).emit('ENDING', message);
+        getIO().to(this.GameRoom.getRoomID()).emit('ENDING', message);
         Timers.countdownFactory(this.GameRoom, this.GameRoom.getNewGameTime(), 'Establishing', 'starting new game countdown');
         this.GameRoom.saveGame();
         this.GameRoom.awardPoints();
@@ -127,8 +127,8 @@ export class Terminating {
     constructor(GameRoom) {
         this.GameRoom = GameRoom;
         this.name = 'TERMINATING';
-        getIO().to(this.GameRoom._id).emit('TERMINATING');
-        GameRoomManager.removeGameRoom(this.GameRoom._id);
+        getIO().to(this.GameRoom.getRoomID()).emit('TERMINATING');
+        GameRoomManager.removeGameRoom(this.GameRoom.getRoomID());
     }
 
     getName() {

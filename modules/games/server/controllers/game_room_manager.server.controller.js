@@ -15,7 +15,7 @@ export var ConnectedPlayers = new Map();
 export function createGameRoom(players, public_game, CountdownTimes) {
     var game_room_id = generateID();
     if (!CountdownTimes) CountdownTimes = DefaultCountdownTimes;
-    GameRooms.set(game_room_id, new GameRoom(players, public_game, game_room_id));
+    GameRooms.set(game_room_id, new GameRoom(players, public_game, game_room_id, CountdownTimes));
 }
 
 // remove a GameRoom from the GameRooms map

@@ -18,13 +18,13 @@
     <button class="btn btn-info" ng-repeat="phrase in GameRoom.phrases" style="margin-right: 8px" ng-click=setPhrase(phrase)>{{phrase}}</button>
     </div>
     <div class="countdown" ng-switch on="GameRoom.state">
-        <h5 id="drawing-countdown" ng-switch-when="DRAWING" ng-if="GameRoom.drawing_countdown" style="color: green">
+        <h5 id="drawing-countdown" ng-switch-when="DRAWING" ng-if="GameRoom.drawing_countdown > -1" style="color: green">
             Drawing Countdown: {{GameRoom.drawing_countdown}}
         </h5>
-        <h5 id="selecting-winner-countdown" ng-switch-when="SELECTING_WINNER" ng-if="GameRoom.winner_selection_countdown" style="color: green">
+        <h5 id="selecting-winner-countdown" ng-switch-when="SELECTING_WINNER" ng-if="GameRoom.winner_selection_countdown > -1 " style="color: green">
             Selecting Winner Countdown: {{GameRoom.winner_selection_countdown}}
         </h5>
-        <h5 id="new-game-countdown" ng-switch-when="ENDING" ng-if="GameRoom.new_game_countdown" style="color: green">
+        <h5 id="new-game-countdown" ng-switch-when="ENDING" ng-if="GameRoom.new_game_countdown > -1" style="color: green">
             New Game Countdown: {{GameRoom.new_game_countdown}}
         </h5>
     </div>

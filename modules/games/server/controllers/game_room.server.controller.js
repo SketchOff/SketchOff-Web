@@ -96,7 +96,7 @@ export default class GameRoom {
     }
 
     setState(State, reason) {
-        console.log(this._id, 'is changing states to', State);
+        console.log(this.room_id, 'is changing states to', State);
         this.cancelCurrCountdown();
         this.State = new GameRoomStates[State](this, reason);
         if (this.hasAdminSubscribers()) {

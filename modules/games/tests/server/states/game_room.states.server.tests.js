@@ -56,7 +56,7 @@
                     }).should.throw('Players param is not an array');
 
                     (function() {
-                        new GameRoom([1,2,3], true, 'randomly_generated_id', TempCountdownTimes);
+                        new GameRoom([1, 2, 3], true, 'randomly_generated_id', TempCountdownTimes);
                     }).should.throw('Players array contains non-object values');
 
                     (function() {
@@ -149,6 +149,7 @@
 
                 it('should correctly set the id', function(done) {
                     TheGameRoom.getGameID().should.be.exactly('randomly_generated_id#1');
+                    done();
                 });
 
                 it('should not have a winner yet', function(done) {
@@ -181,12 +182,14 @@
             });
 
             describe('First Game: Drawing State', function() {
+                var start_time;
                 var test_phrase = 'some phrase';
                 it('should change states after phrase selection', function(done) {
                     TheGameRoom.setPhrase(test_phrase);
                     TheGameRoom.getStateName().should.be.exactly('DRAWING');
                     done();
                 });
+                start_time = process.hrtime();
 
                 it('should have the phrase set correctly', function(done) {
                     TheGameRoom.getPhrase().should.be.exactly(test_phrase);
@@ -197,6 +200,7 @@
                     TheGameRoom.isAvailable().should.not.be.true; // jshint ignore:line
                     done();
                 });
+
             });
         });
     });
