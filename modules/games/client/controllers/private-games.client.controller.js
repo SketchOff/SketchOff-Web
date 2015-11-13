@@ -25,10 +25,10 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
             $scope.GameRoom = msg;
         });
 
-    Socket.on('go private game'){
+    Socket.on('go private game', function(){
         console.log('go private game');
         $state.go('games.room');
-    }
+    });
 
 	$scope.invitePlayers = function() {
             $scope.animationsEnabled = true;

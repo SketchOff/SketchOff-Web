@@ -117,8 +117,8 @@
           var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
 	  console.log(GameRoom);
           socket.emit('lobby info responding', {
-           max_players = GameRoom.max_players;
-           min_players = GameRoom.min_players;
+           max_players: GameRoom.max_players;
+           min_players: GameRoom.min_players;
 	       _id: GameRoom._id,
 	       players: GameRoom.getPlayerUserNames(),
 	       state: GameRoom.getStateName()
