@@ -88,8 +88,12 @@ export default class GameRoom {
                 player.join(this.getRoomId());
             }
         }
-        var index = getRandomIntInclusive(0, this.players.length - 1);
-        this.players.splice(index, 0, player);
+        if(this.getStateName === "LOBBY"){
+            this.players.push(player);
+        } else{
+            var index = getRandomIntInclusive(0, this.players.length - 1);
+            this.players.splice(index, 0, player);
+        }
         var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
         ConnectedPlayer.in_game = true;
         ConnectedPlayer.in_queue = false;
