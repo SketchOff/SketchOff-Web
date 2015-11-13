@@ -49,7 +49,7 @@ export default class GameRoom {
     }
 
     setLobbyLeader(){
-        this.lobbyLeader = this.players[0].request.user.username;
+        this.lobbyLeader = this.players[this.players.length - 1].request.user.username;
     }
 
     getRoomType() {
@@ -198,7 +198,7 @@ export default class GameRoom {
         player.leave(this._id);
         delete player.game_room_id;
 
-        if (this.getStateName()!== 'LOBBY'){
+        if ((this.getStateName()!== 'LOBBY') || this.getNumPlayers() == 0){
             if (this.getNumAllPlayers() < min_players) {
                  console.log('Terminating because not enough total players');
                  this.setState('Terminating');
