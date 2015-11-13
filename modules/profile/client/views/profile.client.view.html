@@ -4,18 +4,30 @@
             <img style="float:left; margin-right:25px" ng-src="{{Profile.profileImageURL}}" alt="{{Profile.displayName}}" class="img-thumbnail user-profile-picture">
             <h1 ng-bind="Profile.displayName"></h1>
             <small class="list-group-item-text">
-        	<span ng-bind="Profile._id"></span><br>
-        	<span ng-bind="Profile.username"></span>
-        	<button ng-if="!Profile.same && !inFriendsList()" ng-click="sendFriendRequestFromProfile()" style="float:right;" type="button" class="btn btn-primary btn-sm">Send Friend Request</button>
+            <span ng-bind="Profile._id"></span><br>
+            <span ng-bind="Profile.username"></span>
+            <button ng-if="!Profile.same && !inFriendsList()" ng-click="sendFriendRequestFromProfile()" style="float:right;" type="button" class="btn btn-primary btn-sm">Send Friend Request</button>
         </small>
         </div>
         <h1>Friends of <span ng-bind="Profile.displayName"></span></h1>
         <div class="list-group">
             <a ng-repeat="friend in Profile.friends" ui-sref="profile.view({profileId: friend._id})" class="list-group-item">
             </a>
+            <div class="alert alert-warning text-center" ng-if="Profile.$resolved && Profile.friends.length === 0">
+                <span ng-bind="Profile.displayName"></span> has no friends.
+            </div>
         </div>
-    </div>
-    <div class="alert alert-warning text-center" ng-if="Profile.$resolved && (Profile.$promise.$$state.status == 2)">
-        <div ng-bind="Profile.$promise.$$state.value.data.message"></div>
-    </div>
+        <hr>
+        <div ng-if="Profile.same">
+            <h1>Pending Friend Requests</h1>
+            <div class="list-group">
+                <a ng-repeat="fr in Profile.pendingFriendRequests" ui-sref="profile.view({profileId:friend._id})" class="list-group-item"><button style="float:right;" type="button" class="btn btn-primary btn-sm">Accept</button></a>
+                <div class="alert alert-warning text-center" ng-if="Profile.$resolved &&  Profile.friends.length === 0">
+                You have no friend requests at the moment.
+                </div>
+            </div>
+        </div>
+        <div class="alert alert-warning text-center" ng-if="Profile.$resolved && (Profile.$promise.$$state.status == 2)">
+            <div ng-bind="Profile.$promise.$$state.value.data.message"></div>
+        </div>
 </section>
