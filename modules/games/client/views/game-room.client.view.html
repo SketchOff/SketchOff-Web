@@ -50,7 +50,7 @@
         </div>
     </div>
 
-    <div ng-if="amJudge()" drawing-judge>
+    <div ng-if="authentication.user.username === GameRoom.judge" drawing-judge>
         <table>
             <tr>
                 <td>
