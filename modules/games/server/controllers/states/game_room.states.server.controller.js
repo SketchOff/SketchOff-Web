@@ -27,7 +27,10 @@ export class Establishing {
             this.GameRoom.players.push(x);
             this.GameRoom.judge = this.GameRoom.players[0];
             getIO().to(this.GameRoom.getRoomID()).emit('ESTABLISHING', this.GameRoom.getRoomInfo());
-            if (this.GameRoom.isPublic()) q.removeAvailableGame(this.GameRoom.getRoomID());
+            if (this.GameRoom.isPublic()) {
+                this.available = false;
+                q.removeAvailableGame(this.GameRoom.getRoomID());
+            }
         }
         this.GameRoom.countdownFactory(this.GameRoom.getPhraseSelectionTime(), 'Ending', 'selecting phrase countdown');
     }
@@ -42,11 +45,11 @@ export class Establishing {
             player.game_room_id = this.GameRoom.getRoomID();
 
             var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
-             if (ConnectedPlayer) {
-                 ConnectedPlayer.in_queue = false;
-                 ConnectedPlayer.in_game = true;
-             }
-             GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
+            if (ConnectedPlayer) {
+                ConnectedPlayer.in_queue = false;
+                ConnectedPlayer.in_game = true;
+            }
+            GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
         }, this);
     }
 
@@ -74,8 +77,11 @@ export class SelectingWinner {
     constructor(GameRoom) {
         this.name = 'SELECTING_WINNER';
         this.GameRoom = GameRoom;
+        if (!this.GameRoom.isFull() && !this.GameRoom.isPublic()) {
+            this.available = true;
+            q.addAvailableGame(this.GameRoom.getRoomID());
+        }
         getIO().to(this.GameRoom.getRoomID()).emit('SELECTING_WINNER');
-        if (!this.GameRoom.isFull() && this.GameRoom.isPublic()) q.addAvailableGame(this.GameRoom.getRoomID());
         this.GameRoom.countdownFactory(this.GameRoom.getWinnerSelectionTime(), 'Ending', 'selecting winner countdown');
     }
 
@@ -89,7 +95,6 @@ export class Ending {
         var message = {};
         this.name = 'ENDING';
         this.GameRoom = GameRoom;
-
         if (this.GameRoom.winner.localeCompare('No winner yet') === 0) {
             this.GameRoom.noWinner();
             if (!reason) {
@@ -108,9 +113,8 @@ export class Ending {
         this.GameRoom.awardPoints();
 
         if (this.GameRoom.isFirstGame()) this.GameRoom.first_game = false;
-
     }
-
+    
     getName() {
         return this.name;
     }
@@ -121,6 +125,7 @@ export class Terminating {
         this.GameRoom = GameRoom;
         this.name = 'TERMINATING';
         getIO().to(this.GameRoom.getRoomID()).emit('TERMINATING');
+        if (this.GameRoom.isPublic()) q.removeAvailableGame(this.GameRoom.getRoomID());
         GameRoomManager.removeGameRoom(this.GameRoom.getRoomID());
     }
 
