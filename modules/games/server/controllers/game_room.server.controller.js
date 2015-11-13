@@ -219,6 +219,14 @@ export default class GameRoom {
         return RoomInfo;
     }
 
+    getPrivateInfo(){
+        var LobbyInfo = {}
+        LobbyInfo.players = this.getPlayerUserNames();
+        LobbyInfo.state = this.getStateName();
+        LobbyInfo._id = this._id();
+        return LobbyInfo;
+    }
+
     hasAdminSubscribers() {
         return (!!getIO().sockets.adapter.rooms.admin_updates);
     }
