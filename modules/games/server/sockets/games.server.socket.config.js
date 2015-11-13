@@ -113,7 +113,6 @@
 	  console.log('hellolobby');
       console.log(socket);
       console.log(socket.game_room_id);
-	//THIS IS FAILING, HE ISNT PUT INTO THE GAME ROOM????
           var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
 	  console.log(GameRoom);
           socket.emit('lobby info responding', {
