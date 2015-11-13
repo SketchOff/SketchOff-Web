@@ -83,7 +83,9 @@ export default class GameRoom {
         }
         var index = getRandomIntInclusive(0, this.players.length - 1);
         this.players.splice(index, 0, player);
-        player.in_game = true;
+        var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
+        ConnectedPlayer.in_game = true;
+        ConnectedPlayer.in_queue = false;
     }
 
     addWaitingPlayer(player) {
