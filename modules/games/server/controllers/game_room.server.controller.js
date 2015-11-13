@@ -220,10 +220,10 @@ export default class GameRoom {
     }
 
     getPrivateInfo(){
-        var LobbyInfo = {}
+        var LobbyInfo = {};
         LobbyInfo.players = this.getPlayerUserNames();
         LobbyInfo.state = this.getStateName();
-        LobbyInfo._id = this._id();
+        LobbyInfo._id = this.getRoomId();
         return LobbyInfo;
     }
 
