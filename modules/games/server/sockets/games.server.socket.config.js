@@ -48,12 +48,12 @@
 	});
 
 
-    socket.on('start private game'){
+    socket.on('start private game', function(){
         console.log('start private game');
         var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
         GameRoom.startPrivateGame();
         io.to(GameRoom.getRoomId()).emit('go private game');
-    }
+    });
 
 
      socket.on('create private game', function() {
