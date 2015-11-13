@@ -83,6 +83,7 @@ export default class GameRoom {
         }
         var index = getRandomIntInclusive(0, this.players.length - 1);
         this.players.splice(index, 0, player);
+        player.in_game = true;
     }
 
     addWaitingPlayer(player) {
