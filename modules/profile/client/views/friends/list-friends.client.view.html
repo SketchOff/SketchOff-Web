@@ -1,0 +1,19 @@
+<section ng-controller="FriendsController" ng-init="find()">
+  <div class="page-header">
+    <h1 style="display:inline;">Friends</h1>
+    Username: <input type="text" ng-model="friendCriteria">
+    <a class="btn btn-primary btn-lg" style="float:right" href="" ng-click="addFriend()">Add Friend</a>
+  </div>
+  <div>{{results}}</div>
+  <!--
+  <div class="list-group">
+    <a ng-repeat="friend in friends" ui-sref="friends.view({friendId: friends._id})" class="list-group-item">
+      <small class="list-group-item-text">
+        <span ng-bind="friend.username"></span>
+      </small>
+      <h4 class="list-group-item-heading" ng-bind="friend.displayName"></h4>
+   </a>
+   </div>
+   -->
+   <div class="alert alert-warning text-center" ng-if="friends.$resolved && !friends.length">No friends yet, why don't you add one?</div>
+   </section>

@@ -87,6 +87,34 @@ export default class GameRoom {
         return this.CountdownTimes.new_game;
     }
 
+    // Emits _data_ to everyone
+    emitToEveryone(type, data) {
+        console.log('emitting data to everyone');
+        this.players.forEach(function (player) {
+            player.emit(type, data);
+        });
+    }
+
+    // Emits _data_ to player_id (Authentication.user._uid)
+    emitToPlayer(type, player_id, data) {
+        console.log('emitting data to specific player ' + player_id);
+        this.players.forEach(function (player) {
+            if(player.request.user._uid === player_id) {
+                player.emit(type, data);
+            }
+        });
+    }
+
+    // Emits _data_ to everyone except player_id (Authentication.user._uid)
+    emitToEveryoneExcept(type, player_id, data) {
+        console.log('emitting data to everyone except ' + player_id);
+        this.players.forEach(function (player) {
+            if(player.request.user._uid !== player_id) {
+                player.emit(type, data);
+            }
+        });
+    }
+
     getRoomType() {
         if (this.is_public) return 'public';
         return 'private';

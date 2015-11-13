@@ -1,22 +1,22 @@
- 'use strict';
+'use strict';
 
- import {
-     q
- }
- from '../controllers/queue.server.controller';
- import * as GameRoomManager from '../controllers/game_room_manager.server.controller';
+import {
+ q
+}
+from '../controllers/queue.server.controller';
+import * as GameRoomManager from '../controllers/game_room_manager.server.controller';
 
- var setSocket = false;
+var setSocket = false;
 
- // Create the game socket.io configuration
- export default function(io, socket) {
+// Create the game socket.io configuration
+export default function(io, socket) {
 
-     if (!setSocket) {
+    if (!setSocket) {
          setSocket = true;
          q.setIO(io);
-     }
+    }
 
-     if (!GameRoomManager.ConnectedPlayers.has(socket.request.user.username)) {
+    if (!GameRoomManager.ConnectedPlayers.has(socket.request.user.username)) {
          GameRoomManager.ConnectedPlayers.set(socket.request.user.username, {
              in_queue: false,
              in_game: false,
@@ -24,14 +24,14 @@
              num_connections: 1,
              socket_id: socket.id
          });
-     } else {
+    } else {
          var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
          ConnectedPlayer.num_connections++;
-     }
-     console.log(socket.request.user.username, 'connected');
+    }
+    console.log(socket.request.user.username, 'connected');
 
 
-     socket.on('join public game', function() {
+    socket.on('join public game', function() {
          var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
 
          if (ConnectedPlayer.in_queue) {
@@ -44,9 +44,9 @@
              ConnectedPlayer.in_queue = true;
              GameRoomManager.ConnectedPlayers.set(socket.request.user.username, ConnectedPlayer);
          }
-     });
+    });
 
-     socket.on('get game info', function() {
+    socket.on('get game info', function() {
          var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
          socket.emit('game info responding', GameRoom.getGameInfo());
 
@@ -129,4 +129,17 @@
              }
          }
      });
- }
+
+    socket.on('CLIENT_P2S_pSync', function(data) {
+        console.log('Client Player sync state message received');
+        //console.log(data);
+    });
+
+    socket.on('CLIENT_P2S_pDiff', function(data) {
+        console.log('Client Player image diff received');
+        //console.log(data);
+        var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
+        GameRoom.emitToEveryone('CLIENT_S2P_pDiff', data);
+});
+
+}

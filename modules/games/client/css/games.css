@@ -1,0 +1,43 @@
+.playerContainer{
+
+}
+
+.cavnasContainer{
+	position: relative;
+	width: 640px;
+	height: 480px;
+	margin: 0 auto;
+}
+
+.sketchpad{
+	position: absolute;
+	border: 1px solid black; 
+	background-color: #FFFFFF;
+	z-index: 0;
+	top: 0;
+	left: 0;
+	width: 640px;
+	height: 480px;
+}
+
+.jsketchpad{
+	width: 480px;
+	height: 360px;
+	border: 1px solid black; 
+	background-color: #FFFFFF;
+	padding: 10px;
+}
+
+.tempOverlay{
+	position: absolute;
+	z-index: 1;
+	top: 0;
+	left: 0;
+	width: 640px;
+	height: 480px;
+}
+
+.kbackground{
+	outline-style: solid;
+	outline-color: black;
+}
