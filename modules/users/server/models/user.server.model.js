@@ -102,10 +102,10 @@ var UserSchema = new Schema({
     type: Number,
     default: 0
   },
-  flags: {
+  flags: [{
     type: Schema.objectID,
-    ref: 'flags'
-  }
+    ref: 'Flag'
+  }]
 });
 
 /**

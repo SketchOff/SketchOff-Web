@@ -14,10 +14,7 @@ var FlagSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  user: {
-    type: Schema.ObjectId,
-    ref: 'User'
-  },
+  /* schema value removed: user, type schema.objectid, ref 'User' */
   reason: {
     type: String,
     enum: ['aborted']
