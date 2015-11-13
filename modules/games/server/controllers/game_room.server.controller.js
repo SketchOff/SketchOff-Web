@@ -42,6 +42,7 @@ export default class GameRoom {
 	if (this.is_public){
             this.State = new GameRoomStates.Establishing(this);
         } else {
+        this.lobbyLeader = players[0].request.user.username;
 	    this.State = new GameRoomStates.Lobby(this);
 	}
         if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
@@ -221,6 +222,7 @@ export default class GameRoom {
 
     getLobbyInfo(){
         var LobbyInfo = {};
+        LobbyInfo.lobbyLeader = this.lobbyLeader;
         LobbyInfo.players = this.getPlayerUserNames();
         LobbyInfo.state = this.getStateName();
         LobbyInfo._id = this.getRoomId();
