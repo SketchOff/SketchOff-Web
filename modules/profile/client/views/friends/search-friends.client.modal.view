@@ -1,0 +1,19 @@
+<div style="text-align: center">
+    <h1>Search Criteria</h1><br>
+    Username: <input type="text" ng-model="searchCriteria"><br>
+
+    <div class="list-group">
+    <!-- <a ng-repeat="friend in friends" ui-sref="friends.view({friendId: friends._id})" class="list-group-item">
+      <small class="list-group-item-text">
+        <span ng-bind="friend.username"></span>
+      </small>
+      <h4 class="list-group-item-heading" ng-bind="friend.displayName"></h4>
+  </a> -->
+      <a class="list-group-item">
+        <p>{{results}}</p>
+      </a>
+    </div>
+<!-- <span us-spinner></span> -->
+<button class="btn btn-warning" style="margin-bottom: 12px" ng-click="go()">Search</button>
+<button class="btn btn-warning" style="margin-bottom: 12px" ng-click="cancel()">Cancel</button>
+</div>
