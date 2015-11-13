@@ -19,8 +19,10 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
 
         Socket.on('lobby info responding', function(msg) {
         	$scope.GameRoom = msg;
-		console.log('hello');
-		console.log(msg);
+        });
+
+    Socket.on('update lobby info', function(msg) {
+            $scope.GameRoom = msg;
         });
 
 	$scope.invitePlayers = function() {
