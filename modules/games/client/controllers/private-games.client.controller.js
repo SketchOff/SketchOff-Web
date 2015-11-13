@@ -41,7 +41,7 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
 
     $scope.leaveGame = function() {
             Socket.emit('leave room');
-            state.go('home');
+            $state.go('home');
         };
 
 	$scope.startGame = function() {
