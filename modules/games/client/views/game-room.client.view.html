@@ -50,12 +50,37 @@
         </div>
     </div>
 
-
-    <div ng-if="authentication.user.username === GameRoom.judge" drawing-judge>
-        <p>Player:</p>
-        <canvas width="640" height="480" class="jsketchpad" id="sp1">
-            Your browser does not support HTML5 Canvas
-        </canvas>
+    <div ng-if="amJudge()" drawing-judge>
+        <table>
+            <tr>
+                <td>
+                    <p>Player: {{getPlayer(1)}}</p>
+                    <canvas width="640" height="480" class="jsketchpad" id="sp1">
+                        Your browser does not support HTML5 Canvas
+                    </canvas>
+                </td>
+                <td ng-if="existPlayer(2)">
+                    <p>Player: {{getPlayer(2)}}</p>
+                    <canvas width="640" height="480" class="jsketchpad" id="sp2">
+                        Your browser does not support HTML5 Canvas
+                    </canvas>
+                </td>
+            </tr>
+            <tr>
+                <td ng-if="existPlayer(3)">
+                    <p>Player: {{getPlayer(2)}}</p>
+                    <canvas width="640" height="480" class="jsketchpad" id="sp1">
+                        Your browser does not support HTML5 Canvas
+                    </canvas>
+                </td>
+                <td ng-if="existPlayer(4)">
+                    <p>Player: {{getPlayer(2)}}</p>
+                    <canvas width="640" height="480" class="jsketchpad" id="sp2">
+                        Your browser does not support HTML5 Canvas
+                    </canvas>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <div ng-if="true" drawing-end>

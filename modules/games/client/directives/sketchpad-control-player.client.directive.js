@@ -5,9 +5,9 @@ angular.module('games')
 	return{
 		restrict: "A",
 		link: function(scope, element){
-    	console.log(element);
-      //console.log(element.children()[0].style);
-      //console.log(window.getComputedStyle(element.children()[0], null).marginLeft);
+    	// console.log(element);
+      // console.log(element.children()[0].style);
+      // console.log(window.getComputedStyle(element.children()[0], null).marginLeft);
 
       // rip readability
       // xoffset due to floating relative stuff
@@ -60,6 +60,10 @@ angular.module('games')
 
       	currentX = event.clientX-xoffset;
       	currentY = event.offsetY;
+
+        if(currentX < 0 || currentX > 640 || currentY < 0 || currentY > 480) {
+          return;
+        }
 
       	if(canDraw) {
 

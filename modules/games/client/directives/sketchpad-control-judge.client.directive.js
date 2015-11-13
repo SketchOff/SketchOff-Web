@@ -5,11 +5,31 @@ angular.module('games')
 	return{
 		restrict: "A",
 		link: function(scope, element){
-      var ctx = '';
+      var playersArray = [];
+      // console.log(element);
 
-    	// On recieved S2P_pDiff, if you are the judge, display the canvas wrt to id
+      for(var i=0; i<scope.getNumPlayers(); i++) {
+        if(scope.getNumPlayers() > 1) {
+          alert("yeah unimplemented");
+        }
+        else {
+          playersArray.push(
+            {
+              ctx:element.children().children()
+                .children().children()
+                .children()[1].getContext('2d'),
+              uid:scope.getPlayer(1)
+            }
+          );
+        }
+      }
+
+      console.log(playersArray);
+
+    	// On recieved S2P_pDiff, display the canvas wrt to id
     	Socket.on('CLIENT_S2P_pDiff', function(data) {
     		console.log('client_s2p_pdiff received');
+        judgepDiff(data);
     	});
 
     	Socket.on('CLIENT_S2P_pSync', function(data) {
@@ -18,23 +38,39 @@ angular.module('games')
           // TODO: implement
       });
 
+      function getContextFromID(id) {
+        for(var i=0; i<playersArray.length; i++) {
+          if(playersArray[i].uid === id) {
+            return playersArray[i].ctx;
+          }
+        }
+
+        console.log("getContextFromID failed");
+        console.log("lookupID: " + id);
+        console.log("playersArray: " + playersArray);
+      }
+
     	function judgepDiff(data) {
-      	// TODO: Find canvas with correct cID
+        console.log(data);
+        var ctx = getContextFromID(data.clientID);
 
       	switch(data.diffTool) {
       		case 0:
-      		  judgeDiffToolDot(data.toolData);
+      		  judgeDiffToolDot(data.toolData, ctx);
       		  break;
       		case 1: 
-      			// TODO:
+      			judgeDiffToolLine(data.toolData, ctx);
       			break;
+          case 2:
+            judgeDiffToolEraser(data.toolData, ctx);
+            break;
       		default:
       			console.log('ERROR UNKNOWN TOOL ' + data.diffTool);
       			break;
       		}
       	}
 
-      function judgeDiffToolDot(toolData) {
+      function judgeDiffToolDot(toolData, ctx) {
     		var cx, cy, lx, ly, color, thick;
     		var temp = toolData.pop();
     		cx = temp[0];
@@ -64,48 +100,70 @@ angular.module('games')
     			ctx.moveTo(lx, ly);
     			ctx.lineTo(cx, cy);
 
-    			ctx.strokeColor = color;
+    			ctx.strokeStyle = color;
     			ctx.lineWidth = 2*thick;
     			ctx.stroke();
     		}
     	}
 
-     	////////////////////////
-    	// START DOWN TOOLS   //
-    	////////////////////////
+      function judgeDiffToolLine(toolData, ctx) {
+        console.log("2pointline called");
+        var x1, y1, x2, y2, color, thick;
+        var temp = toolData[1];
 
-    	function drawDownDot(downX, downY, color, thick) {
-    		// console.log('mousedown at ' + downX + ',' + downY);
+        x1 = temp[0];
+        y1 = temp[1];
+        x2 = temp[2];
+        y2 = temp[3];
+        color = temp[4];
+        thick = temp[5];
 
-    		ctx.fillStyle = color;
-    		ctx.beginPath();
-    		ctx.arc(downX, downY, thick, 0, 2*Math.PI, true);
-    		ctx.fill();
-    	}
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x1, y1, thick, 0, 2*Math.PI, true);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x2, y2, thick, 0, 2*Math.PI, true);
+        ctx.fill();
 
-    	////////////////////////
-    	// START MOVE TOOLS   //
-    	////////////////////////
+        twoPointLine(ctx, x1, y1, x2, y2, color, thick);
+      }
 
-    	function drawMoveDot(currentX, currentY, lastX, lastY, toolColor, toolSize) {
+      function judgeDiffToolEraser(toolData, ctx) {
+        var cx, cy, lx, ly, color, thick;
+        var temp = toolData.pop();
+        cx = temp[0];
+        cy = temp[1];
+        color = temp[2];
+        thick = temp[3];
 
-    		// Draw end point
-    		ctx.beginPath();
-    		ctx.arc(currentX, currentY, toolSize, 0, 2*Math.PI, true);
-    		ctx.fill();
+        ctx.clearRect(cx-thick, cy-thick, 2*thick, 2*thick);
 
-    		// Interpolate
-    		twoPointLine(ctx, lastX, lastY, currentX, currentY, toolColor, toolSize);
+        while(toolData.length > 0) {
+          lx = cx;
+          ly = cy;
+          temp = toolData.pop();
+          cx = temp[0];
+          cy = temp[1];
+          color = temp[2];
+          thick = temp[3];
 
-    	}
+          var tslopey = ly - cy;
+          var tslopex = lx - cx;
 
-    	////////////////////////
-    	// START UP TOOLS   //
-    	////////////////////////
+          // Interpolate - validate this
+          if(tslopex === 0) {
+            ctx.clearRect(lx-thick, ly-thick, thick*2, Math.abs(tslopey) + 2*thick);
+          }
+          else {
+            var slope = tslopey/tslopex;
+            for(var i=0; i<Math.abs(tslopex); i++) {
+              ctx.clearRect(lx-thick+i, ly-thick+i*slope, thick*2, thick*2);
+            }
+          }
+        }
+      }
 
-    	function drawUpDot(currentX, currentY, lastX, lastY, toolColor, toolSize) {
-    		drawMoveDot(currentX, currentY, lastX, lastY, toolColor, toolSize);
-    	}
 
     	// Draws a 2 point line in _context_ from _x1, y1_ to _x2, y2_ with _color_ and _thick_.
     	// Takes a context argument in the event shit needs to be drawn on a temp canvas.
@@ -114,7 +172,7 @@ angular.module('games')
     		context.moveTo(x1, y1);
     		context.lineTo(x2, y2);
 
-    		context.strokeColor = color;
+    		context.strokeStyle = color;
     		context.lineWidth = 2*thick;
     		context.stroke();
     	}

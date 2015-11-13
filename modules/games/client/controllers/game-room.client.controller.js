@@ -47,6 +47,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             $scope.GameRoom.phrase = undefined;
             $scope.GameRoom.winner = undefined;
             // TODO: Give judge a countdown to select phrase, otherwise kick judge
+            console.log($scope.GameRoom.players);
         };
 
         var draw = function(msg) {
@@ -189,11 +190,34 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             // console.log($scope.authentication.user);
             // console.log();
             // console.log($scope.authentication.user._id);
-            return $scope.authentication.user._id;
+            return $scope.authentication.user.username;
         };
 
         $scope.amJudge = function() {
             return is_judge;
+        };
+
+        // NOTE: THIS IS NOT AN OFF BY ONE ERROR BECAUSE THE JUDGE IS A PLAYER
+        $scope.existPlayer = function(arg) {
+            return $scope.GameRoom.players.length > arg;
+        };
+
+        $scope.getNumPlayers = function(arg) {
+            return $scope.GameRoom.players.length-1;
+        };
+
+        // Note off by 1 error, valid arg = 1-> # players
+        $scope.getPlayer = function(arg) {
+            var temp = [];
+            var joff = 0;
+            for(var i=0; i< $scope.GameRoom.players.length-1; i++) {
+                if($scope.GameRoom.players[i] === $scope.GameRoom.judge) {
+                    joff += 1;
+                }
+                temp[i] = $scope.GameRoom.players[i+joff];
+            }
+
+            return temp[arg-1];
         };
 
         $scope.broadcastCanvasData = function(data) {
@@ -203,7 +227,6 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             Socket.emit('CLIENT_P2S_'+data.sType, data.data);
             console.log("socket emitted: " + 'CLIENT_P2S_'+data.sType); 
         };
-
     }
 
 ]);

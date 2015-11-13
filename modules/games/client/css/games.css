@@ -1,4 +1,5 @@
 .playerContainer{
+
 }
 
 .cavnasContainer{
@@ -17,6 +18,14 @@
 	left: 0;
 	width: 640px;
 	height: 480px;
+}
+
+.jsketchpad{
+	width: 480px;
+	height: 360px;
+	border: 1px solid black; 
+	background-color: #FFFFFF;
+	padding: 10px;
 }
 
 .tempOverlay{
