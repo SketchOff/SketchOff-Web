@@ -28,8 +28,10 @@ export default class GameRoom {
         players.forEach(function(player) {
             if (typeof player !== 'object') throw new Error('Players array contains non-object values');
         });
-        if (players.length < min_players) throw new Error('Too few players');
-        if (players.length > max_players) throw new Error('Too many players');
+        if (is_public_room) {
+            if (players.length < min_players) throw new Error('Too few players');
+            if (players.length > max_players) throw new Error('Too many players');
+        }
         if (typeof is_public_room !== 'boolean') throw new Error('is_public_room param must be a boolean');
         if (typeof room_id === 'undefined') throw new Error('room_id is undefined');
         if (typeof room_id !== 'string') throw new Error('room_id param must be a string');
