@@ -203,7 +203,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         };
 
         $scope.amJudge = function() {
-            return is_judge;
+            return $scope.authentication.user.username === $scope.GameRoom.judge;
         };
 
         // NOTE: THIS IS NOT AN OFF BY ONE ERROR BECAUSE THE JUDGE IS A PLAYER

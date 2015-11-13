@@ -38,6 +38,12 @@ angular.module('games')
           // TODO: implement
       });
 
+      Socket.on('ESTABLISHING', function() {
+        for(var i=0; i<playersArray.length; i++) {
+          playersArray[i].ctx.clearRect(0,0,640,480);
+        }
+      });
+
       function getContextFromID(id) {
         for(var i=0; i<playersArray.length; i++) {
           if(playersArray[i].uid === id) {

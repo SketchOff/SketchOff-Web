@@ -13,6 +13,8 @@ angular.module('games')
       // xoffset due to floating relative stuff
       var xoffset = 30+parseInt(window.getComputedStyle(element.children()[0], null).marginLeft.split('px')[0]);
 
+      console.log(element.children().children()[0]);
+
     	var ctx = element.children().children()[0].getContext('2d');
       var ctxtemp = element.children().children()[1].getContext('2d');
 
@@ -20,6 +22,9 @@ angular.module('games')
 
       // variable that indicates if in a gamestate where drawing is allowed
       var canDraw = false;
+
+      // variable that indicates if we are in a drawing phase
+      var isDrawingPhase = false;
       
       // variable that decides if something should be drawn on mousemove
       var drawing = false;
@@ -50,7 +55,7 @@ angular.module('games')
       // On mousedown, gather all information that would be relevant for any kind of tool used.
       element.bind('mousedown', function(event){
         console.log(event);
-      	canDraw = !scope.amJudge();
+      	canDraw = !scope.amJudge() && isDrawingPhase;
 
       	anchorX = event.clientX-xoffset;
       	anchorY = event.offsetY;
@@ -160,6 +165,15 @@ angular.module('games')
 
       Socket.on('ESTABLISHING', function() {
           ctx.clearRect(0,0,640,480);
+      });
+
+      Socket.on('DRAWING', function() {
+        isDrawingPhase = true;
+        // element.children().children()[0].style
+      });
+
+      Socket.on('selecting winner countdown', function() {
+        isDrawingPhase = false;
       });
 
       function flushSocketQueueData() {
