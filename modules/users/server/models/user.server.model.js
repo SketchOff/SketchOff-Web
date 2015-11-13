@@ -101,6 +101,10 @@ var UserSchema = new Schema({
   xp: {
     type: Number,
     default: 0
+  },
+  flags: {
+    type: Schema.objectID,
+    ref: 'flags'
   }
 });
 
