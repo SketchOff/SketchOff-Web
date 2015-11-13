@@ -224,6 +224,8 @@ export default class GameRoom {
         LobbyInfo.players = this.getPlayerUserNames();
         LobbyInfo.state = this.getStateName();
         LobbyInfo._id = this.getRoomId();
+        LobbyInfo.min_players = this.min_players;
+        LobbyInfo.max_players = this.max_players;
         return LobbyInfo;
     }
 
@@ -314,6 +316,10 @@ export default class GameRoom {
                 player.request.user.save(saveCallback);
             }
         }
+    }
+
+    startPrivateGame(){
+        this.setState('Establishing');
     }
 }
 

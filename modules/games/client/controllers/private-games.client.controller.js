@@ -25,6 +25,11 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
             $scope.GameRoom = msg;
         });
 
+    Socket.on('go private game'){
+        console.log('go private game');
+        $state.go('games.room');
+    }
+
 	$scope.invitePlayers = function() {
             $scope.animationsEnabled = true;
             modalInstance = $uibModal.open({
@@ -35,12 +40,12 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
         };
 
 	$scope.startGame = function() {
-	    //TODO: emit start?
-	    //I DONT GET HOW A GAME IS ATTACHED TO THIS CONTROLLER
-	    //I WANT TO GO FROM 'LOBBY' TO 'ESTABLISHING'
-	    $state.go('games.room');//???????
+	    if($scope.GameRoom.players.length <= $scope.GameRoom.min_players){
+            Socket.emit('start private game')
+        } else {
+            alert("not enough players to start");
+        }
 	};
-
 
     }
 

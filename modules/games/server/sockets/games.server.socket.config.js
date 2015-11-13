@@ -47,6 +47,15 @@
        io.to(GameRoom.getRoomId()).emit('update lobby info', GameRoom.getPrivateInfo());
 	});
 
+
+    socket.on('start private game'){
+        console.log('start private game');
+        var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
+        GameRoom.startPrivateGame();
+        io.to(GameRoom.getRoomId()).emit('go private game');
+    }
+
+
      socket.on('create private game', function() {
          var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
 	 console.log('creating private game');
@@ -108,6 +117,8 @@
           var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
 	  console.log(GameRoom);
           socket.emit('lobby info responding', {
+           max_players = GameRoom.max_players;
+           min_players = GameRoom.min_players;
 	       _id: GameRoom._id,
 	       players: GameRoom.getPlayerUserNames(),
 	       state: GameRoom.getStateName()
