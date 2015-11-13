@@ -219,13 +219,13 @@ export default class GameRoom {
         return RoomInfo;
     }
 
-    getPrivateInfo(){
+    getLobbyInfo(){
         var LobbyInfo = {};
         LobbyInfo.players = this.getPlayerUserNames();
         LobbyInfo.state = this.getStateName();
         LobbyInfo._id = this.getRoomId();
-        LobbyInfo.min_players = this.min_players;
-        LobbyInfo.max_players = this.max_players;
+        LobbyInfo.min_players = min_players;
+        LobbyInfo.max_players = max_players;
         return LobbyInfo;
     }
 

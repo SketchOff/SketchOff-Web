@@ -44,7 +44,7 @@
 	   var GameRoom = GameRoomManager.getGameRoom(msg[0]);
        GameRoom.addPlayer(socket);
 	   io.to(msg[1]).emit('joined private lobby');
-       io.to(GameRoom.getRoomId()).emit('update lobby info', GameRoom.getPrivateInfo());
+       io.to(GameRoom.getRoomId()).emit('update lobby info', GameRoom.getLobbyInfo());
 	});
 
 
