@@ -39,16 +39,15 @@
          }
      });
 
-     socket.on('join private lobby', function(msg) {
-	console.log('join private jobby');
-	console.log(msg);
-	//ADDING THE PLAYER ISNT WORKING I DONT KNOW WHY
-	GameRoomManager.getGameRoom(msg[0]).addPlayer(msg[1]);
-	console.log('added player');
-	console.log(GameRoomManager.getGameRoom(msg[0]).players);
-	io.to(msg[1]).emit('joined private lobby');
-	
-     });
+    socket.on('join private lobby', function(msg) {
+	   console.log('join private jobby');
+	   console.log(msg);
+	   //ADDING THE PLAYER ISNT WORKING I DONT KNOW WHY
+	   GameRoomManager.getGameRoom(msg[0]).addPlayer(socket);
+	   console.log('added player');
+	   console.log(GameRoomManager.getGameRoom(msg[0]).players);
+	   io.to(msg[1]).emit('joined private lobby');
+	});
 
      socket.on('create private game', function() {
          var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
@@ -75,7 +74,8 @@
 
      socket.on('invite player', function(msg){
 	 console.log(socket.game_room_id);
-	 io.to(msg).emit('invite notification', [socket.game_room_id, socket.request.user.username, msg]); 
+     var invite_socket_id = msg;
+	 io.to(msg).emit('invite notification', [socket.game_room_id, socket.request.user.username, invite_socket_id]); 
      });
 
 
