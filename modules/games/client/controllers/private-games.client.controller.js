@@ -40,6 +40,8 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
         };
 
 	$scope.startGame = function() {
+        console.log($scope.GameRoom.players.length);
+        console.log($scope.GameRoom.min_players);
 	    if($scope.GameRoom.players.length <= $scope.GameRoom.min_players){
             Socket.emit('start private game');
         } else {
