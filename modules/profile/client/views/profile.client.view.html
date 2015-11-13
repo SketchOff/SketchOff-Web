@@ -6,7 +6,7 @@
             <small class="list-group-item-text">
             <span ng-bind="Profile._id"></span><br>
             <span ng-bind="Profile.username"></span>
-            <!-- <button ng-if="!Profile.same && !inFriendsList()" ng-click="sendFriendRequestFromProfile()" style="float:right;" type="button" class="btn btn-primary btn-sm">Send Friend Request</button> -->
+            <button ng-if="!Profile.same && !inFriendsList()" ng-click="sendFriendRequestFromProfile()" style="float:right;" type="button" class="btn btn-primary btn-sm">Send Friend Request</button>
         </small>
         </div>
         <h1>Friends of <span ng-bind="Profile.displayName"></span></h1>
