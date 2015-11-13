@@ -188,23 +188,25 @@ export default class GameRoom {
         player.leave(this._id);
         delete player.game_room_id;
 
-        if (this.getNumAllPlayers() < min_players) {
-            console.log('Terminating because not enough total players');
-            this.setState('Terminating');
-        } else if (this.getNumPlayers() < min_players) {
-            console.log('not enough playing player but enough total players');
-            this.setState('Ending', 'Not enough active players to continue.');
-        } else {
-            if (player.request.user.username.localeCompare(this.judge.request.username)) {
-                this.setState('Ending', 'The judge left the game.');
+        if (this.getStateName()!='LOBBY'){
+            if (this.getNumAllPlayers() < min_players) {
+                 console.log('Terminating because not enough total players');
+                 this.setState('Terminating');
+            } else if (this.getNumPlayers() < min_players) {
+                console.log('not enough playing player but enough total players');
+                this.setState('Ending', 'Not enough active players to continue.');
             } else {
-                console.log('player left but doesnt effect game play');
-                getIO().to(this._id).emit('player leaving', {
+                if (player.request.user.username.localeCompare(this.judge.request.username)) {
+                    this.setState('Ending', 'The judge left the game.');
+             } else {
+                    console.log('player left but doesnt effect game play');
+                    getIO().to(this._id).emit('player leaving', {
                     players: this.getPlayerUserNames(),
                     waiting_players: this.getWaitingPlayerUserNames()
-                });
+                 });
+             }
+             if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
             }
-            if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
         }
     }
 
