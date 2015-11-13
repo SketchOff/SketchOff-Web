@@ -77,7 +77,7 @@ export class SelectingWinner {
     constructor(GameRoom) {
         this.name = 'SELECTING_WINNER';
         this.GameRoom = GameRoom;
-        if (!this.GameRoom.isFull() && !this.GameRoom.isPublic()) {
+        if (!this.GameRoom.isFull() && this.GameRoom.isPublic()) {
             this.available = true;
             q.addAvailableGame(this.GameRoom.getRoomID());
         }
@@ -111,10 +111,14 @@ export class Ending {
         this.GameRoom.countdownFactory(this.GameRoom.getNewGameTime(), 'Establishing', 'starting new game countdown');
         this.GameRoom.saveGame();
         this.GameRoom.awardPoints();
+        if (!this.GameRoom.isFull() && this.GameRoom.isPublic() && !this.GameRoom.isAvailable()) {
+            this.available = true;
+            q.addAvailableGame(this.GameRoom.getRoomID());
+        }
 
         if (this.GameRoom.isFirstGame()) this.GameRoom.first_game = false;
     }
-    
+
     getName() {
         return this.name;
     }

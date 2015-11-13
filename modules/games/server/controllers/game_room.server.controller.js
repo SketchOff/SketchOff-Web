@@ -121,8 +121,8 @@ export default class GameRoom {
         ConnectedPlayer.in_game = true;
         GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
 
-        player.join(this._id);
-        player.game_room_id = this._id;
+        player.join(this.getRoomID());
+        player.game_room_id = this.getRoomID();
         this.waiting_players.push(player);
         getIO().to(this._id).emit('player joining', this.getWaitingPlayerUsernames());
         if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
@@ -256,7 +256,7 @@ export default class GameRoom {
                 this.setState('Ending', 'The judge left the game.');
             } else {
                 console.log('player left but doesnt effect game play');
-                getIO().to(this._id).emit('player leaving', {
+                getIO().to(this.getRoomID()).emit('player leaving', {
                     players: this.getPlayerUsernames(),
                     waiting_players: this.getWaitingPlayerUsernames()
                 });
