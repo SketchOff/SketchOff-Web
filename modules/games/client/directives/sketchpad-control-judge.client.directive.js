@@ -10,6 +10,7 @@ angular.module('games')
 
       for(var i=0; i<scope.getNumPlayers(); i++) {
         if(scope.getNumPlayers() > 1) {
+          console.log(element);
           alert("yeah unimplemented");
         }
         else {

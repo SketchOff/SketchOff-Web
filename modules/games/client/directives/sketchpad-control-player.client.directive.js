@@ -13,7 +13,7 @@ angular.module('games')
       // xoffset due to floating relative stuff
       var xoffset = 30+parseInt(window.getComputedStyle(element.children()[0], null).marginLeft.split('px')[0]);
 
-      console.log(element.children().children()[0]);
+      // console.log(element.children().children()[0]);
 
     	var ctx = element.children().children()[0].getContext('2d');
       var ctxtemp = element.children().children()[1].getContext('2d');
