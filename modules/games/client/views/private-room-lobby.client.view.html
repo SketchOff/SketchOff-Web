@@ -35,6 +35,7 @@ table tr:nth-child(even) {
 </table>
   <h4 ng-if="authentication.user.username === GameRoom.lobbyLeader">Warning, Do not start the game with only one player in the lobby</h4>
   <a class="btn btn-primary btn-lg" href=""  ng-click="invitePlayers()">Invite Players</a>
+  <a class="btn btn-primary btn-lg" href=""  ng-click="leaveGame()">Leave Game</a>
   <a ng-if="authentication.user.username === GameRoom.lobbyLeader" class="btn btn-primary btn-lg" href=""  ng-click="startGame()">Start Game</a>
 </div>
 

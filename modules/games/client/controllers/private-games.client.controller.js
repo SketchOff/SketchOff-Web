@@ -39,6 +39,11 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
             });
         };
 
+    $scope.leaveGame = function() {
+            Socket.emit('leave room');
+            state.go('home');
+        };
+
 	$scope.startGame = function() {
         console.log($scope.GameRoom.players.length);
         console.log($scope.GameRoom.min_players);

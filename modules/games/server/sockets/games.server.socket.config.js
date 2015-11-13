@@ -125,6 +125,7 @@
           });
      });
 
+
      socket.on('set phrase', function(msg) {
          var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
          GameRoom.setPhrase(msg);
@@ -144,6 +145,9 @@
              var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
              ConnectedPlayer.in_game = false;
              GameRoomManager.ConnectedPlayers.set(socket.request.user.username, ConnectedPlayer);
+             if(!GameRoom.isPublic()){
+                io.to(GameRoom.getRoomId()).emit('update lobby info', GameRoom.getLobbyInfo());
+             }
          }
      });
 
