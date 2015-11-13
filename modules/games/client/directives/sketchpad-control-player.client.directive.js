@@ -158,6 +158,10 @@ angular.module('games')
         drawing = false;
       });
 
+      Socket.on('ESTABLISHING', function() {
+          ctx.clearRect(0,0,640,480);
+      });
+
       function flushSocketQueueData() {
       	socketQueue = [];
       }
