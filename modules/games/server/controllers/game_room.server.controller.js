@@ -188,7 +188,7 @@ export default class GameRoom {
         player.leave(this._id);
         delete player.game_room_id;
 
-        if (this.getStateName()!='LOBBY'){
+        if (this.getStateName()!== 'LOBBY'){
             if (this.getNumAllPlayers() < min_players) {
                  console.log('Terminating because not enough total players');
                  this.setState('Terminating');
