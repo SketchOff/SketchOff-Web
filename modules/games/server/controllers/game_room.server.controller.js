@@ -80,7 +80,7 @@ export default class GameRoom {
     addPlayer(player) {
         if(!player.game_room_id){
             player.game_room_id = this.getRoomId();
-            if(socket.rooms.indexOf(this.getRoomId()) < 0){
+            if(player.rooms.indexOf(this.getRoomId()) < 0){
                 player.join(this.getRoomId());
             }
         }
