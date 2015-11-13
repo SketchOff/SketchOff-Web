@@ -69,11 +69,15 @@
                         done();
                     });
 
-                    it('should be accepting new players', function(done) {
-                        TheGameRoom.isAvailable().should.be.true // jshint ignore:line
+                    it('should not be accepting new players', function(done) {
+                        TheGameRoom.isAvailable().should.not.be.true // jshint ignore:line
                         done();
                     });
 
+                    it('should not have room_id listed in the queue\'s available games', function(done) {
+                        q.getAvailableGameIds().should.not.containEql(TheGameRoom.getRoomID());
+                        done();
+                    });
                 });
 
                 describe('Drawing State', function() {

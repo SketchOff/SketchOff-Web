@@ -56,7 +56,7 @@ export default class GameRoom {
         this.is_public = is_public_room;
         // Set to true if judge leaves
         this.first_game = true;
-        this.available = true;
+        this.available = false;
         this.waiting_players = [];
         this.CountdownTimes = CountdownTimes;
         this.winner = null;
