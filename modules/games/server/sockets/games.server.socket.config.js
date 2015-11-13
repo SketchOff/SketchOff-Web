@@ -160,6 +160,9 @@
              if (socket.game_room_id) {
                  var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
                  GameRoom.removePlayer(socket);
+                 if (!GameRoom.isPublic()){
+                    io.to(GameRoom.getRoomId()).emit('update lobby info', GameRoom.getLobbyInfo());
+                 }
              }
 
              GameRoomManager.ConnectedPlayers.delete(socket.request.user.username);
