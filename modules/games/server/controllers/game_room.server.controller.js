@@ -49,7 +49,9 @@ export default class GameRoom {
     }
 
     setLobbyLeader(){
-        this.lobbyLeader = this.players[this.players.length - 1].request.user.username;
+        if(this.players.length !== 0){
+            this.lobbyLeader = this.players[this.players.length - 1].request.user.username;
+        }
     }
 
     getRoomType() {
