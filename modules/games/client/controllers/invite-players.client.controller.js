@@ -33,18 +33,22 @@ angular.module('games').controller('InvitePlayersCtrl', ['$scope', 'Authenticati
 
 
 
-        $scope.cancel = function() {
-           $modalInstance.dismiss('cancel');
-        };
+    $scope.cancel = function() {
+       $modalInstance.dismiss('cancel');
+    };
 
-        $scope.invite = function(player_username) {
-	    var socket_id = avaliablePlayers[player_username].socket_id;
-	    Socket.emit('invite player', socket_id);
-	    console.log(socket_id); 
-	    console.log('client invite');
-        };
+    $scope.invite = function(player_username) {
+    	var socket_id = avaliablePlayers[player_username].socket_id;
+    	Socket.emit('invite player', socket_id);
+    	console.log(socket_id); 
+    	console.log('client invite');
+    };
 
+    $scope.getAvaliablePlayers = function(){
+    	Socket.emit('get all avaliable players');
+    }
 
+    setInterval($scope.getAvaliablePlayers(), 5000);
 
     }
 ]);
