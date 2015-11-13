@@ -30,12 +30,16 @@ export function isUserFriend(profileId, userId, callback) {
   user.select('friends');
   user.exec(function(err, u) {
     if (err) {console.log('isuserFriend broke', err); return false; }
+    if (u.friends.length === 0) {
+      callback(false);
+    }
     for (var i = 0, len = u.friends.length; i < len; i++) {
       if (String(u.friends[i]._id) === profileId) {
         callback(true);
+      } else if (i === len-1) {
+        callback(false);
       }
     }
-    callback(false);
   });
 
   //profile.select('pendingFriendRequests friends');
@@ -76,23 +80,39 @@ export function isUserPendingFriendRequest(profileId, userId, callback) {
   profile.select('pendingFriendRequests');
   profile.exec(function(err,p) {
     if (err) { console.log('something broke', err); return false; }
+    if (p.pendingFriendRequests.length === 0) {
+      callback(false);
+    }
     for(var i = 0, len = p.pendingFriendRequests.length; i < len; i++) {
         if (String(p.pendingFriendRequests[i].requestedBy) === userId) {
           callback(true);
+        } else if (i === len-1) {
+          callback(false);
         }
     }
-    callback(false);
   });
 }
 
 export function createFriendRequest(profileId, userId, callback) {
-  var profile = User.findOne( { '_id': profileId });
+  
+  /*var profile = User.findOne( { '_id': profileId });
   profile.select('pendingFriendRequests');
-  profile.pendingFriendRequests.push({ 'requestedBy': userId });
+  profile.push({ requestedBy: userId });
   profile.save(function (err) {
     if (err) { callback(false); return; }
     else { callback(true); }
   });
+  */
+
+  var condition = { _id: profileId },
+      update = { $push: {'pendingFriendRequests': { 'requestedBy': userId}}},
+      options = {};
+
+      User.update(condition, update, options, function(err, numAffected) {
+        if (err) { console.log('something broke', err); return false;}
+        console.log(numAffected);
+        callback(true);
+      });
 }
 
 export function getPlayerName(profileId, callback) {
@@ -121,12 +141,14 @@ export function friendRequest(profileId, userId) {
   isUserPendingFriendRequest(profileId, userId, function(foundinPendingRequests) {
     if (foundinPendingRequests) {
       console.log('Already sent friend request');
+      return;
     } else {
       console.log('3');
       isUserFriend(profileId, userId, function(foundinFriends) {
         console.log('4');
         if (foundinFriends) {
           console.log('Already friends with other');
+          return;
         } else {
           console.log('5');
           createFriendRequest(profileId, userId, function(success) {
