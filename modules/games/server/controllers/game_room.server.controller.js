@@ -77,6 +77,9 @@ export default class GameRoom {
 
     // Add a player to the game
     addPlayer(player) {
+        if(!player.game_room_id){
+            player.game_room_id = this._id;
+        }
         var index = getRandomIntInclusive(0, this.players.length - 1);
         this.players.splice(index, 0, player);
     }
