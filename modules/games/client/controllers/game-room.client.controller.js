@@ -6,6 +6,11 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
 
         $scope.authentication = Authentication;
         $scope.GameRoom = {};
+        $scope.playerVars = {
+            toolSize: 5,
+            toolColor: "#000000",
+            activeTool: 0
+        };
 
         var is_judge = false;
         var set_winner = false;
@@ -142,6 +147,43 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
                     Socket.emit('leave room');
                 }
         });
+
+        $scope.setTool = function(arg) {
+            console.log("Active tool changed from " + $scope.playerVars.activeTool + " to " + arg);
+            $scope.playerVars.activeTool = arg;
+        }
+
+        $scope.isActiveTool = function(arg) {
+            if($scope.playerVars.activeTool === arg) {
+                return {"color":"purple"};
+            }
+            else {
+                return {"color":"black"};
+            }
+        }
+
+        $scope.increaseToolSize = function() {
+            // console.log("+tool size");
+            $scope.playerVars.toolSize++;
+            // console.log($scope.playerVars.toolSize-1, $scope.playerVars.toolSize+1);
+        };
+
+        $scope.decreaseToolSize = function() {
+            $scope.playerVars.toolSize--;
+        };
+
+        $scope.colorStyle = function(arg) {
+            // console.log(arg)
+            return {"background-color":arg};
+        };
+
+        $scope.setColor = function(arg) {
+            $scope.playerVars.toolColor = arg;
+        };
+
+        $scope.iconToName = function(id) {
+            return ['Pen','Line','Eraser'][id];
+        };
 
         $scope.getUserID = function() {
             // console.log($scope.authentication.user);

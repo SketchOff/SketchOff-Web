@@ -6,8 +6,15 @@ angular.module('games')
 		restrict: "A",
 		link: function(scope, element){
     	console.log(element);
-    	var ctx = element.children()[0].getContext('2d');
-      var ctxtemp = element.children()[1].getContext('2d');
+      //console.log(element.children()[0].style);
+      //console.log(window.getComputedStyle(element.children()[0], null).marginLeft);
+
+      // rip readability
+      // xoffset due to floating relative stuff
+      var xoffset = 30+parseInt(window.getComputedStyle(element.children()[0], null).marginLeft.split('px')[0]);
+
+    	var ctx = element.children().children()[0].getContext('2d');
+      var ctxtemp = element.children().children()[1].getContext('2d');
 
       // var ctx2 = element[1].getContext('2d');
 
@@ -39,36 +46,36 @@ angular.module('games')
       // 1 line (2 point)
       // 2 eraser
 
-      var activeTool = 0;
-      var toolSize = 5;
-      var toolColor = "#000000"; // filler
 
       // On mousedown, gather all information that would be relevant for any kind of tool used.
       element.bind('mousedown', function(event){
+        console.log(event);
       	canDraw = !scope.amJudge();
 
-      	anchorX = event.offsetX;
+      	anchorX = event.clientX-xoffset;
       	anchorY = event.offsetY;
 
-      	lastX = event.offsetX;
+      	lastX = event.clientX-xoffset;
       	lastY = event.offsetY;
 
-      	currentX = event.offsetX;
+      	currentX = event.clientX-xoffset;
       	currentY = event.offsetY;
 
       	if(canDraw) {
 
 	        // Switch behavior based on active tool
 	        // Determine correct socket data format (with socketPopulateDown) now.
-	        switch(activeTool) {
+	        switch(scope.playerVars.activeTool) {
 	        	case 0:
-  	        	socketPopulateDown(0, [currentX, currentY, toolColor, toolSize]);
-  	        	drawDownDot(currentX, currentY, toolColor, toolSize);
+  	        	socketPopulateDown(0, [currentX, currentY, scope.playerVars.toolColor, scope.playerVars.toolSize]);
+  	        	drawDownDot(currentX, currentY, scope.playerVars.toolColor, scope.playerVars.toolSize);
   	        	break;
 	        	case 1:
-	        	  break;
+              socketPopulateDown(1, [currentX, currentY, scope.playerVars.toolColor, scope.playerVars.toolSize]);
+	        	  drawLineDown(currentX, currentY, scope.playerVars.toolColor, scope.playerVars.toolSize);
+              break;
 	        	default:
-	        	console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +activeTool);
+	        	console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +scope.playerVars.activeTool);
 
 	        }
 
@@ -78,26 +85,27 @@ angular.module('games')
 
       element.bind('mousemove', function(event){
       	// Update needed variables
-      	currentX = event.offsetX;
+      	currentX = event.clientX-xoffset;
       	currentY = event.offsetY;
 
       	if(drawing){
           // Switch behavior based on active tool
           // Update socketQueue if needed by tool
-          switch(activeTool) {
+          switch(scope.playerVars.activeTool) {
           	case 0:
             	socketPushToolData([
-            		currentX, currentY, toolColor, toolSize
+            		currentX, currentY, scope.playerVars.toolColor, scope.playerVars.toolSize
             		]);
-            	drawMoveDot(currentX, currentY, lastX, lastY, toolColor, toolSize);
-          	break;
-          	 case 1:
-          	break;
-          	 default:
-          	console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +activeTool);
+            	drawMoveDot(currentX, currentY, lastX, lastY, scope.playerVars.toolColor, scope.playerVars.toolSize);
+          	  break;
+          	case 1:
+              drawMoveLine(currentX, currentY, anchorX, anchorY, scope.playerVars.toolColor, scope.playerVars.toolSize);
+          	  break;
+          	default:
+          	  console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +scope.playerVars.activeTool);
           }
         }
-      lastX = event.offsetX;
+      lastX = event.clientX-xoffset;
       lastY = event.offsetY;
       });
 
@@ -106,18 +114,22 @@ angular.module('games')
       	// TODO: BROADCAST EVENT via socket
 
       	if(drawing){
-      		switch(activeTool) {
+      		switch(scope.playerVars.activeTool) {
       			case 0:
         			socketPushToolData([
-        				currentX, currentY, toolColor, toolSize
+        				currentX, currentY, scope.playerVars.toolColor, scope.playerVars.toolSize
         				]);
-        			drawUpDot(currentX, currentY, lastX, lastY, toolColor, toolSize);
+        			drawUpDot(currentX, currentY, lastX, lastY, scope.playerVars.toolColor, scope.playerVars.toolSize);
         			socketSendMessage();
-      			break;
-      			 case 1:
-      			break;
-      			 default:
-      			console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +activeTool);
+      			  break;
+      			case 1:
+              socketPushToolData([
+                currentX, currentY, anchorX, anchorY, scope.playerVars.toolColor, scope.playerVars.toolSize
+              ]);
+              drawUpLine(currentX, currentY, anchorX, anchorY, scope.playerVars.toolColor, scope.playerVars.toolSize);
+      			  break;
+      			default:
+      			  console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +scope.playerVars.activeTool);
       		}
 
       	}
@@ -149,7 +161,7 @@ angular.module('games')
 
       // Sends socket message
       function socketSendMessage() {
-      	console.log('Attempting to send socketQueue ' + JSON.stringify(socketQueue));
+      	// console.log('Attempting to send socketQueue ' + JSON.stringify(socketQueue));
 
       	scope.broadcastCanvasData(socketQueue);
       	// TODO: Implement
@@ -173,73 +185,6 @@ angular.module('games')
       	socketSendMessage();
       }
 
-      	// On recieved S2P_pDiff, if you are the judge, display the canvas wrt to id
-      	Socket.on('CLIENT_S2P_pDiff', function(data) {
-      		console.log('client_s2p_pdiff received');
-
-      		if(!canDraw) {
-      			judgepDiff(data);
-      		}
-      	});
-
-      	Socket.on('CLIENT_S2P_pSync', function(data) {
-      		console.log('client_s2p_psync received');
-
-            // TODO: implement
-        });
-
-      	function judgepDiff(data) {
-        	// TODO: Find canvas with correct cID
-
-        	switch(data.diffTool) {
-        		case 0:
-        		  judgeDiffToolDot(data.toolData);
-        		  break;
-        		case 1: 
-        			// TODO:
-        			break;
-        		default:
-        			console.log('ERROR UNKNOWN TOOL ' + data.diffTool);
-        			break;
-        		}
-        	}
-
-        function judgeDiffToolDot(toolData) {
-      		var cx, cy, lx, ly, color, thick;
-      		var temp = toolData.pop();
-      		cx = temp[0];
-      		cy = temp[1];
-      		color = temp[2];
-      		thick = temp[3];
-
-      		ctx.fillStyle = color;
-      		ctx.beginPath();
-      		ctx.arc(cx, cy, thick, 0, 2*Math.PI, true);
-      		ctx.fill();
-
-      		while(toolData.length > 0) {
-      			lx = cx;
-      			ly = cy;
-      			temp = toolData.pop();
-      			cx = temp[0];
-      			cy = temp[1];
-      			color = temp[2];
-      			thick = temp[3];
-
-      			ctx.beginPath();
-      			ctx.arc(cx, cy, thick, 0, 2*Math.PI, true);
-      			ctx.fill();
-
-      			ctx.beginPath();
-      			ctx.moveTo(lx, ly);
-      			ctx.lineTo(cx, cy);
-
-      			ctx.strokeColor = color;
-      			ctx.lineWidth = 2*thick;
-      			ctx.stroke();
-      		}
-      	}
-
      	////////////////////////
     	// START DOWN TOOLS   //
     	////////////////////////
@@ -252,6 +197,10 @@ angular.module('games')
     		ctx.arc(downX, downY, thick, 0, 2*Math.PI, true);
     		ctx.fill();
     	}
+
+      function drawLineDown(downX, downY, color, thick) {
+        drawDownDot(downX, downY, color, thick);
+      }
 
     	////////////////////////
     	// START MOVE TOOLS   //
@@ -269,6 +218,15 @@ angular.module('games')
 
     	}
 
+      function drawMoveLine(currentX, currentY, anchorX, anchorY, toolColor, toolSize) {
+        ctxtemp.clearRect(0,0,640,480);
+        twoPointLine(ctxtemp, anchorX, anchorY, currentX, currentY, toolColor, toolSize);
+        ctxtemp.fillStyle = color;
+        ctxtemp.beginPath();
+        ctxtemp.arc(downX, downY, thick, 0, 2*Math.PI, true);
+        ctxtemp.fill();
+      }
+
     	////////////////////////
     	// START UP TOOLS   //
     	////////////////////////
@@ -277,6 +235,12 @@ angular.module('games')
     		drawMoveDot(currentX, currentY, lastX, lastY, toolColor, toolSize);
     	}
 
+      function drawUpLine(currentX, currentY, anchorX, anchorY, toolColor, toolSize) {
+        ctxtemp.clearRect(0,0,640,480);
+        twoPointLine(ctx, anchorX, anchorY, currentX, currentY, toolColor, toolSize);
+        drawDownDot(currentX, currentY, toolColor, toolSize);
+      }
+
     	// Draws a 2 point line in _context_ from _x1, y1_ to _x2, y2_ with _color_ and _thick_.
     	// Takes a context argument in the event shit needs to be drawn on a temp canvas.
     	function twoPointLine(context, x1, y1, x2, y2, color, thick) {
@@ -284,7 +248,7 @@ angular.module('games')
     		context.moveTo(x1, y1);
     		context.lineTo(x2, y2);
 
-    		context.strokeColor = color;
+    		context.strokeStyle = color;
     		context.lineWidth = 2*thick;
     		context.stroke();
     	}

@@ -1,12 +1,20 @@
+.playerContainer{
+}
+
+.cavnasContainer{
+	position: relative;
+	width: 640px;
+	height: 480px;
+	margin: 0 auto;
+}
+
 .sketchpad{
+	position: absolute;
 	border: 1px solid black; 
 	background-color: #FFFFFF;
 	z-index: 0;
-	padding-left: 0;
-	padding-right: 0;
-	margin-left: auto;
-	margin-right: auto;
-	display: block;
+	top: 0;
+	left: 0;
 	width: 640px;
 	height: 480px;
 }
@@ -14,11 +22,13 @@
 .tempOverlay{
 	position: absolute;
 	z-index: 1;
-	padding-left: 0;
-	padding-right: 0;
-	margin-left: auto;
-	margin-right: auto;
-	display: block;
+	top: 0;
+	left: 0;
 	width: 640px;
 	height: 480px;
+}
+
+.kbackground{
+	outline-style: solid;
+	outline-color: black;
 }
