@@ -74,24 +74,18 @@
      socket.on('get all avaliable players', function(){	
 	 var avaliablePlayers = {};
 	 GameRoomManager.ConnectedPlayers.forEach(function(val, key){if( !val.in_game && !val.in_queue){avaliablePlayers[key]=val;}});
-	 console.log(avaliablePlayers);
 	 socket.emit('avaliable players responding', avaliablePlayers);
      });
     
 
      socket.on('invite player', function(msg){
-	 console.log(socket.game_room_id);
      var invite_socket_id = msg;
 	 io.to(msg).emit('invite notification', [socket.game_room_id, socket.request.user.username, invite_socket_id]); 
      });
 
 
      socket.on('get game info', function() {
-	 console.log(socket.game_room_id);
          var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
-	 console.log('1');
-	 console.log(GameRoom);
-	 console.log('2');
          socket.emit('game info responding', {
              _id: GameRoom._id,
              players: GameRoom.getPlayerUserNames(),
@@ -110,11 +104,7 @@
      });
 
      socket.on('get lobby info', function(){
-	  console.log('hellolobby');
-      console.log(socket);
-      console.log(socket.game_room_id);
           var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
-	  console.log(GameRoom);
           socket.emit('lobby info responding', {
            lobbyLeader: GameRoom.lobbyLeader,
            max_players: GameRoom.max_players,
