@@ -1,9 +1,12 @@
 'use strict';
 
 // Articles controller
-angular.module('profile').controller('ProfileController', ['$scope', '$stateParams', '$location', 'Authentication', 'Profiles',
-  function ($scope, $stateParams, $location, Authentication, Profiles) {
+angular.module('profile').controller('ProfileController', ['$scope', '$stateParams', '$location', 'Authentication', 'Profiles', 'Socket',
+  function ($scope, $stateParams, $location, Authentication, Profiles, Socket) {
     $scope.authentication = Authentication;
+    if (!Socket.socket) {
+            Socket.connect();
+    }
 /*
     // Create new Article
     $scope.create = function (isValid) {
@@ -83,8 +86,9 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
     };
 
     $scope.sendFriendRequestFromProfile = function() {
-      console.log("Send Friend Request Clicked");
-      $scope.message = Profiles.friendRequest();
+      // not safe
+      Socket.emit('send friend request', $stateParams.profileId);
+      
       /*
           things to check:
             is user the same person?

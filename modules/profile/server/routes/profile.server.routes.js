@@ -14,8 +14,8 @@ module.exports = function (app) {
 
   // Single article routes
   app.route('/api/profile/:profileId').all(profilePolicy.isAllowed)
-    .get(profile.read)
-    .post(profile.friendRequest);
+    .get(profile.read);
+    //.post(profile.friendRequest);
     //.put(articles.update)
     //.delete(articles.delete);
 

@@ -6,8 +6,12 @@
 var path = require('path'),
   mongoose = require('mongoose'),
   User = mongoose.model('User'),
+  friend_request = mongoose.model('friend_request'),
   // Article = mongoose.model('Article'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+
+
+
 
 /**
  * Show the current article
@@ -16,12 +20,28 @@ exports.read = function (req, res) {
   res.json(req.Profile);
 };
 
-exports.friendRequest = function(req,res) {
-  console.log("FRIEND REQUEST CALLED");
-  console.log(req.Profile);
-  console.log(req.user);
-  res.message("hello");
-};
+// exports.friendRequest = function(req,res) {
+//   console.log("FRIEND REQUEST CALLED");
+// };
+
+export function friendRequest(profileId, userId) {
+
+  // profile/userid scanning
+  if (profileId === userId) {
+    console.log("Cannot add self as friend");
+  }
+
+  //  TODO: more userId/profileId validation checking ):
+
+  /*var req = new friend_request({ requestedBy: userId });
+  User.findbyId(profileId).pendingFriendRequests
+
+  
+  parent.children[0].name = 'Matthew';
+  parent.save(callback);
+  */
+}
+
 /**
  * List of Articles
  
