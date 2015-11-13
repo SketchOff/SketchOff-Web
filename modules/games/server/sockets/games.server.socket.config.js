@@ -146,10 +146,12 @@
              ConnectedPlayer.in_game = false;
              GameRoomManager.ConnectedPlayers.set(socket.request.user.username, ConnectedPlayer);
              if(!GameRoom.isPublic()){
+                GameRoom.setLobbyLeader();
                 io.to(GameRoom.getRoomId()).emit('update lobby info', GameRoom.getLobbyInfo());
              }
          }
      });
+
 
      socket.on('admin updates subscribe', function() {
          socket.join('admin_updates');
