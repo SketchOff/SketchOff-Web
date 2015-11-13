@@ -49,7 +49,7 @@ export default class GameRoom {
     }
 
     setLobbyLeader(){
-        this.lobbyLeader = players[0].request.user.username;
+        this.lobbyLeader = this.players[0].request.user.username;
     }
 
     getRoomType() {
