@@ -77,6 +77,20 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
       $scope.articles = Articles.query();
     };
 */
+
+    $scope.acceptFriendRequest = function(requesterId) {
+      //console.log(requesterId.profileId);
+      Socket.emit('accept friend request', requesterId);
+    };
+
+    $scope.getPlayerName = function(id) {
+      
+      Socket.emit('get player name', id);
+      Socket.on('return player name', function(profileName) {
+        return profileName;
+      });
+    };
+
     $scope.inFriendsList = function() {
       if (Authentication.user.friends.indexOf($scope.Profile.profileId) > -1) {
         return true;

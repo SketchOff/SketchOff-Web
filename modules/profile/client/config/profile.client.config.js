@@ -10,7 +10,7 @@ angular.module('profile').run(['Menus',
       state: "profile.view",
       roles: ['user']   
     });
-
+/*
     Menus.addMenuItem('topbar', {
       title: 'Friends',
       state: 'friends',
@@ -22,5 +22,6 @@ angular.module('profile').run(['Menus',
       title: 'List Friends',
       state: 'friends.list'
     });
+    */
   }
   ]);
