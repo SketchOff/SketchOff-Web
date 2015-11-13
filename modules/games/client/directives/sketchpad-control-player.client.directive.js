@@ -74,9 +74,12 @@ angular.module('games')
               socketPopulateDown(1, [currentX, currentY, scope.playerVars.toolColor, scope.playerVars.toolSize]);
 	        	  drawLineDown(currentX, currentY, scope.playerVars.toolColor, scope.playerVars.toolSize);
               break;
+	        	case 2:
+              socketPopulateDown(2, [currentX, currentY, scope.playerVars.toolColor, scope.playerVars.toolSize]);
+              drawEraseDown(currentX, currentY, scope.playerVars.toolColor, scope.playerVars.toolSize);
+              break;
 	        	default:
-	        	console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +scope.playerVars.activeTool);
-
+            console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +scope.playerVars.activeTool);
 	        }
 
 	        drawing = true;
@@ -101,6 +104,12 @@ angular.module('games')
           	case 1:
               drawMoveLine(currentX, currentY, anchorX, anchorY, scope.playerVars.toolColor, scope.playerVars.toolSize);
           	  break;
+            case 2:
+              socketPushToolData([
+                currentX, currentY, scope.playerVars.toolColor, scope.playerVars.toolSize
+                ]);
+              drawMoveErase(currentX, currentY, lastX, lastY, scope.playerVars.toolColor, scope.playerVars.toolSize);
+              break;
           	default:
           	  console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +scope.playerVars.activeTool);
           }
@@ -127,7 +136,15 @@ angular.module('games')
                 currentX, currentY, anchorX, anchorY, scope.playerVars.toolColor, scope.playerVars.toolSize
               ]);
               drawUpLine(currentX, currentY, anchorX, anchorY, scope.playerVars.toolColor, scope.playerVars.toolSize);
-      			  break;
+      			  socketSendMessage();
+              break;
+            case 2:
+              socketPushToolData([
+                currentX, currentY, scope.playerVars.toolColor, scope.playerVars.toolSize
+                ]);
+              drawUpErase(currentX, currentY, lastX, lastY, scope.playerVars.toolColor, scope.playerVars.toolSize);
+              socketSendMessage();
+              break;
       			default:
       			  console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +scope.playerVars.activeTool);
       		}
@@ -202,6 +219,10 @@ angular.module('games')
         drawDownDot(downX, downY, color, thick);
       }
 
+      function drawEraseDown(downX, downY, color, thick) {
+        ctx.clearRect(downX-thick, downY-thick, 2*thick, 2*thick);
+      }
+
     	////////////////////////
     	// START MOVE TOOLS   //
     	////////////////////////
@@ -221,10 +242,26 @@ angular.module('games')
       function drawMoveLine(currentX, currentY, anchorX, anchorY, toolColor, toolSize) {
         ctxtemp.clearRect(0,0,640,480);
         twoPointLine(ctxtemp, anchorX, anchorY, currentX, currentY, toolColor, toolSize);
-        ctxtemp.fillStyle = color;
+        ctxtemp.fillStyle = toolColor;
         ctxtemp.beginPath();
-        ctxtemp.arc(downX, downY, thick, 0, 2*Math.PI, true);
+        ctxtemp.arc(currentX, currentY, toolSize, 0, 2*Math.PI, true);
         ctxtemp.fill();
+      }
+
+      function drawMoveErase(currentX, currentY, lastX, lastY, toolColor, toolSize) {
+        var tslopey = lastY - currentY;
+        var tslopex = lastX - currentX;
+
+        // Interpolate - validate this
+        if(tslopex === 0) {
+          ctx.clearRect(lastX-toolSize, lastY-toolSize, toolSize*2, Math.abs(tslopey) + 2*toolSize);
+        }
+        else {
+          var slope = tslopey/tslopex;
+          for(var i=0; i<Math.abs(tslopex); i++) {
+            ctx.clearRect(lastX-toolSize+i, lastY-toolSize+i*slope, toolSize*2, toolSize*2);
+          }
+        }
       }
 
     	////////////////////////
@@ -232,13 +269,17 @@ angular.module('games')
     	////////////////////////
 
     	function drawUpDot(currentX, currentY, lastX, lastY, toolColor, toolSize) {
-    		drawMoveDot(currentX, currentY, lastX, lastY, toolColor, toolSize);
+    		drawDownDot(currentX, currentY, toolColor, toolSize);
     	}
 
       function drawUpLine(currentX, currentY, anchorX, anchorY, toolColor, toolSize) {
         ctxtemp.clearRect(0,0,640,480);
         twoPointLine(ctx, anchorX, anchorY, currentX, currentY, toolColor, toolSize);
         drawDownDot(currentX, currentY, toolColor, toolSize);
+      }
+
+      function drawUpErase(currentX, currentY, lastX, lastY, toolColor, toolSize) {
+        drawEraseDown(currentX, currentY, toolColor, toolSize); 
       }
 
     	// Draws a 2 point line in _context_ from _x1, y1_ to _x2, y2_ with _color_ and _thick_.

@@ -151,7 +151,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         $scope.setTool = function(arg) {
             console.log("Active tool changed from " + $scope.playerVars.activeTool + " to " + arg);
             $scope.playerVars.activeTool = arg;
-        }
+        };
 
         $scope.isActiveTool = function(arg) {
             if($scope.playerVars.activeTool === arg) {
@@ -160,7 +160,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             else {
                 return {"color":"black"};
             }
-        }
+        };
 
         $scope.increaseToolSize = function() {
             // console.log("+tool size");
