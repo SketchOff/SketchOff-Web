@@ -46,7 +46,7 @@ angular.module('games').controller('InvitePlayersCtrl', ['$scope', 'Authenticati
 
     $scope.getAvaliablePlayers = function(){
     	Socket.emit('get all avaliable players');
-    }
+    };
 
     setInterval($scope.getAvaliablePlayers(), 5000);
 
