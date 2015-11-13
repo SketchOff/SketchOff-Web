@@ -5,7 +5,6 @@ import {
     getIO, q
 }
 from './queue.server.controller';
-import * as Timers from './timers.server.controller';
 import * as GameRoomManager from '../controllers/game_room_manager.server.controller';
 
 var path = require('path'),
@@ -14,33 +13,78 @@ var path = require('path'),
     User = mongoose.model('User'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
-// Set min and max players
+// Default game properties
 export var min_players = 2;
 export var max_players = 7;
 
+
 export default class GameRoom {
 
-    constructor(players, is_public_room, game_id) {
-        // Set players prop, return error if not array
-        if (Array.isArray(players)) this.players = players;
-        else throw 'Attempted to create game without correct players param';
-        // Set the game_id generated from the game_rooms controller
-        this._id = game_id;
+    // TODO: Add points objects to constructor parameter
+    // TODO: Create save-id which is game_id + game_num;
+    constructor(players, is_public_room, room_id, CountdownTimes) {
+        if (arguments.length !== 4) throw new Error('Missing arguments');
+        if (!Array.isArray(players)) throw new Error('Players param is not an array');
+        players.forEach(function(player) {
+            if (typeof player !== 'object') throw new Error('Players array contains non-object values');
+        });
+        if (is_public_room) {
+            if (players.length < min_players) throw new Error('Too few players');
+            if (players.length > max_players) throw new Error('Too many players');
+        }
+        if (typeof is_public_room !== 'boolean') throw new Error('is_public_room param must be a boolean');
+        if (typeof room_id === 'undefined') throw new Error('room_id is undefined');
+        if (typeof room_id !== 'string') throw new Error('room_id param must be a string');
+        if (typeof CountdownTimes !== 'object') throw new Error('CountdownTimes param must be an object');
+        if (typeof CountdownTimes.choose_phrase === 'undefined' || typeof CountdownTimes.drawing === 'undefined' || typeof CountdownTimes.winner_selection === 'undefined' || typeof CountdownTimes.new_game === 'undefined') {
+            throw new Error('Missing necessary countdown properties for the CountdownTimes param');
+        }
+        if (Object.keys(CountdownTimes).length !== 4) {
+            throw new Error('Unnecessary properties in CountdownTimes param');
+        }
+        if (typeof CountdownTimes.choose_phrase !== 'number' || typeof CountdownTimes.drawing !== 'number' || typeof CountdownTimes.winner_selection !== 'number' || typeof CountdownTimes.new_game !== 'number') {
+            throw new Error('All countdown values must be numbers');
+        }
+        if (CountdownTimes.choose_phrase < 0 || CountdownTimes.drawing < 0 || CountdownTimes.winner_selection < 0 || CountdownTimes.new_game < 0) {
+            throw new Error('Countdown values cant be less than 0');
+        }
+
+        this.players = players;
+        // Set the room_id generated from the game_rooms controller
+        this.room_id = room_id;
+        this._id = room_id + '#1';
         this.is_public = is_public_room;
         // Set to true if judge leaves
         this.first_game = true;
-        this.available = true;
+        this.available = false;
         this.waiting_players = [];
-        this.choose_phrase_time = 5;
-        this.drawing_time = 5;
-        this.winner_selection_time = 5;
-        this.new_game_time = 5;
+        this.CountdownTimes = CountdownTimes;
         this.winner = null;
         this.interval = null;
         this.winner_points = 100;
         this.participation_points = 10;
         this.State = new GameRoomStates.Establishing(this);
-        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
+        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
+    }
+
+    getCountdownTimes() {
+        return this.CountdownTimes;
+    }
+
+    getPhraseSelectionTime() {
+        return this.CountdownTimes.choose_phrase;
+    }
+
+    getWinnerSelectionTime() {
+        return this.CountdownTimes.winner_selection;
+    }
+
+    getDrawingTime() {
+        return this.CountdownTimes.drawing;
+    }
+
+    getNewGameTime() {
+        return this.CountdownTimes.new_game;
     }
 
     // Emits _data_ to everyone
@@ -81,12 +125,12 @@ export default class GameRoom {
     }
 
     setState(State, reason) {
-        console.log(this._id, 'is changing states to', State);
+        console.log(this.room_id, 'is changing states to', State);
         this.cancelCurrCountdown();
         this.State = new GameRoomStates[State](this, reason);
         if (this.hasAdminSubscribers()) {
-            if (State === 'Terminating') getIO().to('admin_updates').emit('room termination', this.getRoomId());
-            else getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
+            if (State === 'Terminating') getIO().to('admin_updates').emit('room termination', this.getRoomID());
+            else getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
         }
     }
 
@@ -108,11 +152,11 @@ export default class GameRoom {
         player.join(this._id);
         player.game_room_id = this._id;
         this.waiting_players.push(player);
-        getIO().to(this._id).emit('player joining', this.getWaitingPlayerUserNames());
-        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
+        getIO().to(this._id).emit('player joining', this.getWaitingPlayerUsernames());
+        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
     }
 
-    getPlayerUserNames() {
+    getPlayerUsernames() {
         var player_names = [];
         this.players.forEach(function(player) {
             player_names.push(player.request.user.username);
@@ -128,7 +172,7 @@ export default class GameRoom {
         return player_users;
     }
 
-    getWaitingPlayerUserNames() {
+    getWaitingPlayerUsernames() {
         var waiting_player_names = [];
         this.waiting_players.forEach(function(player) {
             waiting_player_names.push(player.request.user.username);
@@ -136,7 +180,7 @@ export default class GameRoom {
         return waiting_player_names;
     }
 
-    getJudgeUserName() {
+    getJudgeUsername() {
         return this.judge.request.user.username;
     }
 
@@ -148,8 +192,19 @@ export default class GameRoom {
         return this.judge;
     }
 
-    getRoomId() {
+    getRoomID() {
+        return this.room_id;
+    }
+
+    getGameID() {
         return this._id;
+    }
+
+    incrementGameID() {
+        var temp = this._id.split('#');
+        var game_num = parseInt(temp[1]);
+        game_num++;
+        this._id = this.room_id + '#' + game_num;
     }
 
     getPhrases() {
@@ -184,7 +239,9 @@ export default class GameRoom {
     }
 
     setWinner(winner) {
+        if (winner === this.getJudgeUsername()) throw new Error('Cannot set judge as game winner.');
         this.winner = winner;
+        this.setState('Ending');
     }
 
     getWinner() {
@@ -195,9 +252,14 @@ export default class GameRoom {
         return this.available;
     }
 
+    isFirstGame() {
+        return this.first_game;
+    }
+
     // TODO: Flag player for leaving mid game
     removePlayer(player) {
-        console.log('removing', player.request.user.username, 'from', this._id);
+        console.log('removing', player.request.user.username, 'from', this.getRoomID());
+        player.leave(this.getRoomID());
         player.active_user = false;
         var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
         ConnectedPlayer.in_game = false;
@@ -208,7 +270,6 @@ export default class GameRoom {
         } else {
             this.waiting_players.splice(this.waiting_players.indexOf(player), 1);
         }
-        player.leave(this._id);
         delete player.game_room_id;
 
         if (this.getNumAllPlayers() < min_players) {
@@ -224,24 +285,36 @@ export default class GameRoom {
             } else {
                 console.log('player left but doesnt effect game play');
                 getIO().to(this._id).emit('player leaving', {
-                    players: this.getPlayerUserNames(),
-                    waiting_players: this.getWaitingPlayerUserNames()
+                    players: this.getPlayerUsernames(),
+                    waiting_players: this.getWaitingPlayerUsernames()
                 });
             }
-            if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomId(), this.getInfo()]);
+            if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
         }
     }
 
-    getInfo() {
+    getRoomInfo() {
         var RoomInfo = {};
         RoomInfo.room_type = this.getRoomType();
         RoomInfo.state = this.getStateName();
-        RoomInfo.players = this.getPlayerUserNames();
-        RoomInfo.waiting_players = this.getWaitingPlayerUserNames();
-        RoomInfo.judge = this.getJudgeUserName();
+        RoomInfo.players = this.getPlayerUsernames();
+        RoomInfo.waiting_players = this.getWaitingPlayerUsernames();
+        RoomInfo.judge = this.getJudgeUsername();
         RoomInfo.phrase = this.getPhrase();
         RoomInfo.winner = this.getWinner();
         return RoomInfo;
+    }
+
+    getGameInfo() {
+        var GameInfo = {
+            game_id: this.getGameID(),
+            players: this.getPlayerUsernames(),
+            waiting_players: this.getWaitingPlayerUsernames(),
+            state: this.getStateName(),
+            judge: this.getJudgeUsername(),
+            phrases: this.getPhrases()
+        };
+        return GameInfo;
     }
 
     hasAdminSubscribers() {
@@ -297,15 +370,14 @@ export default class GameRoom {
         };
         var game = new Game(_game);
 
-        game.save(function(err) {
-            if (err) {
-                console.log('error saving game');
-                console.log(err);
-                getIO().to(_id).emit('game save failure', {
-                    message: errorHandler.getErrorMessage(err)
-                });
-            }
-        });
+        try {
+            game.save();
+        } catch (e) {
+            console.log('Error saving game');
+            console.log(e);
+            // TODO: Handle this socket event
+            getIO().to(_id).emit('game save failure');
+        }
     }
 
     awardPoints() {
@@ -314,31 +386,41 @@ export default class GameRoom {
             if (winner.xp) winner.xp += this.winner_points;
             else winner.xp = this.winner_points;
 
-            winner.save(function(err) {
-                if (err) {
-                    console.log('error awarding winner points');
-                    console.log(err);
-                }
-            });
+            try {
+                winner.save(function(err) {});
+            } catch (e) {
+                console.log('Error awarding winner points');
+                console.log(e);
+            }
         } else {
-            var saveCallback = function(err) {
-                if (err) {
-                    console.log('error awarding participation points');
-                    console.log(err);
+            try {
+                for (let player of this.players) {
+                    if (player.request.user.xp) player.request.user.xp += this.participation_points;
+                    else player.request.user.xp = this.participation_points;
+                    player.request.user.save();
                 }
-            };
-
-            for (let player of this.players) {
-                if (player.request.user.xp) player.request.user.xp += this.participation_points;
-                else player.request.user.xp = this.participation_points;
-                player.request.user.save(saveCallback);
+            } catch (e) {
+                console.log('Error awarding participation_points');
+                console.log(e);
             }
         }
     }
-}
 
-// Returns a random integer between min (included) and max (included)
-// Using Math.round() will give you a non-uniform distribution!
-function getRandomIntInclusive(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    countdownFactory(time, NextState, emit_msg) {
+        var time_left = time;
+        var that = this;
+        getIO().to(this.getRoomID()).emit(emit_msg, time_left);
+
+        this.interval = setInterval(function() {
+            time_left--;
+            getIO().to(that.getRoomID()).emit(emit_msg, time_left);
+            if (time_left < 0) {
+                clearInterval(this);
+                if (NextState === 'Ending') {
+                    // TODO: Kick/Flag Judge
+                    that.setState(NextState, 'Judge didn\'t pick a phrase');
+                } else that.setState(NextState);
+            }
+        }, 1000);
+    }
 }

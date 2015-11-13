@@ -3,12 +3,19 @@
 import GameRoom from './game_room.server.controller.js';
 
 var GameRooms = new Map();
+var DefaultCountdownTimes ={};
+DefaultCountdownTimes.choose_phrase = 5;
+DefaultCountdownTimes.drawing = 5;
+DefaultCountdownTimes.winner_selection = 5;
+DefaultCountdownTimes.new_game = 5;
+
 export var ConnectedPlayers = new Map();
 
 // Create a new game room and add it to the GameRooms map
-export function createGameRoom(players, public_game) {
+export function createGameRoom(players, public_game, CountdownTimes) {
     var game_room_id = generateID();
-    GameRooms.set(game_room_id, new GameRoom(players, public_game, game_room_id));
+    if (!CountdownTimes) CountdownTimes = DefaultCountdownTimes;
+    GameRooms.set(game_room_id, new GameRoom(players, public_game, game_room_id, CountdownTimes));
 }
 
 // remove a GameRoom from the GameRooms map
@@ -25,7 +32,7 @@ export function getGameRoom(game_room_id) {
 export function getInfo() {
     var RoomsInfo = {};
     GameRooms.forEach(function(GameRoom, id) {
-        RoomsInfo[id] = GameRoom.getInfo();
+        RoomsInfo[id] = GameRoom.getRoomInfo();
     });
     return RoomsInfo;
 }

@@ -1,8 +1,8 @@
 'use strict';
 
 // Games controller
-angular.module('games').controller('GameRoomController', ['$rootScope', '$scope', 'Authentication', 'Socket', '$state',
-    function($rootScope, $scope, Authentication, Socket, $state) {
+angular.module('games').controller('GameRoomController', ['$rootScope', '$scope', 'Authentication', 'Socket', '$state', '$window',
+    function($rootScope, $scope, Authentication, Socket, $state, $window) {
 
         $scope.authentication = Authentication;
         $scope.GameRoom = {};
@@ -14,7 +14,6 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
 
         var is_judge = false;
         var set_winner = false;
-        var pressed_leave_room = false;
 
         var getGameInfo = function() {
             Socket.emit('get game info');
@@ -39,6 +38,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             $scope.GameRoom.judge = msg.judge;
             $scope.GameRoom.players = msg.players;
             $scope.GameRoom.waiting_players = msg.waiting_players;
+            $scope.GameRoom.phrase_selection_countdown = undefined;
             $scope.GameRoom.drawing_countdown = undefined;
             $scope.GameRoom.winner_selection_countdown = undefined;
             $scope.GameRoom.new_game_countdown = undefined;
@@ -78,6 +78,10 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             $scope.GameRoom.waiting_players = msg;
         };
 
+        var selectPhraseCountdown = function(msg) {
+            $scope.GameRoom.phrase_selection_countdown = msg;
+        };
+
         var drawCountdown = function(msg) {
             $scope.GameRoom.drawing_countdown = msg;
         };
@@ -114,6 +118,8 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
 
         Socket.on('player joining', playerJoin);
 
+        Socket.on('selecting phrase countdown', selectPhraseCountdown);
+
         Socket.on('drawing countdown', drawCountdown);
 
         Socket.on('selecting winner countdown', selectWinnerCountdown);
@@ -135,18 +141,21 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         };
 
         $scope.leaveGameRoom = function() {
-            Socket.emit('leave room');
-            pressed_leave_room = true;
-            $state.go('home');
+            if ($scope.GameRoom.state !== 'ENDING' && $scope.GameRoom.state !== 'TERMINATING') {
+                if (confirm('You will be flagged for leaving the game early') === true) {
+                    $state.go('home');
+                }
+            } else {
+                $state.go('home');
+            }
         };
         /* END Button Functions */
 
 
-        $rootScope.$on('$stateChangeStart',
-            function(event, toState, toParams, fromState, fromParams) {
-                if (fromState.name === 'games.room' && !pressed_leave_room) {
-                    Socket.emit('leave room');
-                }
+        $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
+            if (fromState.name === 'games.room') {
+                Socket.emit('leave room');
+            }        
         });
 
         $scope.setTool = function(arg) {
@@ -228,5 +237,4 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             console.log("socket emitted: " + 'CLIENT_P2S_'+data.sType); 
         };
     }
-
 ]);

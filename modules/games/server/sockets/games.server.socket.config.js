@@ -48,16 +48,9 @@ export default function(io, socket) {
 
     socket.on('get game info', function() {
          var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
-         socket.emit('game info responding', {
-             _id: GameRoom._id,
-             players: GameRoom.getPlayerUserNames(),
-             waiting_players: GameRoom.getWaitingPlayerUserNames(),
-             state: GameRoom.getStateName(),
-             judge: GameRoom.getJudgeUserName(),
-             phrases: GameRoom.getPhrases()
-         });
+         socket.emit('game info responding', GameRoom.getGameInfo());
 
-         for (let username of GameRoom.getPlayerUserNames()) {
+         for (let username of GameRoom.getPlayerUsernames()) {
              var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(username);
              ConnectedPlayer.in_queue = false;
              ConnectedPlayer.in_game = true;
@@ -73,7 +66,6 @@ export default function(io, socket) {
      socket.on('set winner', function(msg) {
          var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
          GameRoom.setWinner(msg);
-         GameRoom.setState('Ending');
      });
 
      socket.on('leave room', function() {
