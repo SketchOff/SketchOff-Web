@@ -166,6 +166,7 @@
                  var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
                  GameRoom.removePlayer(socket);
                  if (!GameRoom.isPublic()){
+                    GameRoom.setLobbyLeader();
                     io.to(GameRoom.getRoomId()).emit('update lobby info', GameRoom.getLobbyInfo());
                  }
              }
