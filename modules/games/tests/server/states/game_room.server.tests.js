@@ -158,7 +158,7 @@
                     done();
                 });
             });
-
+    
             it('should have correct values for CountdownTimes', function(done) {
                 TheGameRoom.getCountdownTimes().should.be.eql(TestingCountdownTimes);
                 done();
@@ -175,12 +175,12 @@
             it('should have max number of players', function(done) {
                 TheGameRoom.getRoomID().should.be.exactly('randomly_generated_id');
                 TheGameRoom.getNumPlayers().should.be.exactly(max_players);
-                TheGameRoom.isFull().should.be.exactly(true); // jshint ignore:line
+                TheGameRoom.isFull().should.be.true; // jshint ignore:line
                 done();
             });
 
             it('should be the first game', function(done) {
-                TheGameRoom.isFirstGame().should.be.exactly(true); // jshint ignore:line
+                TheGameRoom.isFirstGame().should.be.true // jshint ignore:line
                 done();
             });
 
@@ -195,7 +195,7 @@
             });
 
             it('should be a public game', function(done) {
-                TheGameRoom.isPublic().should.be.exactly(true); // jshint ignore:line
+                TheGameRoom.isPublic().should.be.true; // jshint ignore:line
                 TheGameRoom.getRoomType().should.be.exactly('public');
                 done();
             });

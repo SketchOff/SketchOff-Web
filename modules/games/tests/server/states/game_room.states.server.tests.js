@@ -10,8 +10,6 @@
     }
     from '../../../server/controllers/queue.server.controller';
 
-    var mongoose = require('mongoose');
-    var User = mongoose.model('User');
     var should = require('should');
     var SocketMock = require('socket-io-mock');
     var socketPort = 3006;
@@ -19,36 +17,13 @@
     var ioserver = require('socket.io').listen(socketPort);
     q.setIO(ioserver);
 
-    // var createMockUser = function(user_num) {
-    //     // Create user credentials
-    //     var credentials = {
-    //         username: 'username' + user_num,
-    //         password: 'M3@n.jsI$Aw3$0m3'
-    //     };
-
-    //     // Create a new user
-    //     var user = new User({
-    //         firstName: 'Full',
-    //         lastName: 'Name' + user_num,
-    //         displayName: 'Full Name' + user_num,
-    //         email: credentials.username +  '@test.com',
-    //         username: credentials.username,
-    //         password: credentials.password,
-    //         provider: 'local'
-    //     });
-
-    //     // Save a user to the test db and create new article
-    //     user.save();
-    // };
-
     var getMockSockets = function(num_players) {
         var sockets = [];
         for (var i = 0; i < num_players; i++) {
-            // createMockUser(i);
             sockets[i] = new SocketMock();
             sockets[i].request = {
                 user: {
-                    username: 'username' + i
+                    username: 'user' + i
                 }
             };
         }
@@ -67,6 +42,7 @@
             var players = getMockSockets(max_players);
             var TheGameRoom = new GameRoom(players, true, 'randomly_generated_id', TestingCountdownTimes);
 
+            console.log('hlkjhkl', TheGameRoom.getStateName());
             describe('First Game -->', function() {
                 describe('ESTABLISHING State', function() {
                     it('should be in the ESTABLISHING state after GameRoom initialization', function(done) {
@@ -94,7 +70,7 @@
                     });
 
                     it('should not be accepting new players', function(done) {
-                        TheGameRoom.isAvailable().should.not.be.exactly(true); // jshint ignore:line
+                        TheGameRoom.isAvailable().should.not.be.true // jshint ignore:line
                         done();
                     });
 
@@ -112,65 +88,21 @@
                         done();
                     });
 
-                    it('should be in DRAWING state after setState(\'Drawing\')', function(done) {
-                        TheGameRoom.setState('Establishing');
-                        TheGameRoom.setState('Drawing');
-                        TheGameRoom.getStateName().should.be.exactly('DRAWING');
-                        done();
-                    });
-
                     it('should have the phrase set correctly', function(done) {
                         TheGameRoom.getPhrase().should.be.exactly(test_phrase);
                         done();
                     });
 
                     it('should not be accepting new players', function(done) {
-                        TheGameRoom.isAvailable().should.not.be.exactly(true); // jshint ignore:line
-                        done();
-                    });
-
-                    it('should not be accepting new players', function(done) {
-                        TheGameRoom.isAvailable().should.not.be.exactly(true); // jshint ignore:line
-                        done();
-                    });
-
-                    it('should not have room_id listed in the queue\'s available games', function(done) {
-                        q.getAvailableGameIds().should.not.containEql(TheGameRoom.getRoomID());
+                        TheGameRoom.isAvailable().should.not.be.true; // jshint ignore:line
                         done();
                     });
                 });
 
                 describe('Selecting Winner State', function() {
-                    it('should be in the SELECTING_WINNER state after setState(\'SelectingWinner\')', function(done) {
+                    it('should be in the SelectingWinner state after setState(\'SelectingWinner\')', function(done) {
                         TheGameRoom.setState('SelectingWinner');
                         TheGameRoom.getStateName().should.be.exactly('SELECTING_WINNER');
-                        done();
-                    });
-
-                    it('should not be accepting new players', function(done) {
-                        TheGameRoom.isAvailable().should.be.exactly(false); // jshint ignore:line
-                        done();
-                    });
-
-                    it('should not have room_id listed in the queue\'s available games because game is full', function(done) {
-                        q.getAvailableGameIds().should.not.containEql(TheGameRoom.getRoomID());
-                        done();
-                    });
-                });
-
-                describe('Ending State', function() {
-                    it('should throw an error if you try to set the judge as winner', function(done) {
-                        var judge = TheGameRoom.getJudgeUsername();
-                        (function() {
-                            TheGameRoom.setWinner(judge);
-                        }).should.throw('Cannot set judge as game winner.');
-                        done();
-                    });
-
-                    it('should be in the ENDING state after a winner is selected', function(done) {
-                        var test_winner = players[1].request.user.username;
-                        TheGameRoom.setWinner(test_winner);
-                        TheGameRoom.getStateName().should.be.exactly('ENDING');
                         done();
                     });
                 });
