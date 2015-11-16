@@ -6,27 +6,28 @@
     <h4>Players: <i>{{GameRoom.players.join(', ')}}</i></h4>
     <h4 ng-if="GameRoom.waiting_players && GameRoom.waiting_players.length">Waiting Players: <i>{{GameRoom.waiting_players.join(', ')}}</i></h4>
     <h4>Judge: <i>{{GameRoom.judge}}</i></h4>
-    <h4>State: <i>{{GameRoom.state}}</i></h4>
+    <h4>State: <span style="color:green">{{GameRoom.state}}</span></h4>
+
+    <div class="countdown" ng-switch on="GameRoom.state">
+        <h5 id="selecting-phrase-countdown" ng-switch-when="ESTABLISHING" ng-if="GameRoom.phrase_selection_countdown > -1" style="color: orange">
+            Select Phrase Countdown: {{GameRoom.phrase_selection_countdown}}
+        </h5>
+        <h5 id="drawing-countdown" ng-switch-when="DRAWING" ng-if="GameRoom.drawing_countdown > -1" style="color: orange">
+            Drawing Countdown: {{GameRoom.drawing_countdown}}
+        </h5>
+        <h5 id="selecting-winner-countdown" ng-switch-when="SELECTING_WINNER" ng-if="GameRoom.winner_selection_countdown > -1 " style="color: orange">
+            Selecting Winner Countdown: {{GameRoom.winner_selection_countdown}}
+        </h5>
+        <h5 id="new-game-countdown" ng-switch-when="ENDING" ng-if="GameRoom.new_game_countdown > -1" style="color: orange">
+            New Game Countdown: {{GameRoom.new_game_countdown}}
+        </h5>
+    </div>
+
     <h4 ng-if="GameRoom.phrase">Phrase: <i>{{GameRoom.phrase}}</i></h4>
     <h4 ng-if="GameRoom.winner">Winner: <i>{{GameRoom.winner}}</i></h4>
     <h4 ng-if="GameRoom.early_end_reason">Early End Reason: <i>{{GameRoom.early_end_reason}}</i></h4>
     <h4 ng-if="GameRoom.early_end_reason">Heres 10xp for participating</h4>
     <h4 ng-if="GameRoom.judge_didnt_pick">The judge didn't pick a winner. You get 10xp for participating.</i></h4>
-
-    <div class="countdown" ng-switch on="GameRoom.state">
-        <h5 id="selecting-phrase-countdown" ng-switch-when="ESTABLISHING" ng-if="GameRoom.phrase_selection_countdown > -1" style="color: green">
-            Select Phrase Countdown: {{GameRoom.phrase_selection_countdown}}
-        </h5>
-        <h5 id="drawing-countdown" ng-switch-when="DRAWING" ng-if="GameRoom.drawing_countdown > -1" style="color: green">
-            Drawing Countdown: {{GameRoom.drawing_countdown}}
-        </h5>
-        <h5 id="selecting-winner-countdown" ng-switch-when="SELECTING_WINNER" ng-if="GameRoom.winner_selection_countdown > -1 " style="color: green">
-            Selecting Winner Countdown: {{GameRoom.winner_selection_countdown}}
-        </h5>
-        <h5 id="new-game-countdown" ng-switch-when="ENDING" ng-if="GameRoom.new_game_countdown > -1" style="color: green">
-            New Game Countdown: {{GameRoom.new_game_countdown}}
-        </h5>
-    </div>
 
     <div id="choose-phrase" ng-if="authentication.user.username === GameRoom.judge && GameRoom.state === 'ESTABLISHING'">
         <h3 style="color:blue">Ur da judge. Choose a phrase.</h3>

@@ -47,6 +47,7 @@
      });
 
      socket.on('get game info', function() {
+         console.log(socket.request.user.username, 'is requesting info for', socket.game_room_id);
          var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
          socket.emit('game info responding', GameRoom.getGameInfo());
 
@@ -110,7 +111,7 @@
 
                  if (socket.game_room_id) {
                      GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
-                     GameRoom.removePlayer(socket);
+                     if (GameRoom) GameRoom.removePlayer(socket);
                  }
                  GameRoomManager.ConnectedPlayers.delete(socket.request.user.username);
              } else {
@@ -123,7 +124,7 @@
 
                      if (socket.game_room_id) {
                          GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
-                         GameRoom.removePlayer(socket);
+                         if (GameRoom) GameRoom.removePlayer(socket);
                      }
                  }
              }

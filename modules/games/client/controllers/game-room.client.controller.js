@@ -69,7 +69,8 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         };
 
         var playerJoin = function(msg) {
-            $scope.GameRoom.waiting_players = msg;
+            $scope.GameRoom.players = msg.players;
+            $scope.GameRoom.waiting_players = msg.waiting_players;
         };
 
         var selectPhraseCountdown = function(msg) {
@@ -89,6 +90,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         };
 
         var playerLeft = function(msg) {
+            console.log(msg);
             $scope.GameRoom.players = msg.players;
             $scope.GameRoom.waiting_players = msg.waiting_players;
         };

@@ -77,7 +77,7 @@ export class SelectingWinner {
     constructor(GameRoom) {
         this.name = 'SELECTING_WINNER';
         this.GameRoom = GameRoom;
-        if (!this.GameRoom.isFull() && !this.GameRoom.isPublic()) {
+        if (!this.GameRoom.isFull() && this.GameRoom.isPublic()) {
             this.available = true;
             q.addAvailableGame(this.GameRoom.getRoomID());
         }
@@ -95,6 +95,12 @@ export class Ending {
         var message = {};
         this.name = 'ENDING';
         this.GameRoom = GameRoom;
+
+        if (!this.GameRoom.isAvailable() && !this.GameRoom.isFull() && this.GameRoom.isPublic()) {
+            this.available = true;
+            q.addAvailableGame(this.GameRoom.getRoomID());
+        }
+
         if (this.GameRoom.winner.localeCompare('No winner yet') === 0) {
             this.GameRoom.noWinner();
             if (!reason) {
@@ -114,7 +120,7 @@ export class Ending {
 
         if (this.GameRoom.isFirstGame()) this.GameRoom.first_game = false;
     }
-    
+
     getName() {
         return this.name;
     }
