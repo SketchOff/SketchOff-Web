@@ -6,6 +6,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
 
         $scope.authentication = Authentication;
         $scope.GameRoom = {};
+        $scope.GameRoom.chat_messages = [];
 
         var is_judge = false;
         var set_winner = false;
@@ -18,6 +19,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         /* START Socket Event Functions */
 
         var gameInfoResponse = function(msg) {
+            console.log('game info response', msg);
             for (var key in msg) {
                 $scope.GameRoom[key] = msg[key];
             }
@@ -95,6 +97,11 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             $scope.GameRoom.waiting_players = msg.waiting_players;
         };
 
+        var messagesReceived = function(msg) {
+            console.log('chat messages', msg);
+            $scope.GameRoom.chat_messages = msg;
+        };
+
         /* END Socket Event Functions */
 
         /* Socket Event Listeners */
@@ -124,6 +131,9 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
 
         Socket.on('player leaving', playerLeft);
 
+        // Add an event listener to the 'chatMessage' event
+        Socket.on('receiving chat messages', messagesReceived);
+
         /* END Socket Event Listeners */
 
         /* START Button Functions */
@@ -145,7 +155,39 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
                 $state.go('home');
             }
         };
+
+        // Create a controller method for sending messages
+        $scope.sendMessage = function() {
+            // Create a new message object
+            var msg = {
+                text: this.messageText
+            };
+
+            Socket.emit('receiving chat message', msg);
+
+            // Clear the message text
+            this.messageText = '';
+        };
+
         /* END Button Functions */
+
+
+        // Remove the event listener when the controller instance is destroyed
+        $scope.$on('$destroy', function() {
+            Socket.removeListener('game info responding');
+            Socket.removeListener('ESTABLISHING');
+            Socket.removeListener('DRAWING');
+            Socket.removeListener('SELECTING_WINNER');
+            Socket.removeListener('ENDING');
+            Socket.removeListener('TERMINATING');
+            Socket.removeListener('player joining');
+            Socket.removeListener('selecting phrase countdown');
+            Socket.removeListener('drawing countdown');
+            Socket.removeListener('selecting winner countdown');
+            Socket.removeListener('starting new game countdown');
+            Socket.removeListener('player leaving');
+            Socket.removeListener('receiving chat messages');
+        });
 
 
         $rootScope.$on('$stateChangeStart',

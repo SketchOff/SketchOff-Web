@@ -50,6 +50,13 @@ export class Establishing {
                 ConnectedPlayer.in_game = true;
             }
             GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
+            this.GameRoom.addMessage({
+                type: 'status',
+                text: 'Is now connected',
+                created: Date.now(),
+                profileImageURL: player.request.user.profileImageURL,
+                username: player.request.user.username
+            });
         }, this);
     }
 

@@ -95,6 +95,18 @@
          socket.emit('initial rooms info', GameRoomManager.getInfo());
      });
 
+     // Send a chat messages to all connected sockets when a message is received
+     socket.on('receiving chat message', function(message) {
+         var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
+
+         message.type = 'message';
+         message.created = Date.now();
+         message.profileImageURL = socket.request.user.profileImageURL;
+         message.username = socket.request.user.username;
+
+         GameRoom.addMessage(message);
+     });
+
      socket.on('disconnect', function() {
          var GameRoom;
 
