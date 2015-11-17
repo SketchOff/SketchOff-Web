@@ -112,9 +112,10 @@ var UserSchema = new Schema({
   pendingFriendRequests: {
     type: Array,
     arrayType: 'friend_request'
+  },
   flags: [{
     type: Schema.objectID,
-    ref: 'flags'
+    ref: 'Flag'
   }]
 });
 
