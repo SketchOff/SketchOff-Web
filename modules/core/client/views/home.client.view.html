@@ -11,7 +11,7 @@
                 Challenge your friends, family, coworkers <span style="font-style:italic;font-size:14px;vertical-align:super;color:#C2C2C2">(maybe not)</span> to draw a series of kooky objects!
             </p>
         </div>
-        <div ng-if="authentication.user == false" class="row">
+        <div ng-if="!authentication.user" class="row">
             <p>
                 <a ui-sref="authentication.signup" class="btn btn-primary btn-lg" href="#" target="_blank">Create an Account!</a>
             </p>
@@ -22,8 +22,8 @@
     </div>
 
     <div class="row">
-        <a class="btn btn-primary btn-lg" href="" ng-show="authentication.user" ng-click="joinPublicGame()">Join Public Game</a>
-        <a class="btn btn-primary btn-lg" href="" ng-show="authentication.user" ng-click="startPrivateGame()">Start Private Game</a>
+        <a class="btn btn-primary btn-lg" href="" ng-if="authentication.user" ng-click="joinPublicGame()">Join Public Game</a>
+        <a class="btn btn-primary btn-lg" href="" ng-if="authentication.user" ng-click="startPrivateGame()">Start Private Game</a>
     </div>
     <div>
         <h2>Lorem Ipsum!</h2>
