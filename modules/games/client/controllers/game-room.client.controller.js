@@ -12,6 +12,15 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             activeTool: 0
         };
 
+        // UndoStates
+        // [RECENT ITEM, 2nD RECENT ITEM .... LAST ITEM]
+        $scope.imageStates = {
+            states: [],
+            undoPos: 0
+        };
+
+        var MAX_UNDO_STATES = 10;
+
         var is_judge = false;
         var set_winner = false;
 

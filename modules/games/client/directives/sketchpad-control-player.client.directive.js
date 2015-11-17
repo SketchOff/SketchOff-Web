@@ -13,7 +13,9 @@ angular.module('games')
       // xoffset due to floating relative stuff
       var xoffset = 30+parseInt(window.getComputedStyle(element.children()[0], null).marginLeft.split('px')[0]);
 
-    	var ctx = element.children().children()[0].getContext('2d');
+      var canvas = element.children().children()[0];
+
+    	var ctx = canvas.getContext('2d');
       var ctxtemp = element.children().children()[1].getContext('2d');
 
       // var ctx2 = element[1].getContext('2d');
@@ -39,13 +41,12 @@ angular.module('games')
       var currentY;
 
       // Tool data
-      var socketQueue= [];
+      var socketQueue = [];
 
       // Tool enum:
       // 0 dot (line)
       // 1 line (2 point)
       // 2 eraser
-
 
       // On mousedown, gather all information that would be relevant for any kind of tool used.
       element.bind('mousedown', function(event){
@@ -133,30 +134,44 @@ angular.module('games')
         				currentX, currentY, scope.playerVars.toolColor, scope.playerVars.toolSize
         				]);
         			drawUpDot(currentX, currentY, lastX, lastY, scope.playerVars.toolColor, scope.playerVars.toolSize);
-        			socketSendMessage();
       			  break;
       			case 1:
               socketPushToolData([
                 currentX, currentY, anchorX, anchorY, scope.playerVars.toolColor, scope.playerVars.toolSize
               ]);
               drawUpLine(currentX, currentY, anchorX, anchorY, scope.playerVars.toolColor, scope.playerVars.toolSize);
-      			  socketSendMessage();
               break;
             case 2:
               socketPushToolData([
                 currentX, currentY, scope.playerVars.toolColor, scope.playerVars.toolSize
                 ]);
               drawUpErase(currentX, currentY, lastX, lastY, scope.playerVars.toolColor, scope.playerVars.toolSize);
-              socketSendMessage();
               break;
       			default:
       			  console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +scope.playerVars.activeTool);
       		}
+          // send socket data
+          socketSendMessage();
 
+          // write state to undomanager
+          writeUndoState();
       	}
         // stop drawing
         drawing = false;
       });
+
+      // Writes an imagestate to the FRONT of the array.
+      // If more than 10 states, pop last one off to make space
+      function writeUndoState() {
+        var dt = canvas.toDataURL('image/png');
+        if(scope.imageStates.states.length < scope.MAX_UNDO_STATES) {
+          scope.imageStates.states.unshift(dt);
+        }
+        else {
+          scope.imageStates.states.pop();
+          scope.imageStates.states.unshift(dt);
+        }
+      }
 
       function flushSocketQueueData() {
       	socketQueue = [];
@@ -199,7 +214,7 @@ angular.module('games')
       		}
       	};
       	// convert b64 image
-      	var dt = element[0].toDataURL('image/png');
+      	var dt = canvas.toDataURL('image/png');
       	socketQueue.data.imageData = dt;
 
       	// send data

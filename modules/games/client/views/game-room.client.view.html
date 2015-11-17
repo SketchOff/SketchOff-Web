@@ -45,8 +45,8 @@
             <span ng-click="setTool(0)" ng-style="isActiveTool(0)" class="glyphicon glyphicon-pencil"></span>&nbsp
             <span ng-click="setTool(1)" ng-style="isActiveTool(1)" class="glyphicon glyphicon-minus"></span>&nbsp
             <span ng-click="setTool(2)" ng-style="isActiveTool(2)" class="glyphicon glyphicon-erase"></span>&nbsp
-            <span class="glyphicon glyphicon-backward"></span>&nbsp
-            <span class="glyphicon glyphicon-forward"></span>&nbsp
+            <span class="glyphicon glyphicon-backward" ng-style="hasUndo()" ng-click="undoClicked()"></span>&nbsp
+            <span class="glyphicon glyphicon-forward" ng-style="hasRedo()" ng-click="reddoClicked()"></span>&nbsp
         </div>
     </div>
 
