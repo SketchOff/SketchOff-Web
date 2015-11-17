@@ -14,12 +14,13 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
 
         // UndoStates
         // [RECENT ITEM, 2nD RECENT ITEM .... LAST ITEM]
-        $scope.imageStates = {
+        $scope.clientImageStates = {
+            canvas: null,
             states: [],
             undoPos: 0
         };
 
-        var MAX_UNDO_STATES = 10;
+        $scope.MAX_UNDO_STATES = 10;
 
         var is_judge = false;
         var set_winner = false;
@@ -181,6 +182,62 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             }
         };
 
+        // Returns style (green = can undo, black = cannot undo)
+        $scope.hasUndo = function() {
+            // Case: cannot undo
+            if($scope.clientImageStates.undoPos > ($scope.MAX_UNDO_STATES - 1) || 
+                $scope.clientImageStates.undoPos >= $scope.clientImageStates.states.length) {
+                return {"color":"black"};
+            }
+            else {
+                return {"color":"green"};
+            }
+        };
+
+        $scope.hasRedo = function() {
+            // Case: cannot redo
+            if($scope.clientImageStates.undoPos === 0) {
+                return {"color":"black"};
+            }
+            else {
+                return {"color":"green"};
+            }
+        };
+
+        $scope.undoClicked = function() {
+            console.log('attempted undo ' + $scope.clientImageStates.undoPos);
+            if($scope.hasUndo().color === "green") {
+                var img = new Image();
+                img.onLoad = function() {
+                    var ctx = $scope.clientImageStates.canvas.getContext('2d');
+                    ctx.clearRect(0,0,640,480);
+                    ctx.drawImage(img,0,0);
+                    console.log('undo onload fired');
+                };
+                img.src = null;
+                img.src = $scope.clientImageStates.states[$scope.clientImageStates.undoPos];
+                $scope.clientImageStates.undoPos++;
+
+            }
+        };
+
+        $scope.redoClicked = function() {
+            console.log('attempted redo ' + ($scope.clientImageStates.undoPos - 1));
+            if($scope.hasRedo().color === "green") {
+                var img = new Image();
+                img.onLoad = function() {
+                    var ctx = $scope.clientImageStates.canvas.getContext('2d');
+                    ctx.clearRect(0,0,640,480);
+                    ctx.drawImage(img,0,0);
+                    console.log('redo onload fired');
+                };
+                $scope.clientImageStates.undoPos--;
+                img.src = null;
+                img.src = $scope.clientImageStates.states[$scope.clientImageStates.undoPos];
+
+            }
+        };
+
         $scope.increaseToolSize = function() {
             // console.log("+tool size");
             $scope.playerVars.toolSize++;
@@ -239,11 +296,11 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         };
 
         $scope.broadcastCanvasData = function(data) {
-            console.log('canvas data broadcasted');
-            console.log('canvas type =' + data.sType);
+            // console.log('canvas data broadcasted');
+            // console.log('canvas type =' + data.sType);
             // TODO: b64 encode&decode
             Socket.emit('CLIENT_P2S_'+data.sType, data.data);
-            console.log("socket emitted: " + 'CLIENT_P2S_'+data.sType); 
+            // console.log("socket emitted: " + 'CLIENT_P2S_'+data.sType); 
         };
     }
 ]);

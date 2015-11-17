@@ -4,8 +4,8 @@ import GameRoom from './game_room.server.controller.js';
 
 var GameRooms = new Map();
 var DefaultCountdownTimes ={};
-DefaultCountdownTimes.choose_phrase = 5;
-DefaultCountdownTimes.drawing = 5;
+DefaultCountdownTimes.choose_phrase = 10;
+DefaultCountdownTimes.drawing = 60;
 DefaultCountdownTimes.winner_selection = 5;
 DefaultCountdownTimes.new_game = 5;
 

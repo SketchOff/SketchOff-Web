@@ -50,7 +50,7 @@ angular.module('games')
 
       // On mousedown, gather all information that would be relevant for any kind of tool used.
       element.bind('mousedown', function(event){
-        console.log(event);
+        // console.log(event);
       	canDraw = !scope.amJudge();
 
       	anchorX = event.clientX-xoffset;
@@ -153,6 +153,11 @@ angular.module('games')
           // send socket data
           socketSendMessage();
 
+          // ensure state manager has canvas ref
+          if(scope.clientImageStates.canvas === null) {
+            scope.clientImageStates.canvas = canvas;
+          }
+
           // write state to undomanager
           writeUndoState();
       	}
@@ -164,12 +169,12 @@ angular.module('games')
       // If more than 10 states, pop last one off to make space
       function writeUndoState() {
         var dt = canvas.toDataURL('image/png');
-        if(scope.imageStates.states.length < scope.MAX_UNDO_STATES) {
-          scope.imageStates.states.unshift(dt);
+        if(scope.clientImageStates.states.length < scope.MAX_UNDO_STATES) {
+          scope.clientImageStates.states.unshift(dt);
         }
         else {
-          scope.imageStates.states.pop();
-          scope.imageStates.states.unshift(dt);
+          scope.clientImageStates.states.pop();
+          scope.clientImageStates.states.unshift(dt);
         }
       }
 
