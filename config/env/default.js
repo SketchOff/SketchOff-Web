@@ -2,9 +2,9 @@
 
 module.exports = {
   app: {
-    title: 'MEAN.JS',
-    description: 'Full-Stack JavaScript with MongoDB, Express, AngularJS, and Node.js',
-    keywords: 'mongodb, express, angularjs, node.js, mongoose, passport',
+    title: 'SketchOff',
+    description: 'Multiplayer drawing game where you try to draw what someone else wants you to draw!', // TODO: Description is lacking
+    keywords: 'mongodb, express, angularjs, node.js, mongoose, passport, sketchoff, sketch-off, sketch, multiplayer, drawing, online, internet drawing, picture, friends, people, dog',
     googleAnalyticsTrackingID: process.env.GOOGLE_ANALYTICS_TRACKING_ID || 'GOOGLE_ANALYTICS_TRACKING_ID'
   },
   port: process.env.PORT || 3000,
