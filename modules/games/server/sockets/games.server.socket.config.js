@@ -49,7 +49,9 @@
     socket.on('join private lobby', function(msg) {
 	   //ADDING THE PLAYER ISNT WORKING I DONT KNOW WHY
 	   var GameRoom = GameRoomManager.getGameRoom(msg[0]);
-       GameRoom.addPlayer(socket);
+           GameRoom.addPlayer(socket);
+	   console.log(GameRoom.players[0].rooms);
+	   console.log(GameRoom.players[1].rooms);
 	   io.to(msg[1]).emit('joined private lobby');
        	   io.to(GameRoom.getRoomID()).emit('update lobby info', GameRoom.getLobbyInfo());
 	});

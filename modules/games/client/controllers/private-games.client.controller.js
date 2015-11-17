@@ -21,7 +21,7 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
         	$scope.GameRoom = msg;
         });
 
-    Socket.on('update lobby info', function(msg) {
+        Socket.on('update lobby info', function(msg) {
 		console.log("made it to lobby info thing");
 		console.log(msg);
             $scope.GameRoom = msg;

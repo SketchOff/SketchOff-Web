@@ -20,9 +20,16 @@ export class Lobby {
 
     connectPlayers() {
         this.GameRoom.players.forEach(function(player) {
-            player.join(this.GameRoom._id);
+            player.join(this.GameRoom.getRoomID());
             player.game_room_id = this.GameRoom.getRoomID();
+     	    var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
+      	    if (ConnectedPlayer) {
+          	  ConnectedPlayer.in_queue = false;
+           	 ConnectedPlayer.in_game = true;
+            }
         }, this);
+	console.log(this.GameRoom.getPlayerUsernames());
+
     }
 
     getName(){
