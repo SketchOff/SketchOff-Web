@@ -103,6 +103,7 @@ var UserSchema = new Schema({
     type: Number,
     default: 0
   },
+<<<<<<< HEAD
   friends: {
     type: Array,
     arrayType: {
@@ -112,6 +113,11 @@ var UserSchema = new Schema({
   pendingFriendRequests: {
     type: Array,
     arrayType: 'friend_request'
+=======
+  flags: {
+    type: Schema.objectID,
+    ref: 'flags'
+>>>>>>> flags setup; needs controller update
   }
 });
 
