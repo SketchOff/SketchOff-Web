@@ -11,7 +11,8 @@
         </div>
         <h1>Friends of <span ng-bind="Profile.displayName"></span></h1>
         <div class="list-group">
-            <a ng-repeat="friend in Profile.friends" ui-sref="profile.view({profileId: friend._id})" class="list-group-item">
+            <a ng-repeat="friend in Profile.friends" ui-sref="profile.view({profileId: friend})" class="list-group-item">
+            <span ng-bind="friend"></span>
             </a>
             <div class="alert alert-warning text-center" ng-if="Profile.$resolved && Profile.friends.length === 0">
                 <span ng-bind="Profile.displayName"></span> has no friends.

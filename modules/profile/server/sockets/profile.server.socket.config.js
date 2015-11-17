@@ -23,7 +23,12 @@ export default function(io, socket) {
     });
 
     socket.on('accept friend request', function(requesterId) {
-    	prof.createFriends(String(requesterId), String(socket.request.user._id));
+    	if (requesterId.profileId)
+    		prof.createFriends(String(requesterId.profileId), String(socket.request.user._id));
+    	else
+    		console.log('profile id not found');
+    	//console.log(String(requesterId.profileId), String(socket.request.user._id));
+    	
     });
 
 

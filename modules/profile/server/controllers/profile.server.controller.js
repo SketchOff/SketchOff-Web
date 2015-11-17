@@ -24,12 +24,14 @@ exports.read = function (req, res) {
 //   console.log("FRIEND REQUEST CALLED");
 // };
 
+export function userExists() {} // not sure if I want to use this.
+
 export function isUserFriend(profileId, userId, callback) {
 
   var user = User.findOne( { '_id': userId });
   user.select('friends');
   user.exec(function(err, u) {
-    if (err) {console.log('isuserFriend broke', err); return false; }
+    if (err) {console.log('isuserFriend(): failure to execute mongoose query.', err); return false; }
     if (u.friends.length === 0) {
       callback(false);
     }
@@ -54,37 +56,63 @@ export function isUserFriend(profileId, userId, callback) {
 }
 
 export function createFriends(profileId, userId) {
-  // check to make sure either profile or user isUserPendingFriendRequest;
-  isUserPendingFriendRequest(profileId, userId, function (isPendingRequest) {
+
+  isUserPendingFriendRequest(userId, profileId, function (isPendingRequest) {
     if (isPendingRequest) {
-      var profile = User.findOne( {'_id': profileId});
-      var user = User.findOne( {'_id': userId});
-      profile.select('pendingFriendRequests friends');
-      user.select('pendingFriendRequests friends');
-      profile.friends.push(user);
-      user.friends.push(profile);
-      profile.pendingFriendRequests.pull( { requestedBy: userId});
-      user.pendingFriendRequests.pull( { requestedBy: profileId});
-      profile.save(function(err) {
-        if (err) { console.log('save broke createfriends'); return; }
+      var frUser= new User( {'_id': userId});
+      console.log(frUser);
+      var frProfile = new User( {'_id': profileId});
+      console.log(frProfile);
+      var conFindUser = { '_id': frUser._id },
+          conFindProfile = { '_id': frProfile._id },
+          addUserAsFriend = { $push: {'friends': frUser._id } },
+      //update = { $push: {'pendingFriendRequests': { 'requestedBy': userId}}},
+          addProfileAsFriend = { $push: {'friends': frProfile._id } },
+          removeProfileFriendRequest = { $pull: {'pendingFriendRequests': { 'requestedBy': frProfile._id}}},
+          removeUserFriendRequest = { $pull: {'pendingFriendRequests': { 'requestedBy': frUser._id}}},
+          options = {};
+
+      User.update(conFindUser, addProfileAsFriend, options, function(err, numAffected) {
+        if (err) { console.log('createFriends():update db for addProfileAsFriend broke.', err); return false;}
+        console.log('Find user, add profile as friend ');
+        console.log(numAffected);
       });
-      user.save(function(err) {
-        if (err) { console.log('save broke createfriends'); return; }
+
+      User.update(conFindProfile, addUserAsFriend, options, function(err, numAffected) {
+        if (err) { console.log('createFriends():update db for addUserAsFriend broke.', err); return false;}
+        console.log('Find profile, add user as friend ');
+        console.log(numAffected);
+      });
+
+      User.update(conFindUser, removeProfileFriendRequest, options, function(err, numAffected) {
+        if (err) { console.log('createFriends():update db for addUserAsFriend broke.', err); return false;}
+        console.log('Find user, remove profile from friend requests ');
+        console.log(numAffected);
+      });
+
+      isUserPendingFriendRequest(profileId, userId, function(otherHasFriendRequestFromMe) {
+        if (otherHasFriendRequestFromMe) {
+          User.update(conFindProfile, removeUserFriendRequest, options, function(err, numAffected) {
+            if (err) { console.log('createFriends():update db for addUserAsFriend broke.', err); return false;}
+            console.log('Find profile, remove user from friend requests ');
+            console.log(numAffected);
+          });
+        }
       });
     }
   });
 }
 
-export function isUserPendingFriendRequest(profileId, userId, callback) {
-  var profile = User.findOne( { '_id': profileId});
+export function isUserPendingFriendRequest(selectedUserId, fromUserId, callback) {
+  var profile = User.findOne( { '_id': selectedUserId});
   profile.select('pendingFriendRequests');
   profile.exec(function(err,p) {
-    if (err) { console.log('something broke', err); return false; }
+    if (err) { console.log('isUserPendingFriendRequest(): exec of finding profile ID failed.', err); return false; }
     if (p.pendingFriendRequests.length === 0) {
       callback(false);
     }
     for(var i = 0, len = p.pendingFriendRequests.length; i < len; i++) {
-        if (String(p.pendingFriendRequests[i].requestedBy) === userId) {
+        if (String(p.pendingFriendRequests[i].requestedBy) === fromUserId) {
           callback(true);
         } else if (i === len-1) {
           callback(false);
@@ -104,12 +132,13 @@ export function createFriendRequest(profileId, userId, callback) {
   });
   */
 
+  var req = new friend_request({ 'requestedBy': userId});
   var condition = { _id: profileId },
-      update = { $push: {'pendingFriendRequests': { 'requestedBy': userId}}},
+      update = { $push: {'pendingFriendRequests': req}},
       options = {};
 
       User.update(condition, update, options, function(err, numAffected) {
-        if (err) { console.log('something broke', err); return false;}
+        if (err) { console.log('createFriendRequest(): update of pushing friend request to profile failed.', err); return false;}
         console.log(numAffected);
         callback(true);
       });
@@ -120,38 +149,40 @@ export function getPlayerName(profileId, callback) {
   playerName.select('displayName');
 
   playerName.exec(function(err, p) {
-    if (err) { console.log('something broke', err); return false;}
+    if (err) { console.log('getPlayerName(): mongoose query failed to execute.', err); return false;}
     callback(String(p.displayName));
   });
 }
 
-export function friendRequest(profileId, userId) {
+
+
+export function friendRequest(toProfileId, fromUserId) {
 
   // profile/userid scanning
-  // if (profileId === userId) {
+  // if (profileId === fromUserId) {
   //   console.log("Cannot add self as friend");
   // }
-  //console.log(profileId);
-  //console.log(userId);
+  //console.log(toProfileId);
+  //console.log(fromUserId);
   //  TODO: more userId/profileId validation checking ):
 
-  var req = new friend_request({ requestedBy: userId});
+  var req = new friend_request({ requestedBy: fromUserId});
   //var user = User.findbyId(profileId);
   console.log('1');
-  isUserPendingFriendRequest(profileId, userId, function(foundinPendingRequests) {
+  isUserPendingFriendRequest(toProfileId, fromUserId, function(foundinPendingRequests) {
     if (foundinPendingRequests) {
       console.log('Already sent friend request');
       return;
     } else {
       console.log('3');
-      isUserFriend(profileId, userId, function(foundinFriends) {
+      isUserFriend(toProfileId, fromUserId, function(foundinFriends) {
         console.log('4');
         if (foundinFriends) {
           console.log('Already friends with other');
           return;
         } else {
           console.log('5');
-          createFriendRequest(profileId, userId, function(success) {
+          createFriendRequest(toProfileId, fromUserId, function(success) {
             if (success) console.log('Friend request submitted');
             else console.log('Friend request failed');
           });
@@ -213,6 +244,14 @@ exports.list = function (req, res) {
 
 */
 
+export function getDisplayName(userId, callback) {
+    if (mongoose.Types.ObjectId.isValid(userId)) {
+      User.findById(userId, function (err, user) {
+        if (err) {console.log('getDisplayName(): mongoose query failed'); return;}
+        callback(user.displayName, user.username);
+      });
+    }
+} 
 
 /**
  * Profile middleware
@@ -251,7 +290,18 @@ exports.profileByID = function (req, res, next, id) {
       strippedUser.roles = user.roles;
       strippedUser.same = true;
     }
+
+    strippedUser.friends.forEach (function (entry) {
+      console.log(entry);
+      getDisplayName(entry._id, function (displayname, username) {
+        entry.displayName = displayname;
+        entry.username = username;
+      });
+      console.log(entry.displayName);
+    });
+
     req.Profile = strippedUser;
     next();
   });
 };
+
