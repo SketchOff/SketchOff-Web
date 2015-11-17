@@ -10,6 +10,33 @@ import {
 }
 from '../queue.server.controller';
 
+export class Lobby {
+    constructor(GameRoom){
+	console.log('made it to lobby');
+	this.GameRoom = GameRoom;
+	this.name = 'LOBBY';
+	this.connectPlayers();
+    }
+
+    connectPlayers() {
+        this.GameRoom.players.forEach(function(player) {
+            player.join(this.GameRoom.getRoomID());
+            player.game_room_id = this.GameRoom.getRoomID();
+     	    var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
+      	    if (ConnectedPlayer) {
+          	  ConnectedPlayer.in_queue = false;
+           	 ConnectedPlayer.in_game = true;
+            }
+        }, this);
+	console.log(this.GameRoom.getPlayerUsernames());
+
+    }
+
+    getName(){
+        return this.name;
+    }
+}
+
 export class Establishing {
     constructor(GameRoom) {
         this.GameRoom = GameRoom;

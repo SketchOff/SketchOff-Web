@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication', 'Socket', '$uibModal', '$timeout',
-    function($scope, Authentication, Socket, $uibModal, $timeout) {
+angular.module('core').controller('HomeController', ['$scope', 'Authentication', 'Socket', '$uibModal', '$timeout', '$state',
+    function($scope, Authentication, Socket, $uibModal, $timeout, $state) {
         // This provides Authentication context.
         $scope.authentication = Authentication;
         $scope.error = {};
@@ -22,7 +22,14 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
             });
         };
 
-        $scope.startPrivateGame = function() {
+        Socket.on('already in game redirect', function() {
+            $scope.error.already_waiting = 'Youre already waiting to join a game';
+            console.log("already wating");
+        });
+
+	$scope.startPrivateGame = function() {
+		Socket.emit('create private game');
+		$state.go('games.private-lobby');
         };
     }
 ]);

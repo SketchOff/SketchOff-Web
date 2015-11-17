@@ -17,6 +17,10 @@ angular.module('games').config(['$stateProvider',
       .state('games.terminated', {
         url: '',
         templateUrl: 'modules/games/client/views/terminated-game-room.client.view.html'
+      })
+      .state('games.private-lobby', {
+	url: '',
+	templateUrl: 'modules/games/client/views/private-room-lobby.client.view.html'
       });
   }
 ]);
