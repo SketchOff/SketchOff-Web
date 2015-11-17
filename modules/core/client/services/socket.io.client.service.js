@@ -12,6 +12,19 @@ angular.module('core').service('Socket', ['Authentication', '$state', '$timeout'
     };
     this.connect();
 
+    this.socket.on('invite notification', function(msg){
+	console.log('invite notification');
+	console.log(msg);
+	if(confirm('Invite to', msg[0])){
+	    this.emit('join private lobby', [msg[0], msg[2]]);
+        }
+    });
+
+    this.socket.on('joined private lobby', function(){
+	console.log('joined private lobby');
+	$state.go('games.private-lobby');
+    });
+
     // Wrap the Socket.io 'on' method
     this.on = function (eventName, callback) {
       if (this.socket) {

@@ -10,6 +10,26 @@ import {
 }
 from '../queue.server.controller';
 
+export class Lobby {
+    constructor(GameRoom){
+	console.log('made it to lobby');
+	this.GameRoom = GameRoom;
+	this.name = 'LOBBY';
+	this.connectPlayers();
+    }
+
+    connectPlayers() {
+        this.GameRoom.players.forEach(function(player) {
+            player.join(this.GameRoom._id);
+            player.game_room_id = this.GameRoom.getRoomID();
+        }, this);
+    }
+
+    getName(){
+        return this.name;
+    }
+}
+
 export class Establishing {
     constructor(GameRoom) {
         this.GameRoom = GameRoom;

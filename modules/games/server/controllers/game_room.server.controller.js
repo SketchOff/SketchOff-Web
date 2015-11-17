@@ -63,8 +63,16 @@ export default class GameRoom {
         this.interval = null;
         this.winner_points = 100;
         this.participation_points = 10;
-        this.State = new GameRoomStates.Establishing(this);
-        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
+        if (this.is_public){
+            this.State = new GameRoomStates.Establishing(this);
+        } else {
+	    this.lobbyLeader = null;
+            this.setLobbyLeader();
+		console.log("THE FOLLOWING LINE IS HERE");
+	    console.log(this.lobbyLeader);
+            this.State = new GameRoomStates.Lobby(this);
+        }
+        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getInfo()]);
     }
 
     getCountdownTimes() {
@@ -85,6 +93,13 @@ export default class GameRoom {
 
     getNewGameTime() {
         return this.CountdownTimes.new_game;
+    }
+
+    setLobbyLeader(){
+        if(this.players.length !== 0){
+	    console.log(this.players);
+            this.lobbyLeader = this.players[this.players.length - 1].request.user.username;
+        }
     }
 
     getRoomType() {
@@ -113,6 +128,26 @@ export default class GameRoom {
     isFull() {
         var num = this.players.length + this.waiting_players.length;
         return num === max_players;
+    }
+
+//error here?
+    // Add a player to the game
+    addPlayer(player) {
+        if(!player.game_room_id){
+            player.game_room_id = this.getRoomID();
+            if(player.rooms.indexOf(this.getRoomID()) < 0){
+                player.join(this.getRoomID());
+            }
+        }
+        if(this.getStateName === "LOBBY"){
+            this.players.push(player);
+        } else{
+            var index = getRandomIntInclusive(0, this.players.length - 1);
+            this.players.splice(index, 0, player);
+        }
+        var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
+        ConnectedPlayer.in_game = true;
+        ConnectedPlayer.in_queue = false;
     }
 
     addWaitingPlayer(player) {
@@ -244,22 +279,24 @@ export default class GameRoom {
         }
         delete player.game_room_id;
 
-        if (this.getNumAllPlayers() < min_players) {
-            console.log('Terminating because not enough total players');
-            this.setState('Terminating');
-        } else if (this.getNumPlayers() < min_players) {
-            console.log('not enough playing player but enough total players');
-            this.setState('Ending', 'Not enough active players to continue.');
-        } else {
-            console.log('Sending players info', this.getPlayersInfo());
-            getIO().to(this.getRoomID()).emit('player leaving', this.getPlayersInfo());
-            if (player.request.user.username.localeCompare(this.judge.request.username) === 0) {
-                console.log('The judge left the game. But the game will continue.');
-                this.setState('Ending', 'The judge left the game.');
-            } else {
-                console.log('Player left but doesnt effect game play');
-            }
+        if ((this.getStateName()!== 'LOBBY') || this.getNumPlayers() === 0){
+	        if (this.getNumAllPlayers() < min_players) {
+	            console.log('Terminating because not enough total players');
+  	          this.setState('Terminating');
+    	    } else if (this.getNumPlayers() < min_players) {
+     	       console.log('not enough playing player but enough total players');
+     	       this.setState('Ending', 'Not enough active players to continue.');
+     	   } else {
+     	       console.log('Sending players info', this.getPlayersInfo());
+     	       getIO().to(this.getRoomID()).emit('player leaving', this.getPlayersInfo());
+      	      if (player.request.user.username.localeCompare(this.judge.request.username) === 0) {
+      	          console.log('The judge left the game. But the game will continue.');
+      	          this.setState('Ending', 'The judge left the game.');
+      	      } else {
+      	          console.log('Player left but doesnt effect game play');
+      	      }
             if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
+	    }
         }
     }
 
@@ -292,6 +329,17 @@ export default class GameRoom {
             phrases: this.getPhrases()
         };
         return GameInfo;
+    }
+
+    getLobbyInfo(){
+        var LobbyInfo = {};
+        LobbyInfo.lobbyLeader = this.lobbyLeader;
+        LobbyInfo.players = this.getPlayerUsernames();
+        LobbyInfo.state = this.getStateName();
+        LobbyInfo._id = this.getRoomID();
+        LobbyInfo.min_players = min_players;
+        LobbyInfo.max_players = max_players;
+        return LobbyInfo;
     }
 
     hasAdminSubscribers() {
@@ -383,6 +431,10 @@ export default class GameRoom {
         }
     }
 
+    startPrivateGame(){
+        this.setState('Establishing');
+    }
+
     countdownFactory(time, NextState, emit_msg) {
         var time_left = time;
         var that = this;
@@ -400,4 +452,8 @@ export default class GameRoom {
             }
         }, 1000);
     }
+}
+
+function getRandomIntInclusive(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
