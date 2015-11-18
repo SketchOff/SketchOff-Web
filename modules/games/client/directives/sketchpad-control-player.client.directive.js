@@ -50,6 +50,8 @@ angular.module('games')
 
       // On mousedown, gather all information that would be relevant for any kind of tool used.
       element.bind('mousedown', function(event){
+        savePrevState();
+
         // console.log(event);
       	canDraw = !scope.amJudge();
 
@@ -165,24 +167,31 @@ angular.module('games')
         drawing = false;
       });
 
-      // Writes an imagestate to the FRONT of the array.
+      // Saves previous state
+      function savePrevState() {
+        var dt = canvas.toDataURL('image/png');
+        if(scope.clientImageStates.uStates.length < scope.MAX_UNDO_STATES) {
+          scope.clientImageStates.uStates.push(dt);
+        }
+        else {
+          console.log('had to shift');
+          scope.clientImageStates.uStates.shift();
+          scope.clientImageStates.uStates.push(dt);
+        }
+      }
+
+      // Writes an imagestate to the BACK of the array.
       // If more than 10 states, pop last one off to make space
       function writeUndoState() {
         var dt = canvas.toDataURL('image/png');
-        if(scope.clientImageStates.states.length < scope.MAX_UNDO_STATES) {
-          scope.clientImageStates.states.unshift(dt);
-        }
-        else {
-          scope.clientImageStates.states.pop();
-          scope.clientImageStates.states.unshift(dt);
-        }
+        scope.clientImageStates.cState = dt;
+        scope.clientImageStates.rStates = [];
       }
 
       function flushSocketQueueData() {
       	socketQueue = [];
       }
 
-      // TODO: CLIENT IDS FOR >1 SKETCHPAD
       // Socket mouseDown behavior if drawing. Fills socketQueue with an initial tool format
       function socketPopulateDown(tool, tdata) {
       	socketQueue = {

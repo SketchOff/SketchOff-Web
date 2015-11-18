@@ -16,8 +16,9 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         // [RECENT ITEM, 2nD RECENT ITEM .... LAST ITEM]
         $scope.clientImageStates = {
             canvas: null,
-            states: [],
-            undoPos: 0
+            uStates: [],
+            rStates: [],
+            cState: null
         };
 
         $scope.MAX_UNDO_STATES = 10;
@@ -184,59 +185,58 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
 
         // Returns style (green = can undo, black = cannot undo)
         $scope.hasUndo = function() {
-            // Case: cannot undo
-            if($scope.clientImageStates.undoPos > ($scope.MAX_UNDO_STATES - 1) || 
-                $scope.clientImageStates.undoPos >= $scope.clientImageStates.states.length) {
-                return {"color":"black"};
+            if($scope.clientImageStates.uStates.length > 0) {
+                return {"color":"green"};
             }
             else {
-                return {"color":"green"};
+                return {"color":"black"};
             }
         };
 
         $scope.hasRedo = function() {
             // Case: cannot redo
-            if($scope.clientImageStates.undoPos === 0) {
-                return {"color":"black"};
+            if($scope.clientImageStates.rStates.length > 0) {
+                return {"color":"green"};
             }
             else {
-                return {"color":"green"};
+                return {"color":"black"};
             }
         };
 
         $scope.undoClicked = function() {
-            console.log('attempted undo ' + $scope.clientImageStates.undoPos);
+            console.log('attempted undo');
             if($scope.hasUndo().color === "green") {
+                console.log('undo successful');
                 var img = new Image();
-                img.onLoad = function() {
-                    var ctx = $scope.clientImageStates.canvas.getContext('2d');
-                    ctx.clearRect(0,0,640,480);
-                    ctx.drawImage(img,0,0);
-                    console.log('undo onload fired');
-                };
+                var ctx = $scope.clientImageStates.canvas.getContext('2d');
                 img.src = null;
-                img.src = $scope.clientImageStates.states[$scope.clientImageStates.undoPos];
-                $scope.clientImageStates.undoPos++;
+                var dt = $scope.clientImageStates.uStates.pop();
+                img.src = dt;
 
+                $scope.clientImageStates.rStates.push($scope.clientImageStates.cState);
+                $scope.clientImageStates.cState = dt;
+
+                ctx.clearRect(0,0,640,480);
+                ctx.drawImage(img,0,0);
             }
         };
 
         $scope.redoClicked = function() {
-            console.log('attempted redo ' + ($scope.clientImageStates.undoPos - 1));
             if($scope.hasRedo().color === "green") {
+                console.log('redo successful');
                 var img = new Image();
-                img.onLoad = function() {
-                    var ctx = $scope.clientImageStates.canvas.getContext('2d');
-                    ctx.clearRect(0,0,640,480);
-                    ctx.drawImage(img,0,0);
-                    console.log('redo onload fired');
-                };
-                $scope.clientImageStates.undoPos--;
+                var ctx = $scope.clientImageStates.canvas.getContext('2d');
                 img.src = null;
-                img.src = $scope.clientImageStates.states[$scope.clientImageStates.undoPos];
+                var dt = $scope.clientImageStates.rStates.pop();
+                img.src = dt;
+                
+                $scope.clientImageStates.uStates.push($scope.clientImageStates.cState);
+                $scope.clientImageStates.cState = dt;
 
+                ctx.clearRect(0,0,640,480);
+                ctx.drawImage(img,0,0);
             }
-        };
+        };        
 
         $scope.increaseToolSize = function() {
             // console.log("+tool size");
