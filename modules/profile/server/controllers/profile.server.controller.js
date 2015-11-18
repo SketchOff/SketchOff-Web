@@ -60,9 +60,7 @@ export function createFriends(profileId, userId) {
   isUserPendingFriendRequest(userId, profileId, function (isPendingRequest) {
     if (isPendingRequest) {
       var frUser= new User( {'_id': userId});
-      console.log(frUser);
       var frProfile = new User( {'_id': profileId});
-      console.log(frProfile);
       var conFindUser = { '_id': frUser._id },
           conFindProfile = { '_id': frProfile._id },
           addUserAsFriend = { $push: {'friends': frUser._id } },
@@ -144,7 +142,8 @@ export function createFriendRequest(profileId, userId, callback) {
       });
 }
 
-export function getPlayerName(profileId, callback) {
+/*
+export function getDisplayName(profileId, callback) {
   var playerName = User.findOne( { '_id' : profileId });
   playerName.select('displayName');
 
@@ -153,7 +152,7 @@ export function getPlayerName(profileId, callback) {
     callback(String(p.displayName));
   });
 }
-
+*/
 
 
 export function friendRequest(toProfileId, fromUserId) {
@@ -244,10 +243,10 @@ exports.list = function (req, res) {
 
 */
 //get display name, and user name?
-export function getDisplayName(userId, callback) {
+export function getDisplayUserName(userId, callback) {
     if (mongoose.Types.ObjectId.isValid(userId)) {
       User.findById(userId, function (err, user) {
-        if (err) {console.log('getDisplayName(): mongoose query failed'); return;}
+        if (err) {console.log('getDisplayUserName(): mongoose query failed'); return;}
         callback(user.displayName, user.username);
       });
     }
@@ -257,67 +256,48 @@ export function getDisplayName(userId, callback) {
  * Profile middleware
  */
 
+//  Check if username (uname) exists, if so, return user._id for that user, otherwise
+//  return -1.
 export function getIdFromUsername(uname, callback) {
       User.findOne({username: uname}, function (err, user) {
-        if (err) {console.log('getDisplayName(): mongoose query failed'); return;}
-        callback(user._id);
+        if (err) {console.log('getIdFromUsername(): mongoose query failed'); return;}
+        if (user)
+          callback(user._id);
+        else
+          callback(-1);
       });
 }
 export function profileByIDHelper(req, res, next, id) {
 
-  User.findById(id).populate('user', 'displayName').exec(function (err, user) {
-    if (err) {
-      return next(err);
-    } else if (!user) { //  user dne
-      return res.status(404).send({
-        message: 'No profile with that identifier has been found'
-      });
-    }
-    var strippedUser = {
-      _id:user._id,
-      displayName:user.displayName,
-      username:user.username,
-      profileImageURL:user.profileImageURL,
-      firstName:user.firstName,
-      lastName:user.lastName,
-      email:user.email,
-      friends:user.friends,
-      //friends:[]
-      created:user.created,
-      provider:user.provider,
-      same:false
-    };
-    if (String(req.user._id) === id) {
-      strippedUser.pendingFriendRequests = user.pendingFriendRequests;
-/*
-      var friendrequestsWithNames = [];
-      user.pendingFriendRequests.forEach (function (entry) {
-        console.log(entry);
-        getDisplayName(entry.requestedBy._id, function (displayname, username) {
-          friendrequestsWithNames.push({_id: entry, displayName: displayname, userName: username});
-        });
-      });
-      strippedUser.pendingFriendRequests = ffriendrequestsWithNames;
-*/
-      strippedUser.roles = user.roles;
-      strippedUser.same = true;
-    }
+  //console.log(id);
+  var query = User.findById(id);
 
-/*
-    //  replace friends[] = {{id}, {id}} with friends[] = {{id, username, displayname}, ...}
-    var friendsWithNames = [];
-    user.friends.forEach (function (entry) {
-      console.log(entry);
-      getDisplayName(entry._id, function (displayname, username) {
-        frnds.push({_id: entry, displayName: displayname, userName: username});
-      });
-    });
-    strippedUser.friends = friendsWithNames;
-*/
+  var profileSameAsUser = false;
+  var userFieldsToPopulate = '_id displayName username profileImageURL firstName lastName email friends created provider';
 
-    req.Profile = strippedUser;
-    next();
+  if (String(req.user._id) === id) {
+    userFieldsToPopulate += ' pendingFriendRequests roles';
+    profileSameAsUser = true;
+  }
+
+  query.select(userFieldsToPopulate);
+  query.populate({
+    path:'friends',
+    select: '_id username displayName'
   });
+
+  query.populate({
+    path : 'pendingFriendRequests.requestedBy', 
+    select : '_id username displayName'
+  });
+  query.lean().exec(function (err, user) {
+      if (err) return next(err);
+      else if (!user) return res.status(404).send({ message: 'No profile with that identifier has been found' });
+
+      user.isProfileUser = profileSameAsUser;
+      req.Profile = user;
+      next();
+    });
 }
 
 
@@ -325,11 +305,18 @@ exports.profileByID = function (req, res, next, id) {
 
   if (!mongoose.Types.ObjectId.isValid(id)) {   //  If id is not valid
     if (/^[a-z0-9_!@#$%&*]+$/i.test(id)) {      //  check if it fits username specifications
+      
       getIdFromUsername(id, function(userId) {
-        if (userId) {
+        if (userId !== -1) {
+          //res.location('/api/profile/'.concat(String(userId)));
+          
           profileByIDHelper(req, res, next, String(userId));
+          //console.log(res);
+        } else {
+          return res.status(400).send({message: 'Profile is invalid'});
         }
       });
+
     } else {
       return res.status(400).send({ message: 'Profile is invalid' });
     }

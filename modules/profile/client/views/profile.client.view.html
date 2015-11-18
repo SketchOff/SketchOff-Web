@@ -6,24 +6,24 @@
             <small class="list-group-item-text">
             <span ng-bind="Profile._id"></span><br>
             <span ng-bind="Profile.username"></span>
-            <button ng-if="!Profile.same && !inFriendsList()" ng-click="sendFriendRequestFromProfile()" style="float:right;" type="button" class="btn btn-primary btn-sm">Send Friend Request</button>
+            <button ng-if="!Profile.isProfileUser && !inFriendsList()" ng-click="sendFriendRequestFromProfile()" style="float:right;" type="button" class="btn btn-primary btn-sm">Send Friend Request</button>
         </small>
         </div>
         <h1>Friends of <span ng-bind="Profile.displayName"></span></h1>
         <div class="list-group">
-            <a ng-repeat="friend in Profile.friends" ui-sref="profile.view({profileId: friend})" class="list-group-item">
-            <span ng-bind="friend"></span>
+            <a ng-repeat="friend in Profile.friends" ui-sref="profile.view({profileId: friend._id})" class="list-group-item">
+            <span ng-bind="friend.displayName"></span>
             </a>
             <div class="alert alert-warning text-center" ng-if="Profile.$resolved && Profile.friends.length === 0">
                 <span ng-bind="Profile.displayName"></span> has no friends.
             </div>
         </div>
         <hr>
-        <div ng-if="Profile.same">
+        <div ng-if="Profile.isProfileUser">
             <h1>Pending Friend Requests</h1>
             <div class="list-group">
-                <a ng-repeat="fr in Profile.pendingFriendRequests" ui-sref="profile.view({profileId:fr.requestedBy})" class="list-group-item"><span ng-bind="fr.requestedBy"></span></a><button ng-repeat="fr in Profile.pendingFriendRequests" style="float:right;" type="button" class="btn btn-primary btn-sm" ng-click="acceptFriendRequest({profileId:fr.requestedBy})">Accept</button>
-                <div class="alert alert-warning text-center" ng-if="Profile.$resolved &&  Profile.pendingFriendRequests.length === 0">
+                <a ng-repeat="fr in Profile.pendingFriendRequests" ui-sref="profile.view({profileId:fr.requestedBy._id})" class="list-group-item"><span ng-bind="fr.requestedBy.displayName"></span></a><button ng-repeat="fr in Profile.pendingFriendRequests" style="float:right;" type="button" class="btn btn-primary btn-sm" ng-click="acceptFriendRequest({profileId:fr.requestedBy._id})">Accept</button>
+                <div class="alert alert-warning text-center" ng-if="Profile.$resolved && Profile.pendingFriendRequests.length === 0">
                 You have no friend requests at the moment.
                 </div>
             </div>
