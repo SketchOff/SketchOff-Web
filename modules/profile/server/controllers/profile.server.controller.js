@@ -243,7 +243,7 @@ exports.list = function (req, res) {
 };
 
 */
-
+//get display name, and user name?
 export function getDisplayName(userId, callback) {
     if (mongoose.Types.ObjectId.isValid(userId)) {
       User.findById(userId, function (err, user) {
@@ -256,13 +256,14 @@ export function getDisplayName(userId, callback) {
 /**
  * Profile middleware
  */
-exports.profileByID = function (req, res, next, id) {
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).send({
-      message: 'Profile is invalid'
-    });
-  }
+export function getIdFromUsername(uname, callback) {
+      User.findOne({username: uname}, function (err, user) {
+        if (err) {console.log('getDisplayName(): mongoose query failed'); return;}
+        callback(user._id);
+      });
+}
+export function profileByIDHelper(req, res, next, id) {
 
   User.findById(id).populate('user', 'displayName').exec(function (err, user) {
     if (err) {
@@ -281,27 +282,59 @@ exports.profileByID = function (req, res, next, id) {
       lastName:user.lastName,
       email:user.email,
       friends:user.friends,
+      //friends:[]
       created:user.created,
       provider:user.provider,
       same:false
     };
     if (String(req.user._id) === id) {
       strippedUser.pendingFriendRequests = user.pendingFriendRequests;
+/*
+      var friendrequestsWithNames = [];
+      user.pendingFriendRequests.forEach (function (entry) {
+        console.log(entry);
+        getDisplayName(entry.requestedBy._id, function (displayname, username) {
+          friendrequestsWithNames.push({_id: entry, displayName: displayname, userName: username});
+        });
+      });
+      strippedUser.pendingFriendRequests = ffriendrequestsWithNames;
+*/
       strippedUser.roles = user.roles;
       strippedUser.same = true;
     }
 
-    strippedUser.friends.forEach (function (entry) {
+/*
+    //  replace friends[] = {{id}, {id}} with friends[] = {{id, username, displayname}, ...}
+    var friendsWithNames = [];
+    user.friends.forEach (function (entry) {
       console.log(entry);
       getDisplayName(entry._id, function (displayname, username) {
-        entry.displayName = displayname;
-        entry.username = username;
+        frnds.push({_id: entry, displayName: displayname, userName: username});
       });
-      console.log(entry.displayName);
     });
+    strippedUser.friends = friendsWithNames;
+*/
 
     req.Profile = strippedUser;
     next();
   });
+}
+
+
+exports.profileByID = function (req, res, next, id) {
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {   //  If id is not valid
+    if (/^[a-z0-9_!@#$%&*]+$/i.test(id)) {      //  check if it fits username specifications
+      getIdFromUsername(id, function(userId) {
+        if (userId) {
+          profileByIDHelper(req, res, next, String(userId));
+        }
+      });
+    } else {
+      return res.status(400).send({ message: 'Profile is invalid' });
+    }
+  } else {
+    profileByIDHelper(req, res, next, id);
+  }
 };
 
