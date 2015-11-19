@@ -30,7 +30,8 @@ import {
 }
 from '../../server/controllers/game_room.server.controller';
 import {
-    q
+    q,
+    Queue
 }
 from '../../server/controllers/queue.server.controller';
 
@@ -110,10 +111,10 @@ describe('Queue Functional Tests', function() {
 // });
 
 
-// function duplicateUsernameExists (iter) {
-//     for(var n1 in iter)
-//         for (var n2 in iter)
-//             if( n1 === n2 )
-//                 return true;
-//     return false;
-// }
+function duplicateUsernameExists (iter) {
+    for(var n1 in iter)
+        for (var n2 in iter)
+            if( n1 === n2 )
+                return true;
+    return false;
+}

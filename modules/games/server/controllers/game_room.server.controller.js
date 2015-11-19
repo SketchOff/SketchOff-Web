@@ -429,9 +429,11 @@ export default class GameRoom {
     }
 
     saveGame() {
-        var _id = this.getGameID();
+        var _id = this._id;
+        console.log(_id);
 
         var _game = {
+            gameId: this._id,
             players: this.getPlayerUsers(),
             judge: this.getJudgeUser(),
             winner: this.getWinnerUser()
