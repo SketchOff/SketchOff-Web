@@ -71,21 +71,6 @@ exports.list = function (req, res) {
 };
 
 /**
- * List of flagged Users
- */
-exports.flags = function (req, res) {
-  User.find({ flags : { $size: {$gt: 0} } }, '-salt -password').sort({ 'flags.created' : -1 }).populate('user', 'displayName').exec(function (err, flagUsers) {
-    if (err) {
-      return res.status(400).send({
-        message: errorHandler.getErrorMessage(err)
-      });
-    }
-
-    res.json(flagUsers);
-  });
-};
-
-/**
  * User middleware
  */
 exports.userByID = function (req, res, next, id) {
