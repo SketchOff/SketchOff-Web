@@ -59,7 +59,7 @@
                         <small class="pull-right text-muted" ng-bind="message.created | date:'mediumTime'"></small>
                         <img ng-src="{{message.profileImageURL}}" alt="{{message.username}}" class="pull-left chat-profile-image" />
                         <div class="pull-left chat-message-details">
-                            <strong ng-bind="message.username"></strong>
+                            <a ui-sref="profile.view({profileId: message.username})" target="_blank"><strong ng-bind="message.username"></strong></a>
                             <br>
                             <span ng-bind="message.text"></span>
                         </div>
@@ -67,7 +67,7 @@
                     <div style="display: inline" ng-switch-when="status">
                         <small class="pull-right text-muted" ng-bind="message.created | date:'mediumTime'"></small>
                         <div class="pull-left chat-message-details">
-                            <strong ng-bind="message.username"></strong>
+                            <a ui-sref="profile.view({profileId: message.username})" target="_blank"><strong ng-bind="message.username"></strong></a>
                             <span ng-bind="message.text"></span>
                         </div>
                     </div>
