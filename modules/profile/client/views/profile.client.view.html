@@ -1,3 +1,8 @@
+<script>
+document.getElementById('delbutton').addEventListner('click', function(e) {
+    e.stopPropagation();
+});
+</script>
 <section ng-controller="ProfileController" ng-init="findOne()">
     <div ng-if="Profile.$resolved && (Profile.$promise.$$state.status == 1)">
         <div style="padding-bottom:100px; position:relative;" class="page-header">
@@ -6,24 +11,56 @@
             <small class="list-group-item-text">
             <span ng-bind="Profile._id"></span><br>
             <span ng-bind="Profile.username"></span>
-            <!-- <button ng-if="!Profile.same && !inFriendsList()" ng-click="sendFriendRequestFromProfile()" style="float:right;" type="button" class="btn btn-primary btn-sm">Send Friend Request</button> -->
+            <button ng-if="!Profile.isProfileUser && !inFriendsList()" ng-click="sendFriendRequestFromProfile()" style="float:right;" type="button" class="btn btn-primary btn-sm">Send Friend Request</button>
         </small>
         </div>
         <h1>Friends of <span ng-bind="Profile.displayName"></span></h1>
-        <div class="list-group">
-            <a ng-repeat="friend in Profile.friends" ui-sref="profile.view({profileId: friend._id})" class="list-group-item">
-            </a>
-            <div class="alert alert-warning text-center" ng-if="Profile.$resolved && Profile.friends.length === 0">
-                <span ng-bind="Profile.displayName"></span> has no friends.
+        <!--   <div class="container">
+  <div class="list-group">
+    <a href="#" class="list-group-item clearfix">
+      <span class="glyphicon glyphicon-file"></span>
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+      <span class="pull-right">
+        <button class="btn btn-xs btn-info">CCS</button>
+        <button class="btn btn-xs btn-warning">
+          <span class="glyphicon glyphicon-trash"></span>
+        </button>
+      </span>
+    </a>
+  </div>
+</div> -->
+        <div class="container">
+            <div class="list-group">
+                <a ng-repeat="friend in Profile.friends" class="list-group-item clearfix" ui-sref="profile.view({profileId: friend._id})">
+                    <span class="glyphicon glyphicon-user"></span>
+                    <span style="margin-left: 15px" class="list-group-item-heading">
+                    <span ng-bind="friend.username" style="font-size:16px;font-weight:600"></span>
+                    <span style="font-size:10px;color:#B3B3B3;margin-left:10px">
+                    <span ng-bind="friend.displayName"></span>
+                    </span>
+                    </span>
+                    <span class="pull-right">
+                        <button id="delbutton" class="btn btn-xs btn-danger" href="#">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </button>
+                    </span>
+                </a>
             </div>
         </div>
+        <div class="alert alert-warning text-center" ng-if="Profile.$resolved && Profile.friends.length === 0">
+            <span ng-bind="Profile.displayName"></span> has no friends.
+        </div>
         <hr>
-        <div ng-if="Profile.same">
+        <div ng-if="Profile.isProfileUser">
             <h1>Pending Friend Requests</h1>
             <div class="list-group">
-                <a ng-repeat="fr in Profile.pendingFriendRequests" ui-sref="profile.view({profileId:fr.requestedBy})" class="list-group-item"><span ng-bind="fr.requestedBy"></span></a><button ng-repeat="fr in Profile.pendingFriendRequests" style="float:right;" type="button" class="btn btn-primary btn-sm" ng-click="acceptFriendRequest({profileId:fr.requestedBy})">Accept</button>
-                <div class="alert alert-warning text-center" ng-if="Profile.$resolved &&  Profile.pendingFriendRequests.length === 0">
-                You have no friend requests at the moment.
+                <a ng-repeat="fr in Profile.pendingFriendRequests" ui-sref="profile.view({profileId:fr.requestedBy._id})" class="list-group-item">
+                    <span ng-bind="fr.requestedBy.displayName"></span>
+                    <button style="float:right;" type="button" class="btn btn-danger btn-sm" ng-click="rejectFriendRequest({profileId:fr.requestedBy._id})">Ignore</button>
+                    <button style="float:right;" type="button" class="btn btn-success btn-sm" ng-click="acceptFriendRequest({profileId:fr.requestedBy._id})">Accept</button>
+                </a>
+                <div class="alert alert-warning text-center" ng-if="Profile.$resolved && Profile.pendingFriendRequests.length === 0">
+                    You have no friend requests at the moment.
                 </div>
             </div>
         </div>
