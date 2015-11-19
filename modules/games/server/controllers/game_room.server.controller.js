@@ -168,7 +168,7 @@ export default class GameRoom {
         if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
         this.addMessage({
             type: 'status',
-            text: 'Is now connected',
+            text: 'is now connected',
             created: Date.now(),
             profileImageURL: player.request.user.profileImageURL,
             username: player.request.user.username

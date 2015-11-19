@@ -79,7 +79,7 @@ export class Establishing {
             GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
             this.GameRoom.addMessage({
                 type: 'status',
-                text: 'Is now connected',
+                text: 'is now connected',
                 created: Date.now(),
                 profileImageURL: player.request.user.profileImageURL,
                 username: player.request.user.username
