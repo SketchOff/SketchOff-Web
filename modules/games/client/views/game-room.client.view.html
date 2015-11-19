@@ -57,7 +57,8 @@
                 <div style="display:inline" ng-switch="message.type">
                     <div style="display:inline" ng-switch-default>
                         <small class="pull-right text-muted" ng-bind="message.created | date:'mediumTime'"></small>
-                        <img ng-src="{{message.profileImageURL}}" alt="{{message.username}}" class="pull-left chat-profile-image" />
+                        <a ui-sref="profile.view({profileId: message.username})" target="_blank">
+                            <img ng-src="{{message.profileImageURL}}" alt="{{message.username}}" class="pull-left chat-profile-image" /></a>
                         <div class="pull-left chat-message-details">
                             <a ui-sref="profile.view({profileId: message.username})" target="_blank"><strong ng-bind="message.username"></strong></a>
                             <br>
