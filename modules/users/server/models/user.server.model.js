@@ -113,10 +113,13 @@ var UserSchema = new Schema({
     type: Array,
     arrayType: 'friend_request'
   },
-  flags: [{
-    type: Schema.objectID,
-    ref: 'Flag'
-  }]
+  flags: {
+    type: Array,
+    arrayType: {
+    	type: Schema.ObjectId,
+    	ref: 'Flag'
+    }
+  }
 });
 
 /**

@@ -11,7 +11,7 @@ angular.module('users.admin.routes').config(['$stateProvider',
       })
       .state('admin.flags', {
         url: '/flags',
-        templateUrl: 'modules/users/client/views/admin/list-flags.client.view.html',
+        templateUrl: 'modules/users/client/views/admin/flag-users.client.view.html',
         controller: 'UserFlagsController'
       })
       .state('admin.user', {

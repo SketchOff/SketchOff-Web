@@ -11,7 +11,7 @@ angular.module('users.admin').controller('UserFlagsController', ['$scope', '$fil
       $scope.pagedItems = [];
       $scope.itemsPerPage = 15;
       $scope.currentPage = 1;
-      $scope.figureOutItemsToDisplay();
+      $scope.findFlaggedUsers();
     };
 
     $scope.findFlaggedUsers = function () {
@@ -25,7 +25,7 @@ angular.module('users.admin').controller('UserFlagsController', ['$scope', '$fil
     };
 
     $scope.pageChangedFlags = function () {
-      $scope.figureOutItemsToDisplay();
+      $scope.findFlaggedUsers();
     };
   }
 ]);
