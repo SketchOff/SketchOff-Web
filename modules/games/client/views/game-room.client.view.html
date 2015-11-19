@@ -39,27 +39,29 @@
     <div class="page-header">
         <h1>Chat</h1>
     </div>
-    <!-- The message form -->
-    <form class="col-xs-12 col-md-offset-4 col-md-4" ng-submit="sendMessage();">
-        <fieldset class="row">
-            <div class="input-group">
-                <input type="text" id="messageText" name="messageText" class="form-control" ng-model="messageText" placeholder="Enter new message">
-                <span class="input-group-btn">
+    <div class="message-container">
+        <!-- The message form -->
+        <form class="col-xs-12 col-md-offset-4 col-md-4" ng-submit="sendMessage();">
+            <fieldset class="row">
+                <div class="input-group">
+                    <input type="text" id="messageText" name="messageText" class="form-control" ng-model="messageText" placeholder="Enter new message">
+                    <span class="input-group-btn">
           <button type="submit" class="btn btn-primary" ng-disabled="!messageText.length">Submit</button>
         </span>
-            </div>
-        </fieldset>
-    </form>
-    <ul class="list-unstyled">
-        <!-- List all messages -->
-        <li class="col-xs-12 col-md-offset-4 col-md-4 chat-message" ng-repeat="message in GameRoom.chat_messages">
-            <small class="pull-right text-muted" ng-bind="message.created | date:'mediumTime'"></small>
-            <img ng-src="{{message.profileImageURL}}" alt="{{message.username}}" class="pull-left chat-profile-image" />
-            <div class="pull-left chat-message-details">
-                <strong ng-bind="message.username"></strong>
-                <br>
-                <span ng-bind="message.text"></span>
-            </div>
-        </li>
-    </ul>
+                </div>
+            </fieldset>
+        </form>
+        <ul class="list-unstyled" style="display: inline-block; height: 200px; overflow-y: auto">
+            <!-- List all messages -->
+            <li class="col-xs-12 col-md-offset-4 col-md-4 chat-message" ng-repeat="message in GameRoom.chat_messages">
+                <small class="pull-right text-muted" ng-bind="message.created | date:'mediumTime'"></small>
+                <img ng-src="{{message.profileImageURL}}" alt="{{message.username}}" class="pull-left chat-profile-image" />
+                <div class="pull-left chat-message-details">
+                    <strong ng-bind="message.username"></strong>
+                    <br>
+                    <span ng-bind="message.text"></span>
+                </div>
+            </li>
+        </ul>
+    </div>
 </section>

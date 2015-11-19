@@ -498,7 +498,7 @@ export default class GameRoom {
 
     addMessage(msg) {
         this.chat_messages.unshift(msg);
-        if (this.getChatMessages().length > 5) this.chat_messages.pop();
+        if (this.getChatMessages().length >= 20) this.chat_messages.pop();
         getIO().to(this.getRoomID()).emit('receiving chat messages', this.getChatMessages());
         console.log('adding message', msg);
     }
