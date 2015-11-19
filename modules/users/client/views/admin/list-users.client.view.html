@@ -8,6 +8,22 @@
         <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="figureOutItemsToDisplay()" />
       </div>
     </div>
+    <div class="row">
+      <div class="col-md-4 checkbox">
+	<label><input type="checkbox" value="">Show Flagged Users Only</label>
+      </div>
+      <div class="col-md-4 form-group">
+	Sort Users by: 
+	<select>
+	  <option>Username</option>
+	  <option>First Name</option>
+	  <option>Last Name</option>
+	  <option>Date Created</option>
+	  <option>Number of Flags</option>
+	  <option>Most Recent Flags</option>
+	</select>
+      </div>
+    </div>
   </div>
   <div class="list-group">
     <a ng-repeat="user in pagedItems" ui-sref="admin.user({userId: user._id})" class="list-group-item">
