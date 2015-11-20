@@ -28,7 +28,7 @@ angular.module('games')
 
     	// On recieved S2P_pDiff, display the canvas wrt to id
     	Socket.on('CLIENT_S2P_pDiff', function(data) {
-    		console.log('client_s2p_pdiff received');
+    		// console.log('client_s2p_pdiff received');
         judgepDiff(data);
     	});
 

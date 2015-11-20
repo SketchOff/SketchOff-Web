@@ -235,6 +235,10 @@ angular.module('games')
       	socketSendMessage();
       }
 
+      Socket.on('ENDING', function() {
+        socketSendSync();
+      });
+
      	////////////////////////
     	// START DOWN TOOLS   //
     	////////////////////////

@@ -11,7 +11,9 @@ var path = require('path'),
     mongoose = require('mongoose'),
     Game = mongoose.model('Game'),
     User = mongoose.model('User'),
-    errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+    errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
+    fs = require('fs'),
+    mkdirp = require('mkdirp');
 
 // Default game properties
 export var min_players = 2;
@@ -89,7 +91,7 @@ export default class GameRoom {
 
     // Emits _data_ to everyone
     emitToEveryone(type, data) {
-        console.log('emitting data to everyone');
+        // console.log('emitting data to everyone');
         this.players.forEach(function (player) {
             player.emit(type, data);
         });
@@ -97,7 +99,7 @@ export default class GameRoom {
 
     // Emits _data_ to player_id (Authentication.user._uid)
     emitToPlayer(type, player_id, data) {
-        console.log('emitting data to specific player ' + player_id);
+        // console.log('emitting data to specific player ' + player_id);
         this.players.forEach(function (player) {
             if(player.request.user._uid === player_id) {
                 player.emit(type, data);
@@ -107,7 +109,7 @@ export default class GameRoom {
 
     // Emits _data_ to everyone except player_id (Authentication.user._uid)
     emitToEveryoneExcept(type, player_id, data) {
-        console.log('emitting data to everyone except ' + player_id);
+        // console.log('emitting data to everyone except ' + player_id);
         this.players.forEach(function (player) {
             if(player.request.user._uid !== player_id) {
                 player.emit(type, data);
@@ -423,5 +425,23 @@ export default class GameRoom {
                 } else that.setState(NextState);
             }
         }, 1000);
+    }
+
+    saveImage(round_id, player_id, data) {
+        var path = './modules/games/client/users/uploads/' + round_id + '/';
+        var fname = player_id + '.png';
+        mkdirp(path, function(err) {
+            if(err) {
+                throw err;
+            }
+            else {
+                fs.writeFile(path+fname, data, function(err) {
+                    if(err) {
+                        throw err;
+                    }
+                    console.log('Wrote image to ' + path);
+                });
+            }
+        });
     }
 }
