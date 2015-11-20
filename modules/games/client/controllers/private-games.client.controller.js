@@ -16,10 +16,6 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
 		}
 	});
 
-	window.onbeforeunload = function () {
-   	 return "Are you sure";
-	};
-
         var getLobbyInfo = function() {
             Socket.emit('get lobby info');
             console.log('game info emitted');
@@ -50,10 +46,19 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
             });
         };
 
+	Socket.on('get kicked', function(){
+	     Socket.emit('leave room');
+	     $state.go('home');
+	});
+
     $scope.leaveGame = function() {
             Socket.emit('leave room');
             $state.go('home');
         };
+
+	$scope.kick = function(playerUserName) {
+	  Socket.emit('kick player', playerUserName);
+	};
 
 	$scope.startGame = function() {
 	    if($scope.GameRoom.players.length >= $scope.GameRoom.min_players){

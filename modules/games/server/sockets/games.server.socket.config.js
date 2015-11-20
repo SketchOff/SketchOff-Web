@@ -146,6 +146,17 @@
          }
      });
 
+     socket.on('kick player', function(playerUserName){
+	var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
+	var arrayLength = GameRoom.players.length;
+		for (var i = 0; i < arrayLength; i++) {
+			console.log(GameRoom.players[i].request.user.username);
+    			if (GameRoom.players[i].request.user.username === playerUserName){
+				GameRoom.players[i].emit('get kicked');
+			}
+		}
+     });
+
      socket.on('leave queue', function() {
          console.log(socket.request.user.username, 'has left the queue');
          q.removePlayer(socket.request.user.username);
@@ -163,7 +174,6 @@
 
      socket.on('disconnect', function() {
          var GameRoom;
-
          if (socket.request.user.username) {
              console.log(socket.request.user.username, 'has disconnected');
              var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);

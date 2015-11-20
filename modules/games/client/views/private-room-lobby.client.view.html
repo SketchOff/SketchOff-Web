@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html>
 <style>
+body { 
+  width: 600px; 
+  margin: 0 auto; 
+}
 table, th , td  {
   border: 1px solid grey;
   border-collapse: collapse;
@@ -31,6 +35,7 @@ table tr:nth-child(even) {
 
   <tr ng-repeat="player in GameRoom.players">
     <td>{{ player }} </td>
+    <td><a ng-if="authentication.user.username === GameRoom.lobbyLeader" class="btn btn-primary btn-lg" href="" ng-click="kick(player)">Kick</a></td>
   </tr>
 </table>
   <h4 ng-if="authentication.user.username === GameRoom.lobbyLeader">Warning, Do not start the game with only one player in the lobby</h4>
