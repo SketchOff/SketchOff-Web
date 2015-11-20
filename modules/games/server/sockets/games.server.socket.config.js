@@ -137,6 +137,7 @@
 
              var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
              ConnectedPlayer.in_game = false;
+	     console.log(ConnectedPlayer.in_game);
              GameRoomManager.ConnectedPlayers.set(socket.request.user.username, ConnectedPlayer);
              if(GameRoom && !GameRoom.isPublic()){
                 GameRoom.setLobbyLeader();

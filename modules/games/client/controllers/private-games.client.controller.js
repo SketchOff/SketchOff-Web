@@ -10,6 +10,15 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
 	$scope.Test = {};
 	$scope.Test.players = ['Player 1', 'Player A', 'Player !'];
 
+	$scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
+		if (fromState.name === 'games.private-lobby'){
+			Socket.emit('leave room'); 
+		}
+	});
+
+	window.onbeforeunload = function () {
+   	 return "Are you sure";
+	};
 
         var getLobbyInfo = function() {
             Socket.emit('get lobby info');
