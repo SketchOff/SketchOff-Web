@@ -188,6 +188,18 @@ angular.module('games')
         scope.clientImageStates.rStates = [];
       }
 
+      // Allow drawing state
+      Socket.on('DRAWING', function() {
+        canDraw = true;
+        canvas.style.border = '1px solid black';
+      });
+
+      // Disallow drawing state
+      Socket.on('SELECTING_WINNER', function() {
+        canDraw = false;
+        canvas.style.border = '1px solid red';
+      });
+
       function flushSocketQueueData() {
       	socketQueue = [];
       }
