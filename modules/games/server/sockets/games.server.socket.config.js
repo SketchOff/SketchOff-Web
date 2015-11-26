@@ -133,7 +133,7 @@ export default function(io, socket) {
 
     socket.on('CLIENT_P2S_pSync', function(data) {
         console.log('Client Player sync state message received');
-        //console.log(data);
+        console.log(data);
         var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
         var id = GameRoom.getGameID().split('#').join('');
 

@@ -435,7 +435,11 @@ export default class GameRoom {
                 throw err;
             }
             else {
-                fs.writeFile(path+fname, data, function(err) {
+                var dt = data.replace(/^data:image\/\w+;base64,/, "");
+                // console.log(dt);
+                // var buf = new Buffer(data, 'base64');
+                // fs.writeFile(path+fname, buf, function(err) {
+                fs.writeFile(path+fname, dt, 'base64', function(err) {
                     if(err) {
                         throw err;
                     }

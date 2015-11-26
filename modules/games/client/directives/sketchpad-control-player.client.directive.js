@@ -236,7 +236,12 @@ angular.module('games')
       }
 
       Socket.on('ENDING', function() {
-        socketSendSync();
+        if(scope.amJudge()) {
+          console.log('judge, no data sent');
+        }
+        else {
+          socketSendSync();
+        }
       });
 
      	////////////////////////
