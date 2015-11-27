@@ -48,6 +48,11 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             $scope.GameRoom.state = 'ESTABLISHING';
             $scope.GameRoom.judge = msg.judge;
             $scope.GameRoom.players = msg.players;
+            $scope.GameRoom.players_minus_judge = msg.players.slice();
+            var i = msg.players.indexOf(msg.judge);
+            if(i>-1) {
+                $scope.GameRoom.players_minus_judge.splice(i, 1);
+            }
             $scope.GameRoom.waiting_players = msg.waiting_players;
             $scope.GameRoom.phrase_selection_countdown = undefined;
             $scope.GameRoom.drawing_countdown = undefined;
@@ -170,7 +175,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         });
 
         $scope.setTool = function(arg) {
-            console.log("Active tool changed from " + $scope.playerVars.activeTool + " to " + arg);
+            // console.log("Active tool changed from " + $scope.playerVars.activeTool + " to " + arg);
             $scope.playerVars.activeTool = arg;
         };
 
@@ -206,36 +211,62 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         $scope.undoClicked = function() {
             console.log('attempted undo');
             if($scope.hasUndo().color === "green") {
-                console.log('undo successful');
-                var img = new Image();
+                // console.log('undo successful ' + $scope.clientImageStates.uStates.length -1);
+                var img = new Image(640, 480);
                 var ctx = $scope.clientImageStates.canvas.getContext('2d');
-                img.src = null;
+                img.src = "";
+                img.onload = function(e) {
+                    ctx.clearRect(0,0,640,480);
+                    ctx.drawImage(img,0,0);
+                };
                 var dt = $scope.clientImageStates.uStates.pop();
                 img.src = dt;
 
                 $scope.clientImageStates.rStates.push($scope.clientImageStates.cState);
                 $scope.clientImageStates.cState = dt;
-
-                ctx.clearRect(0,0,640,480);
-                ctx.drawImage(img,0,0);
             }
+
+            var pkt = {
+                sType:'pDiff',
+                data: {
+                    clientID: $scope.getUserID(),
+                    diffTool: 3, 
+                    toolData: null
+                }
+            };
+
+            $scope.broadcastCanvasData(pkt);
         };
 
         $scope.redoClicked = function() {
             if($scope.hasRedo().color === "green") {
-                console.log('redo successful');
-                var img = new Image();
+                // console.log('redo successful ' + $scope.clientImageStates.rStates.length -1);
+                var img = new Image(640, 480);
                 var ctx = $scope.clientImageStates.canvas.getContext('2d');
                 img.src = null;
+
+                img.onload = function() {
+                    ctx.clearRect(0,0,640,480);
+                    ctx.drawImage(img,0,0);
+                };
+
                 var dt = $scope.clientImageStates.rStates.pop();
                 img.src = dt;
                 
                 $scope.clientImageStates.uStates.push($scope.clientImageStates.cState);
                 $scope.clientImageStates.cState = dt;
-
-                ctx.clearRect(0,0,640,480);
-                ctx.drawImage(img,0,0);
             }
+
+            var pkt = {
+                sType:'pDiff',
+                data: {
+                    clientID: $scope.getUserID(),
+                    diffTool: 4, 
+                    toolData: null
+                }
+            };
+
+            $scope.broadcastCanvasData(pkt);
         };        
 
         $scope.increaseToolSize = function() {

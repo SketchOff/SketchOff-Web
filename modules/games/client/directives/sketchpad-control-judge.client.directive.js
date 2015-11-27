@@ -8,6 +8,7 @@ angular.module('games')
       var playersArray = [];
       // console.log(element);
 
+      /*
       for(var i=0; i<scope.getNumPlayers(); i++) {
         if(scope.getNumPlayers() > 1) {
           alert("yeah unimplemented");
@@ -23,19 +24,45 @@ angular.module('games')
           );
         }
       }
+      */
 
-      console.log(playersArray);
+      var canvas = element[0];
+      var ctx = canvas.getContext('2d');
+      var my_cid = element[0].innerHTML;
+
+      var uStates = [];
+      var cState = null;
+      var rStates = [];
+      var MAX_UNDO_STATES = 10;
+
+      // console.log(playersArray);
+
+      Socket.on('ESTABLISHING', function() {
+        my_cid = element[0].innerHTML;
+      });
 
     	// On recieved S2P_pDiff, display the canvas wrt to id
     	Socket.on('CLIENT_S2P_pDiff', function(data) {
-    		console.log('client_s2p_pdiff received');
-        judgepDiff(data);
+    		// console.log('client_s2p_pdiff received');
+        // console.log(element[0]);
+        // console.log(data.clientID, my_cid);
+        if(data.clientID === element[0].innerHTML) {
+          judgepDiff(data);
+        }
     	});
 
     	Socket.on('CLIENT_S2P_pSync', function(data) {
     		console.log('client_s2p_psync received');
+        if(data.clientID === element[0].innerHTML) {
 
-          // TODO: implement
+          var ctx = getContextFromID(data.clientID);
+          var img = new Image();
+          img.src = null;
+          img.src = data.imageData;
+
+          ctx.clearRect(0,0,640,480);
+          ctx.drawImage(img,0,0);
+        }
       });
 
       function getContextFromID(id) {
@@ -51,24 +78,52 @@ angular.module('games')
       }
 
     	function judgepDiff(data) {
-        console.log(data);
-        var ctx = getContextFromID(data.clientID);
-
+        // console.log(data);
       	switch(data.diffTool) {
       		case 0:
+            savePrevState();
       		  judgeDiffToolDot(data.toolData, ctx);
+            pushUndoState();
       		  break;
       		case 1: 
+            savePrevState();
       			judgeDiffToolLine(data.toolData, ctx);
+            pushUndoState();
       			break;
           case 2:
+            savePrevState();
             judgeDiffToolEraser(data.toolData, ctx);
+            pushUndoState();
+            break;
+          case 3:
+            judgeDiffToolUndo(data.toolData, ctx);
+            break;
+          case 4:
+            judgeDiffToolRedo(data.toolData, ctx);
             break;
       		default:
       			console.log('ERROR UNKNOWN TOOL ' + data.diffTool);
       			break;
-      		}
       	}
+      }
+
+      function savePrevState() {
+        var dt = canvas.toDataURL('image/png');
+        if(uStates.length < MAX_UNDO_STATES) {
+          uStates.push(dt);
+        }
+        else {
+          console.log('had to shift');
+          uStates.shift();
+          uStates.push(dt);
+        }
+      }
+
+      function pushUndoState() {
+        var dt = canvas.toDataURL('image/png');
+        cState = dt;
+        rStates = [];
+      }
 
       function judgeDiffToolDot(toolData, ctx) {
     		var cx, cy, lx, ly, color, thick;
@@ -161,6 +216,40 @@ angular.module('games')
               ctx.clearRect(lx-thick+i, ly-thick+i*slope, thick*2, thick*2);
             }
           }
+        }
+      }
+
+      function judgeDiffToolUndo(toolData, ctx) {
+        if(uStates.length > 0) {
+          var img = new Image(640, 480);
+          img.src = "";
+          img.onload = function() {
+            ctx.clearRect(0,0,640,480);
+            ctx.drawImage(img,0,0);
+          };
+          var dt = uStates.pop();
+          img.src = dt;
+
+          rStates.push(cState);
+          cState = dt;
+        }
+      }
+
+      function judgeDiffToolRedo(toolData, ctx) {
+        // console.log(rStates);
+        if(rStates.length > 0) {
+          // console.log('redo successful');
+          var img = new Image(640, 480);
+          img.src = "";
+          img.onload = function() {
+            ctx.clearRect(0,0,640,480);
+            ctx.drawImage(img,0,0);
+          };
+          var dt = rStates.pop();
+          img.src = dt;
+          
+          uStates.push(cState);
+          cState = dt;
         }
       }
 

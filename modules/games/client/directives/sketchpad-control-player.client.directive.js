@@ -50,10 +50,9 @@ angular.module('games')
 
       // On mousedown, gather all information that would be relevant for any kind of tool used.
       element.bind('mousedown', function(event){
-        savePrevState();
 
         // console.log(event);
-      	canDraw = !scope.amJudge();
+      	// canDraw = !scope.amJudge();
 
       	anchorX = event.clientX-xoffset;
       	anchorY = event.offsetY;
@@ -69,7 +68,7 @@ angular.module('games')
         }
 
       	if(canDraw) {
-
+          savePrevState();
 	        // Switch behavior based on active tool
 	        // Determine correct socket data format (with socketPopulateDown) now.
 	        switch(scope.playerVars.activeTool) {
@@ -121,8 +120,8 @@ angular.module('games')
           	  console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +scope.playerVars.activeTool);
           }
         }
-      lastX = event.clientX-xoffset;
-      lastY = event.offsetY;
+        lastX = event.clientX-xoffset;
+        lastY = event.offsetY;
       });
 
       element.bind('mouseup', function(event){
@@ -180,18 +179,22 @@ angular.module('games')
         }
       }
 
-      // Writes an imagestate to the BACK of the array.
-      // If more than 10 states, pop last one off to make space
       function writeUndoState() {
         var dt = canvas.toDataURL('image/png');
         scope.clientImageStates.cState = dt;
         scope.clientImageStates.rStates = [];
       }
 
+      Socket.on('ESTABLISHING', function() {
+        ctx.clearRect(0,0,640,480);
+      });
+
       // Allow drawing state
       Socket.on('DRAWING', function() {
+        ctx.clearRect(0,0,640,480);
         canDraw = true;
         canvas.style.border = '1px solid black';
+        scope.clientImageStates.uStates = [];
       });
 
       // Disallow drawing state

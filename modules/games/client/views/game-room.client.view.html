@@ -50,6 +50,11 @@
         </div>
     </div>
 
+    <div ng-if="authentication.user.username === GameRoom.judge">
+        <canvas width="640" height="480" class="jsketchpad" ng-repeat="player in GameRoom.players_minus_judge" drawing-judge>{{player}}</canvas>
+    </div>
+
+    <!--
     <div ng-if="authentication.user.username === GameRoom.judge" drawing-judge>
         <table>
             <tr>
@@ -81,6 +86,7 @@
                 </td>
             </tr>
         </table>
+        -->
     </div>
 
     <div ng-if="true" drawing-end>
