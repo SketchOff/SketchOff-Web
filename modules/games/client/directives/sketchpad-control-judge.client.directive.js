@@ -26,9 +26,9 @@ angular.module('games')
       }
       */
 
-      var canvas = element[0];
+      var canvas = element.children()[1];
       var ctx = canvas.getContext('2d');
-      var my_cid = element[0].innerHTML;
+      var my_cid = element.children()[1].innerHTML;
 
       var uStates = [];
       var cState = null;
@@ -38,7 +38,8 @@ angular.module('games')
       // console.log(playersArray);
 
       Socket.on('ESTABLISHING', function() {
-        my_cid = element[0].innerHTML;
+        my_cid = element.children()[1].innerHTML;
+        ctx.clearRect(0,0,640,480);
       });
 
     	// On recieved S2P_pDiff, display the canvas wrt to id
@@ -46,22 +47,21 @@ angular.module('games')
     		// console.log('client_s2p_pdiff received');
         // console.log(element[0]);
         // console.log(data.clientID, my_cid);
-        if(data.clientID === element[0].innerHTML) {
+        if(data.clientID === element.children()[1].innerHTML) {
           judgepDiff(data);
         }
     	});
 
     	Socket.on('CLIENT_S2P_pSync', function(data) {
-    		console.log('client_s2p_psync received');
-        if(data.clientID === element[0].innerHTML) {
-
-          var ctx = getContextFromID(data.clientID);
+    		console.log('judge client_s2p_psync received');
+        if(data.clientID === element.children()[1].innerHTML) {
           var img = new Image();
           img.src = null;
+          img.onload = function() {
+            ctx.clearRect(0,0,640,480);
+            ctx.drawImage(img,0,0);
+          };
           img.src = data.imageData;
-
-          ctx.clearRect(0,0,640,480);
-          ctx.drawImage(img,0,0);
         }
       });
 

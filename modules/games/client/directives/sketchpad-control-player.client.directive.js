@@ -201,6 +201,7 @@ angular.module('games')
       Socket.on('SELECTING_WINNER', function() {
         canDraw = false;
         canvas.style.border = '1px solid red';
+        socketSendSync();
       });
 
       function flushSocketQueueData() {

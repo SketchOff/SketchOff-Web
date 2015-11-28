@@ -28,6 +28,14 @@
 	padding: 10px;
 }
 
+.pssketchpad{
+	width: 480px;
+	height: 360px;
+	border: 1px solid blue; 
+	background-color: #FFFFFF;
+	padding: 10px
+}
+
 .tempOverlay{
 	position: absolute;
 	z-index: 1;

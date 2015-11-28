@@ -53,6 +53,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             if(i>-1) {
                 $scope.GameRoom.players_minus_judge.splice(i, 1);
             }
+            $scope.GameRoom.players_minus_judge = $scope.GameRoom.players_minus_judge;
             $scope.GameRoom.waiting_players = msg.waiting_players;
             $scope.GameRoom.phrase_selection_countdown = undefined;
             $scope.GameRoom.drawing_countdown = undefined;
