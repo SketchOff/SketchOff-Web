@@ -3,6 +3,7 @@ document.getElementById('delbutton').addEventListner('click', function(e) {
     e.stopPropagation();
 });
 </script>
+
 <section ng-controller="ProfileController" ng-init="findOne()">
     <div ng-if="Profile.$resolved && (Profile.$promise.$$state.status == 1)">
         <div style="padding-bottom:100px; position:relative;" class="page-header">
@@ -11,7 +12,11 @@ document.getElementById('delbutton').addEventListner('click', function(e) {
             <small class="list-group-item-text">
             <span ng-bind="Profile._id"></span><br>
             <span ng-bind="Profile.username"></span>
-            <button ng-if="!Profile.isProfileUser && !inFriendsList()" ng-click="sendFriendRequestFromProfile()" style="float:right;" type="button" class="btn btn-primary btn-sm">Send Friend Request</button>
+            <div ng-switch on="friendReqButton">
+            <button ng-if="!Profile.isProfileUser && !inFriendsList()" ng-click="sendFriendRequestFromProfile()" style="float:right;" type="button" class="btn btn-primary btn-sm animate-switch" ng-switch-default>Send Friend Request</button>
+            <button ng-click="" style="float:right;" type="button" class="btn btn-success btn-sm animate-switch" ng-switch-when="sent" disabled>Friend Request Sent!</button>
+            <button ng-click="" style="float:right;" type="button" class="btn btn-warning btn-sm animate-switch" ng-switch-when="waiting" disabled>Already Sent Request!</button>
+            </div>
         </small>
         </div>
         <h1>Friends of <span ng-bind="Profile.displayName"></span></h1>
@@ -39,7 +44,7 @@ document.getElementById('delbutton').addEventListner('click', function(e) {
                     <span ng-bind="friend.displayName"></span>
                     </span>
                     </span>
-                    <span class="pull-right">
+                    <span ng-if="Profile.isProfileUser" class="pull-right">
                         <button id="delbutton" class="btn btn-xs btn-danger" href="#">
                             <span class="glyphicon glyphicon-trash"></span>
                         </button>

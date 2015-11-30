@@ -2,13 +2,17 @@
 
 import * as prof from '../controllers/profile.server.controller';
 
+
 // Create the game socket.io configuration
 export default function(io, socket) {
 
     socket.on('send friend request', function(profileId) {
-        prof.friendRequest(String(profileId), String(socket.request.user._id));
+        prof.friendRequest(String(profileId), String(socket.request.user._id), io);
     });
 
+    socket.on('init profile page', function(profileId) {
+        prof.initProfile(String(profileId), String(socket.request.user._id), io);
+    });
 /*
     socket.on('get player name', function(profileId) {
     	prof.getDisplayUser(profileId, function(displayName, userName) {

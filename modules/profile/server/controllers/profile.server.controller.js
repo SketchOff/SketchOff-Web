@@ -3,13 +3,14 @@
 /**
  * Module dependencies.
  */
+
 var path = require('path'),
   mongoose = require('mongoose'),
   User = mongoose.model('User'),
   friend_request = mongoose.model('friend_request'),
   // Article = mongoose.model('Article'),
-  errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
-
+  errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
+  GameRoomManager = require(path.resolve('./modules/games/server/controllers/game_room_manager.server.controller'));
 
 
 
@@ -102,7 +103,14 @@ export function createFriends(profileId, userId) {
 }
 
 export function isUserPendingFriendRequest(selectedUserId, fromUserId, callback) {
-  var profile = User.findOne( { '_id': selectedUserId});
+  var profile;
+  //check if ID coming in is of type ObjectId or username
+  if (selectedUserId.match(/^[0-9a-fA-F]{24}$/)) {
+    profile = User.findOne( { '_id': selectedUserId});
+  } else {
+    profile = User.findOne( {'username': selectedUserId});
+  }
+  
   profile.select('pendingFriendRequests');
   profile.exec(function(err,p) {
     if (err) { console.log('isUserPendingFriendRequest(): exec of finding profile ID failed.', err); return false; }
@@ -154,8 +162,25 @@ export function getDisplayName(profileId, callback) {
 }
 */
 
+export function initProfile(toProfileId, fromUserId, io) {
+  console.log(toProfileId);
+  console.log(fromUserId);
+  if (toProfileId && fromUserId) {
+  isUserPendingFriendRequest(toProfileId, fromUserId, function(foundinPendingRequests) {
+    if (foundinPendingRequests) {
+      console.log('Already sent friend request');
+      getDisplayUserName(fromUserId, function(display, username) {
+        var currentuser = GameRoomManager.ConnectedPlayers.get(username);
+        console.log(currentuser);
+        io.to(currentuser.socket_id).emit('return friend request pending', 'alreadysent');
+      });
+      return;
+    }
+});
+}
+}
 
-export function friendRequest(toProfileId, fromUserId) {
+export function friendRequest(toProfileId, fromUserId, io) {
 
   // profile/userid scanning
   // if (profileId === fromUserId) {
@@ -171,6 +196,11 @@ export function friendRequest(toProfileId, fromUserId) {
   isUserPendingFriendRequest(toProfileId, fromUserId, function(foundinPendingRequests) {
     if (foundinPendingRequests) {
       console.log('Already sent friend request');
+      getDisplayUserName(fromUserId, function(display, username) {
+                var currentuser = GameRoomManager.ConnectedPlayers.get(username);
+                console.log(currentuser);
+                io.to(currentuser.socket_id).emit('return friend request pending', 'alreadysent');
+              });
       return;
     } else {
       console.log('3');
@@ -182,8 +212,17 @@ export function friendRequest(toProfileId, fromUserId) {
         } else {
           console.log('5');
           createFriendRequest(toProfileId, fromUserId, function(success) {
-            if (success) console.log('Friend request submitted');
-            else console.log('Friend request failed');
+            if (success) {
+              console.log('Friend request submitted');
+              getDisplayUserName(fromUserId, function(display, username) {
+                var currentuser = GameRoomManager.ConnectedPlayers.get(username);
+                console.log(currentuser);
+
+                io.to(currentuser.socket_id).emit('return friend request pending', 'success');
+              });
+            } else {
+              console.log('Friend request failed');
+            }
           });
         }
       });
