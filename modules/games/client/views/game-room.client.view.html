@@ -50,7 +50,7 @@
             </div>
         </div>
 
-        <div ng-show="authentication.user.username !== GameRoom.judge && GameRoom.state === 'SELECTING_WINNER'">
+        <div ng-show="!(authentication.user.username === GameRoom.judge) && GameRoom.state === 'SELECTING_WINNER'">
             <div ng-repeat="player in GameRoom.players_minus_judge" drawing-sp>
                 <h3>{{player}}</h3>
                 <canvas width="640" height="480" class="pssketchpad">{{player}}</canvas>
