@@ -23,17 +23,23 @@ export default function(io, socket) {
 
 */
 
-    socket.on('reject friend request', function(requesterId) {
-        if (requesterId.profileId)
-            prof.deleteFriendRequest(String(requesterId.profileId), String(socket.request.user._id), io);
+    socket.on('delete friend', function(friend) {
+        //do checks?
+        console.log("received socket call: delete friend. friend: " + friend.profileId);
+        prof.deleteFriendship(String(friend.profileId), String(socket.request.user._id), io);
+    });
+
+    socket.on('reject friend request', function(pendingFriend) {
+        if (pendingFriend.profileId)
+            prof.deleteFriendRequest(String(pendingFriend.profileId), String(socket.request.user._id), io);
         else
             console.log('profile id not found');
     });
 
-    socket.on('accept friend request', function(requesterId) {
+    socket.on('accept friend request', function(pendingFriend) {
     	//check if requesterId is in socket.profile.pendingfriendrequests?
-    	if (requesterId.profileId)
-    		prof.createFriends(String(requesterId.profileId), String(socket.request.user._id));
+    	if (pendingFriend.profileId)
+    		prof.createFriendship(String(pendingFriend.profileId), String(socket.request.user._id));
     	else
     		console.log('profile id not found');
     	//console.log(String(requesterId.profileId), String(socket.request.user._id));

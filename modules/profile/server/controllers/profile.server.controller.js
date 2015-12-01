@@ -25,27 +25,89 @@ exports.read = function (req, res) {
 //   console.log("FRIEND REQUEST CALLED");
 // };
 
+export function deleteFriendship(profileId, userId, io) {
+  isUserFriend(userId, profileId, function (userIsFriendOfProfile) {
+    if (userIsFriendOfProfile) {
+      console.log('delete friendship accessed2');
+      var frUser = new User({'_id': userId});
+      var frProfile = new User({'_id': profileId});
+      var conFindUser = { '_id': frUser._id },
+          conFindProfile = { '_id': frProfile._id },
+          removeFriendProfile = { $pull: {'friends': frProfile._id}},
+          removeFriendUser = { $pull: {'friends': frUser._id}},
+          options = {};
+
+
+          //these can be consolidated into one or two mongoose calls.
+      User.update(conFindUser, removeFriendProfile, options, function(err, numAffected) {
+        if (err) { console.log('deleteFriendship():update db for removeFriendProfile broke.', err); return false;}
+        console.log(numAffected);
+      });
+
+      User.update(conFindProfile, removeFriendUser, options, function(err, numAffected) {
+        if (err) { console.log('createFriendship():update db for addUserAsFriend broke.', err); return false;}
+        console.log(numAffected);
+      });
+    }
+  });
+}
 export function userExists() {} // not sure if I want to use this.
 
 export function deleteFriendRequest(profileIdPending, userId, io) {
 
-  User.update({'_id': userId}, {$pull: {'pendingFriendRequests': { 'requestedBy': profileIdPending}}}, {multi:false}, function(err, numAffected) {
+  var frProfile = new User( {'_id': profileIdPending});
+  User.update({'_id': userId}, {$pull: {'pendingFriendRequests': { 'requestedBy': frProfile._id}}}, {}, function(err, numAffected) {
     if (err) { console.log('deleteFriendRequest():update db for addProfileAsFriend broke.', err); return false;}
     console.log(numAffected);
   });
   var user = User.findOne({'_id': userId});
   user.update('pendingFriendRequests');
-  getDisplayUserName(userId, function(display, username) {
-    var currentuser = GameRoomManager.ConnectedPlayers.get(username);
-    console.log(currentuser);
-    io.to(currentuser.socket_id).emit('return delete friend request', profileIdPending);
-  });
+  emitToUserId('return delete friend request', profileIdPending, userId, io);
 
 }
 
-export function emitToUserId(msg, userId, io) {}
-export function emitToUsername(msg, userId, io) {}
+export function emitToUserId(msg, data, userId, io) {
+  getDisplayUserName(userId, function(displayname, username) {
+    if (username) {
+      console.log(username);
+      emitToUsername(msg, data, username, io);
+    } else {
+      console.log("emitToUserId(): Error for username supplied: no username found/supplied");
+    }
+  });
+}
+export function emitToUsername(msg, data, username, io) {
+  if (username) {
+    var currentuser = GameRoomManager.ConnectedPlayers.get(username);
+    if (currentuser) io.to(currentuser.socket_id).emit(msg, data);
+    else console.log("emitToUsername(): Error finding socket for user: "+username);
+  } else console.log("emitToUsername(): Error for username supplied: no username supplied");
+  
+}
+
+//  Checks if userId is a friend with profileId.
+//  true to callback if so, else false to callback
 export function isUserFriend(profileId, userId, callback) {
+
+  /*User.findById(userId).populate({path: 'friends', select: '_id username'})
+
+  var query = User.findById(id);
+
+  var profileSameAsUser = false;
+  var userFieldsToPopulate = '_id displayName username profileImageURL firstName lastName email friends created provider';
+
+  if (String(req.user._id) === id) {
+    userFieldsToPopulate += ' pendingFriendRequests roles';
+    profileSameAsUser = true;
+  }
+
+  query.select(userFieldsToPopulate);
+  query.populate({
+    path:'friends',
+    select: '_id username displayName'
+  });
+User.findOne({'_id': userId});
+*/
 
   var user = User.findOne( { '_id': userId });
   user.select('friends');
@@ -54,8 +116,9 @@ export function isUserFriend(profileId, userId, callback) {
     if (u.friends.length === 0) {
       callback(false);
     }
+    console.log(u.friends);
     for (var i = 0, len = u.friends.length; i < len; i++) {
-      if (String(u.friends[i]._id) === profileId) {
+      if (String(u.friends[i]) === profileId) {
         callback(true);
       } else if (i === len-1) {
         callback(false);
@@ -74,10 +137,12 @@ export function isUserFriend(profileId, userId, callback) {
 
 }
 
-export function createFriends(profileId, userId) {
+
+export function createFriendship(profileId, userId) {
 
   isUserPendingFriendRequest(userId, profileId, function (isPendingRequest) {
     if (isPendingRequest) {
+
       var frUser= new User( {'_id': userId});
       var frProfile = new User( {'_id': profileId});
       var conFindUser = { '_id': frUser._id },
@@ -89,20 +154,22 @@ export function createFriends(profileId, userId) {
           removeUserFriendRequest = { $pull: {'pendingFriendRequests': { 'requestedBy': frUser._id}}},
           options = {};
 
+
+          //these can be consolidated into one or two mongoose calls.
       User.update(conFindUser, addProfileAsFriend, options, function(err, numAffected) {
-        if (err) { console.log('createFriends():update db for addProfileAsFriend broke.', err); return false;}
+        if (err) { console.log('createFriendship():update db for addProfileAsFriend broke.', err); return false;}
         console.log('Find user, add profile as friend ');
         console.log(numAffected);
       });
 
       User.update(conFindProfile, addUserAsFriend, options, function(err, numAffected) {
-        if (err) { console.log('createFriends():update db for addUserAsFriend broke.', err); return false;}
+        if (err) { console.log('createFriendship():update db for addUserAsFriend broke.', err); return false;}
         console.log('Find profile, add user as friend ');
         console.log(numAffected);
       });
 
       User.update(conFindUser, removeProfileFriendRequest, options, function(err, numAffected) {
-        if (err) { console.log('createFriends():update db for addUserAsFriend broke.', err); return false;}
+        if (err) { console.log('createFriendship():update db for addUserAsFriend broke.', err); return false;}
         console.log('Find user, remove profile from friend requests ');
         console.log(numAffected);
       });
@@ -110,7 +177,7 @@ export function createFriends(profileId, userId) {
       isUserPendingFriendRequest(profileId, userId, function(otherHasFriendRequestFromMe) {
         if (otherHasFriendRequestFromMe) {
           User.update(conFindProfile, removeUserFriendRequest, options, function(err, numAffected) {
-            if (err) { console.log('createFriends():update db for addUserAsFriend broke.', err); return false;}
+            if (err) { console.log('createFriendship():update db for addUserAsFriend broke.', err); return false;}
             console.log('Find profile, remove user from friend requests ');
             console.log(numAffected);
           });
@@ -163,22 +230,9 @@ export function createFriendRequest(profileId, userId, callback) {
 
       User.update(condition, update, options, function(err, numAffected) {
         if (err) { console.log('createFriendRequest(): update of pushing friend request to profile failed.', err); return false;}
-        console.log(numAffected);
         callback(true);
       });
 }
-
-/*
-export function getDisplayName(profileId, callback) {
-  var playerName = User.findOne( { '_id' : profileId });
-  playerName.select('displayName');
-
-  playerName.exec(function(err, p) {
-    if (err) { console.log('getPlayerName(): mongoose query failed to execute.', err); return false;}
-    callback(String(p.displayName));
-  });
-}
-*/
 
 export function initProfile(toProfileId, fromUserId, io) {
   console.log(toProfileId);
@@ -215,10 +269,10 @@ export function friendRequest(toProfileId, fromUserId, io) {
     if (foundinPendingRequests) {
       console.log('Already sent friend request');
       getDisplayUserName(fromUserId, function(display, username) {
-                var currentuser = GameRoomManager.ConnectedPlayers.get(username);
-                console.log(currentuser);
-                io.to(currentuser.socket_id).emit('return friend request pending', 'alreadysent');
-              });
+        var currentuser = GameRoomManager.ConnectedPlayers.get(username);
+        console.log(currentuser);
+        io.to(currentuser.socket_id).emit('return friend request pending', 'alreadysent');
+      });
       return;
     } else {
       console.log('3');
@@ -232,12 +286,16 @@ export function friendRequest(toProfileId, fromUserId, io) {
           createFriendRequest(toProfileId, fromUserId, function(success) {
             if (success) {
               console.log('Friend request submitted');
-              getDisplayUserName(fromUserId, function(display, username) {
-                var currentuser = GameRoomManager.ConnectedPlayers.get(username);
-                console.log(currentuser);
-
-                io.to(currentuser.socket_id).emit('return friend request pending', 'success');
+              getDisplayUserName(fromUserId, function(dname, uname) {
+                var fromUser = {
+                  _id: fromUserId,
+                  username: uname,
+                  displayName: dname
+                };
+                emitToUserId('friend request received', fromUser, toProfileId, io);
+                emitToUsername('return friend request pending', 'success', uname, io);
               });
+              
             } else {
               console.log('Friend request failed');
             }
@@ -246,59 +304,8 @@ export function friendRequest(toProfileId, fromUserId, io) {
       });
     }
   });
-/*
-   User.findById(profileId).populate('user', 'displayName').exec(function (err, user) {
-    if (err) {
-      console.log(err);
-      return;
-    } else if (!user) {
-      console.log("User DNE");
-      return;
-    }
-    
-    if (user.pendingFriendRequests.findById.populate('requester', 'displayName').exec (function (err, requester) {
-
-    }))
-    user.pendingFriendRequests.push(req);
-    user.save(function (err) {
-      console.log(err);
-    })
-    //next();
-  });
-*/
-  //console.log(user);
-  // console.log(req);
-  // console.log(typeof(profileId));
-  // console.log(typeof(userId));
-
-  //console.log(User.findbyId(profileId));
-  // User.findbyId(profileId).pendingFriendRequests.push({ requestedBy: userId });
-
-  /*var req = new friend_request({ requestedBy: userId });
-  User.findbyId(profileId).pendingFriendRequests
-
-  
-  parent.children[0].name = 'Matthew';
-  parent.save(callback);
-  */
 }
 
-/**
- * List of Articles
- 
-exports.list = function (req, res) {
-  Article.find().sort('-created').populate('user', 'displayName').exec(function (err, articles) {
-    if (err) {
-      return res.status(400).send({
-        message: errorHandler.getErrorMessage(err)
-      });
-    } else {
-      res.json(articles);
-    }
-  });
-};
-
-*/
 //get display name, and user name?
 export function getDisplayUserName(userId, callback) {
     if (mongoose.Types.ObjectId.isValid(userId)) {

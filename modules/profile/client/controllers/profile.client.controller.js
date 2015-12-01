@@ -10,7 +10,12 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
 
     Socket.on('return delete friend request', function (profileIdToRemove) {
       //code to remove list entry for friend
-      console.log('received socket call to remove ' + profileIdToRemove + ' from pending friend requests list');
+      if (profileIdToRemove) {
+        console.log('received socket call to remove ' + profileIdToRemove + ' from pending friend requests list');
+        //$scope.Profile.friends.splice(profileIdToRemove, 1); 
+        // var myEl = angular.element( document.querySelector( '#'+profileIdToRemove ) );
+        // myEl.remove();
+      }
     });
 
     Socket.on('return friend request pending', function(status) {
@@ -23,6 +28,14 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
         $scope.friendReqButton = "sent";  
       }
     });
+
+    Socket.on('friend request received', function (fromUser) {
+      if (fromUser) console.log("friend request received from",fromUser);
+    });
+
+    $scope.deleteFriend = function(friend) {
+      Socket.emit('delete friend', friend);
+    };
 
     $scope.ignoreFriendRequest = function(pendingFriendId) {
       Socket.emit('reject friend request', pendingFriendId);

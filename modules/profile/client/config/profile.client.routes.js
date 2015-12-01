@@ -17,14 +17,12 @@ angular.module('profile').config(['$stateProvider',
           roles: ['user', 'admin']
         }
       })
-      .state('friends', {
-        abstract: true,
-        url: '/friends',
-        template: '<ui-view/>'
-      })
-      .state('friends.list', {
-        url: '/list',
-        templateUrl: 'modules/profiles/client/views/friends/list-friends.client.view.html'
+      .state('profile.viewMe', {
+        url: '/',
+        templateUrl: 'modules/profile/client/views/profile.client.view.html',
+        data: {
+          roles: ['user', 'admin']
+        }
       });
   }
 ]);
