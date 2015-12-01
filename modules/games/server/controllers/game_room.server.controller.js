@@ -11,7 +11,10 @@ var path = require('path'),
     mongoose = require('mongoose'),
     Game = mongoose.model('Game'),
     User = mongoose.model('User'),
-    errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+    Drawing = mongoose.model('Drawing'),
+    errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
+    fs = require('fs'),          // from kevin
+    mkdirp = require('mkdirp');  // from kevin
 
 // Default game properties
 export var min_players = 2;
@@ -503,6 +506,38 @@ export default class GameRoom {
         if (this.getChatMessages().length > 5) this.chat_messages.pop();
         getIO().to(this.getRoomID()).emit('receiving chat messages', this.getChatMessages());
         console.log('adding message', msg);
+    }
+
+    // stolen from kevin and modified
+     saveImage(round_id, player_id, data) {
+        var path = './modules/games/client/users/uploads/' + round_id + '/';
+        var fname = player_id + '.png';
+        mkdirp(path, function(err) {
+            if(err) {
+                throw err;
+            }
+            else {
+                fs.writeFile(path+fname, data, function(err) {
+                    if(err) {
+                        throw err;
+                    }
+
+                    var _drawing = {
+                        fileLocation: path+fname
+                    };
+                    var drawing = new Drawing(_drawing);
+
+                    try {
+                        drawing.save();
+                    } catch (e) {
+                        console.log('Error saving drawing');
+                        console.log(e);
+                    }
+
+                    console.log('Wrote image to ' + path);
+                });
+            }
+        });
     }
 }
 

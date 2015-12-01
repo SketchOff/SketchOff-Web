@@ -16,6 +16,10 @@ var DrawingSchema = new Schema({
         type: Date,
         default: Date.now
     },
+    author: {
+        type: Schema.ObjectId,
+        ref: 'User'
+    },
     fileLocation: {
         type: String
     }
