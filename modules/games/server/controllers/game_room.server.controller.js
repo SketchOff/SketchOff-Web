@@ -319,12 +319,14 @@ export default class GameRoom {
         }
         delete player.game_room_id;
 
+
+	if ((this.getStateName() !== 'LOBBY') || this.getNumPlayers() === 0) {
         if (this.getNumAllPlayers() < min_players) {
             console.log('Terminating because not enough total players');
-            this.setState('Terminating');
-        } else if (this.getNumPlayers() < min_players) {
-            console.log('not enough playing player but enough total players');
-            this.setState('Ending', 'Not enough active players to continue.');
+         	  this.setState('Terminating');
+   	  	 } else if (this.getNumPlayers() < min_players) {
+       	     console.log('not enough playing player but enough total players');
+         	  this.setState('Ending', 'Not enough active players to continue.');
             this.addMessage({
                 type: 'status',
                 text: 'disconnected',
@@ -348,26 +350,8 @@ export default class GameRoom {
                 profileImageURL: player.request.user.profileImageURL,
                 username: player.request.user.username
             });
-            if ((this.getStateName() !== 'LOBBY') || this.getNumPlayers() === 0) {
-                if (this.getNumAllPlayers() < min_players) {
-                    console.log('Terminating because not enough total players');
-                    this.setState('Terminating');
-                } else if (this.getNumPlayers() < min_players) {
-                    console.log('not enough playing player but enough total players');
-                    this.setState('Ending', 'Not enough active players to continue.');
-                } else {
-                    console.log('Sending players info', this.getPlayersInfo());
-                    getIO().to(this.getRoomID()).emit('player leaving', this.getPlayersInfo());
-                    if (player.request.user.username.localeCompare(this.judge.request.username) === 0) {
-                        console.log('The judge left the game. But the game will continue.');
-                        this.setState('Ending', 'The judge left the game.');
-                    } else {
-                        console.log('Player left but doesnt effect game play');
-                    }
-                    if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
-                }
-            }
         }
+	}
     }
 
     getPlayersInfo() {
