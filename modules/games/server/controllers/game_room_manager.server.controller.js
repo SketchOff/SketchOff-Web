@@ -20,6 +20,7 @@ export function createGameRoom(players, public_game, CountdownTimes) {
 
 // remove a GameRoom from the GameRooms map
 export function removeGameRoom(game_room_id) {
+    console.trace('removeGameRoom ' + game_room_id);
     var Room = GameRooms.get(game_room_id);
     Room.disconnectAllPlayers();
     GameRooms.delete(game_room_id);
@@ -47,9 +48,9 @@ function generateID() {
     var now = new Date();
     // nanoseconds since arbitrary time
     var ns = process.hrtime()[1].toString();
-    // number of milliseconds since 1970, divide by 1,000,000 and floor for smaller number 
+    // number of milliseconds since 1970, divide by 1,000,000 and floor for smaller number
     var epoch = now.valueOf().toString();
-    // combine epoch with ns to be safe and avoid collisions 
+    // combine epoch with ns to be safe and avoid collisions
     var id = epoch + ns;
 
     return id;

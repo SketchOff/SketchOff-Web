@@ -38,6 +38,7 @@ export class AvailableGames {
 
     addPlayer() {
         var added = false;
+        var c = 0;
         for (var id of this.queue.available_games) {
             var GameRoom = GameRoomManager.getGameRoom(id);
             if (GameRoom && !GameRoom.isFull()) {
@@ -48,8 +49,9 @@ export class AvailableGames {
                 player.emit('ESTABLISHED');
                 break;
             } else {
-                GameRoomManager.removeGameRoom(id);
+                this.queue.available_games.splice(c,1);
             }
+            c++;
         }
 
         if (!added) this.queue.setState('NOT_ENOUGH');
