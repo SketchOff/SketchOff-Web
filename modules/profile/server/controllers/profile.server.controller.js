@@ -337,8 +337,9 @@ export function profileByIDHelper(req, res, next, id) {
   var query = User.findById(id);
 
   var profileSameAsUser = false;
-  var userFieldsToPopulate = '_id displayName username profileImageURL firstName lastName email friends created provider';
+  var userFieldsToPopulate = '_id displayName username profileImageURL firstName lastName email friends created provider xp';
 
+  // if user is loading own profile
   if (String(req.user._id) === id) {
     userFieldsToPopulate += ' pendingFriendRequests roles';
     profileSameAsUser = true;
@@ -347,12 +348,12 @@ export function profileByIDHelper(req, res, next, id) {
   query.select(userFieldsToPopulate);
   query.populate({
     path:'friends',
-    select: '_id username displayName'
+    select: '_id username displayName xp'
   });
 
   query.populate({
     path : 'pendingFriendRequests.requestedBy', 
-    select : '_id username displayName'
+    select : '_id username displayName xp'
   });
   query.lean().exec(function (err, user) {
       if (err) return next(err);

@@ -2,18 +2,18 @@
     <div ng-if="Profile.$resolved && (Profile.$promise.$$state.status == 1)">
         <div style="padding-bottom:100px; position:relative;" class="page-header">
             <img style="float:left; margin-right:25px" ng-src="{{Profile.profileImageURL}}" alt="{{Profile.displayName}}" class="img-thumbnail user-profile-picture">
-            <h1 ng-bind="Profile.displayName"></h1>
-            <small class="list-group-item-text">
-            <span ng-bind="Profile._id"></span><br>
-            <span ng-bind="Profile.username"></span>
-            <div ng-switch on="friendReqButton">
-            <button ng-if="!Profile.isProfileUser && !inFriendsList()" ng-click="sendFriendRequestFromProfile()" style="float:right;" type="button" class="btn btn-primary btn-sm animate-switch" ng-switch-default>Send Friend Request</button>
-            <button ng-click="" style="float:right;" type="button" class="btn btn-success btn-sm animate-switch" ng-switch-when="sent" disabled>Friend Request Sent!</button>
-            <button ng-click="" style="float:right;" type="button" class="btn btn-warning btn-sm animate-switch" ng-switch-when="waiting" disabled>Already Sent Request!</button>
+            <h1><span ng-bind="Profile.username"></span><br><small><span ng-bind="Profile.displayName"></span></small></h1>
+            <div>
+                <div>ID: <span ng-bind="Profile._id"></span></div>
+                <div style="color:#FFD900">XP: <span style="color:#000" ng-bind="Profile.xp"></span></div>
+                <div ng-switch on="friendReqButton">
+                    <button ng-if="!Profile.isProfileUser && !inFriendsList()" ng-click="sendFriendRequestFromProfile()" style="float:right;" type="button" class="btn btn-primary btn-sm animate-switch" ng-switch-default>Send Friend Request</button>
+                    <button ng-click="" style="float:right;" type="button" class="btn btn-success btn-sm animate-switch" ng-switch-when="sent" disabled>Friend Request Sent!</button>
+                    <button ng-click="" style="float:right;" type="button" class="btn btn-warning btn-sm animate-switch" ng-switch-when="waiting" disabled>Already Sent Request!</button>
+                </div>
             </div>
-        </small>
         </div>
-        <h1>Friends of <span ng-bind="Profile.displayName"></span></h1>
+        <h1>Friends of <span ng-bind="Profile.username"></span></h1>
         <!--   <div class="container">
   <div class="list-group">
     <a href="#" class="list-group-item clearfix">
@@ -35,11 +35,14 @@
                     <a ui-sref="profile.view({profileId: friend._id})">
                         <span style="margin-left: 15px" class="list-group-item-heading">
                     <span ng-bind="friend.username" style="font-size:16px;font-weight:600"></span>
-                        <span style="font-size:10px;color:#B3B3B3;margin-left:10px">
-                        <span ng-bind="friend.displayName"></span>
-                        </span>
                         </span>
                     </a>
+                    <span style="font-size:12px;color:#B3B3B3;margin-left:10px">
+                        <span ng-bind="friend.displayName"></span>
+                    </span>
+                    <span style="font-size:12px;color:#FFD900;margin-left:10px">XP:
+                        <span ng-bind="friend.xp" style="color:#000"></span>
+                    </span>
                     <span ng-if="Profile.isProfileUser" class="pull-right">
                         <button id="delbutton" class="btn btn-xs btn-danger" ng-click="deleteFriend({profileId:friend._id});">
                             <span class="glyphicon glyphicon-trash"></span>
@@ -58,7 +61,20 @@
                 <div class="list-group">
                     <div ng-repeat="fr in Profile.pendingFriendRequests" id="req_{{fr.requestedBy._id}}" class="list-group-item clearfix">
                         <span class="glyphicon glyphicon-user" style="color:orange"></span>
+                        <a ui-sref="profile.view({profileId: fr.requestedBy._id})">
+                            <span style="margin-left: 15px" class="list-group-item-heading">
+                    <span ng-bind="fr.requestedBy.username" style="font-size:16px;font-weight:600"></span>
+                            <span style="font-size:10px;color:#B3B3B3;margin-left:10px">
+                        <span ng-bind="fr.requestedBy.displayName"></span>
+                            </span>
+                            <span style="font-size:10px;color:#FFD900;margin-left:10px">XP:
+                        <span ng-bind="fr.requestedBy.xp" style="color:#000"></span>
+                            </span>
+                        </a>
+                        <!-- 
                         <a ui-sref="profile.view({profileId:fr.requestedBy._id})"><span ng-bind="fr.requestedBy.displayName"></span></a>
+
+ -->
                         <button type="button" class="btn btn-danger btn-xs pull-right" ng-click="ignoreFriendRequest({profileId:fr.requestedBy._id});">Ignore</button>
                         <button type="button" class="btn btn-success btn-xs pull-right" ng-click="acceptFriendRequest({profileId:fr.requestedBy._id});">Accept</button>
                     </div>
