@@ -54,7 +54,10 @@ export class Establishing {
             this.GameRoom.players.push(x);
             this.GameRoom.judge = this.GameRoom.players[0];
             getIO().to(this.GameRoom.getRoomID()).emit('ESTABLISHING', this.GameRoom.getRoomInfo());
-            if (this.GameRoom.isPublic()) q.removeAvailableGame(this.GameRoom.getRoomID());
+            if (this.GameRoom.isPublic()) {
+                this.available = false;
+                q.removeAvailableGame(this.GameRoom.getRoomID());
+            }
         }
         this.GameRoom.countdownFactory(this.GameRoom.getPhraseSelectionTime(), 'Ending', 'selecting phrase countdown');
     }
@@ -167,6 +170,8 @@ export class Terminating {
         this.GameRoom = GameRoom;
         this.name = 'TERMINATING';
         getIO().to(this.GameRoom.getRoomID()).emit('TERMINATING');
+        if (this.GameRoom.isPublic())
+            q.removeAvailableGame(this.GameRoom.getRoomID());
         GameRoomManager.removeGameRoom(this.GameRoom.getRoomID());
     }
 

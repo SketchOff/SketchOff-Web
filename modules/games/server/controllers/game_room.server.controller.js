@@ -286,7 +286,9 @@ export default class GameRoom {
     }
 
     setWinner(winner) {
+        if (winner === this.getJudgeUsername()) throw new Error('Cannot set judge as game winner.');
         this.winner = winner;
+        this.setState('Ending');
     }
 
     getWinner() {
@@ -464,15 +466,6 @@ export default class GameRoom {
         };
         var game = new Game(_game);
 
-        game.save(function(err) {
-            if (err) {
-                console.log('error saving game');
-                console.log(err);
-                getIO().to(_id).emit('game save failure', {
-                    message: errorHandler.getErrorMessage(err)
-                });
-            }
-        });
         try {
             game.save();
         } catch (e) {
@@ -489,24 +482,22 @@ export default class GameRoom {
             if (winner.xp) winner.xp += this.winner_points;
             else winner.xp = this.winner_points;
 
-            winner.save(function(err) {
-                if (err) {
-                    console.log('error awarding winner points');
-                    console.log(err);
-                }
-            });
+            try {
+                winner.save(function(err) {});
+            } catch (e) {
+                console.log('Error awarding winner points');
+                console.log(e);
+            }
         } else {
-            var saveCallback = function(err) {
-                if (err) {
-                    console.log('error awarding participation points');
-                    console.log(err);
+            try {
+                for (let player of this.players) {
+                    if (player.request.user.xp) player.request.user.xp += this.participation_points;
+                    else player.request.user.xp = this.participation_points;
+                    player.request.user.save();
                 }
-            };
-
-            for (let player of this.players) {
-                if (player.request.user.xp) player.request.user.xp += this.participation_points;
-                else player.request.user.xp = this.participation_points;
-                player.request.user.save(saveCallback);
+            } catch (e) {
+                console.log('Error awarding participation_points');
+                console.log(e);
             }
         }
     }
