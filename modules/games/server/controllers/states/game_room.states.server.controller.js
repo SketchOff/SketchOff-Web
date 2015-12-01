@@ -69,13 +69,7 @@ export class Establishing {
             player.game_room_id = this.GameRoom.getRoomID();
 
             var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
-<<<<<<< HEAD
-             if (ConnectedPlayer) {
-                 ConnectedPlayer.in_queue = false;
-                 ConnectedPlayer.in_game = true;
-             }
-             GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
-=======
+
             if (ConnectedPlayer) {
                 ConnectedPlayer.in_queue = false;
                 ConnectedPlayer.in_game = true;
@@ -88,7 +82,6 @@ export class Establishing {
                 profileImageURL: player.request.user.profileImageURL,
                 username: player.request.user.username
             });
->>>>>>> origin/presentation
         }, this);
     }
 
@@ -116,13 +109,12 @@ export class SelectingWinner {
     constructor(GameRoom) {
         this.name = 'SELECTING_WINNER';
         this.GameRoom = GameRoom;
-<<<<<<< HEAD
-=======
+
         if (!this.GameRoom.isFull() && this.GameRoom.isPublic()) {
             this.available = true;
             q.addAvailableGame(this.GameRoom.getRoomID());
         }
->>>>>>> origin/presentation
+
         getIO().to(this.GameRoom.getRoomID()).emit('SELECTING_WINNER');
         if (!this.GameRoom.isFull() && this.GameRoom.isPublic()) q.addAvailableGame(this.GameRoom.getRoomID());
         this.GameRoom.countdownFactory(this.GameRoom.getWinnerSelectionTime(), 'Ending', 'selecting winner countdown');
@@ -139,14 +131,11 @@ export class Ending {
         this.name = 'ENDING';
         this.GameRoom = GameRoom;
 
-<<<<<<< HEAD
-=======
         if (!this.GameRoom.isAvailable() && !this.GameRoom.isFull() && this.GameRoom.isPublic()) {
             this.available = true;
             q.addAvailableGame(this.GameRoom.getRoomID());
         }
 
->>>>>>> origin/presentation
         if (this.GameRoom.winner.localeCompare('No winner yet') === 0) {
             this.GameRoom.noWinner();
             if (!reason) {
