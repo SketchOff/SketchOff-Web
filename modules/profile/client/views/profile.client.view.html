@@ -30,7 +30,7 @@
 </div> -->
         <div class="container">
             <div class="list-group">
-                <div class="list-group-item clearfix" ng-repeat="friend in Profile.friends">
+                <div ng-repeat="friend in Profile.friends" class="list-group-item clearfix" id="friend_{{friend._id}}">
                     <span class="glyphicon glyphicon-user"></span>
                     <a ui-sref="profile.view({profileId: friend._id})">
                         <span style="margin-left: 15px" class="list-group-item-heading">
@@ -56,7 +56,7 @@
             <h1>Pending Friend Requests</h1>
             <div class="container">
                 <div class="list-group">
-                    <div ng-repeat="fr in Profile.pendingFriendRequests" ng-show="$scope.test" class="list-group-item clearfix">
+                    <div ng-repeat="fr in Profile.pendingFriendRequests" id="req_{{fr.requestedBy._id}}" class="list-group-item clearfix">
                         <span class="glyphicon glyphicon-user" style="color:orange"></span>
                         <a ui-sref="profile.view({profileId:fr.requestedBy._id})"><span ng-bind="fr.requestedBy.displayName"></span></a>
                         <button type="button" class="btn btn-danger btn-xs pull-right" ng-click="ignoreFriendRequest({profileId:fr.requestedBy._id});">Ignore</button>
