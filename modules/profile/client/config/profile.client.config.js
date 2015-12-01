@@ -7,7 +7,7 @@ angular.module('profile').run(['Menus',
 
     Menus.addMenuItem('topbar', {
       title: 'My Profile',
-      state: "profile.view",
+      state: "profile.viewMe",
       roles: ['user']   
     });
 /*

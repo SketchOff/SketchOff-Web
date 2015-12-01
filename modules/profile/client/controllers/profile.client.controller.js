@@ -5,12 +5,45 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
   function ($scope, $stateParams, $location, Authentication, Profiles, Socket) {
     $scope.authentication = Authentication;
     if (!Socket.socket) {
-            Socket.connect();
+      Socket.connect();
     }
 
-    $scope.acceptFriendRequest = function(requesterId) {
+    Socket.on('return delete friend request', function (profileIdToRemove) {
+      //code to remove list entry for friend
+      if (profileIdToRemove) {
+        console.log('received socket call to remove ' + profileIdToRemove + ' from pending friend requests list');
+        //$scope.Profile.friends.splice(profileIdToRemove, 1); 
+        // var myEl = angular.element( document.querySelector( '#'+profileIdToRemove ) );
+        // myEl.remove();
+      }
+    });
+
+    Socket.on('return friend request pending', function(status) {
+      console.log("socket received signal");
+      console.log(status);
+      if (status === 'alreadysent') {
+        $scope.friendReqButton = "waiting";
+      }
+      if (status === 'success') {
+        $scope.friendReqButton = "sent";  
+      }
+    });
+
+    Socket.on('friend request received', function (fromUser) {
+      if (fromUser) console.log("friend request received from",fromUser);
+    });
+
+    $scope.deleteFriend = function(friend) {
+      Socket.emit('delete friend', friend);
+    };
+
+    $scope.ignoreFriendRequest = function(pendingFriendId) {
+      Socket.emit('reject friend request', pendingFriendId);
+    };
+
+    $scope.acceptFriendRequest = function(pendingFriendId) {
       //console.log(requesterId.profileId);
-      Socket.emit('accept friend request', requesterId);
+      Socket.emit('accept friend request', pendingFriendId);
     };
 
 /*
@@ -26,8 +59,10 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
     $scope.inFriendsList = function() {
       //console.log($scope.Profile);
       if (Authentication.user.friends.indexOf($scope.Profile._id) > -1) {
+        console.log("YUP!");
         return true;
       } else {
+        console.log("NOPE!");
         return false;
       }
     };
@@ -54,6 +89,7 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
       $scope.Profile = Profiles.get({
         profileId: $stateParams.profileId
       });
+      Socket.emit('init profile page',$stateParams.profileId);
       //$stateParams.profileId = $scope.Profile._id;
       //console.log($scope.Profile._id);
       //console.log($stateParams);

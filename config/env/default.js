@@ -2,7 +2,7 @@
 
 module.exports = {
   app: {
-    title: 'SketchOff',
+    title: 'Sketch Off',
     description: 'Multiplayer drawing game where you try to draw what someone else wants you to draw!', // TODO: Description is lacking
     keywords: 'mongodb, express, angularjs, node.js, mongoose, passport, sketchoff, sketch-off, sketch, multiplayer, drawing, online, internet drawing, picture, friends, people, dog',
     googleAnalyticsTrackingID: process.env.GOOGLE_ANALYTICS_TRACKING_ID || 'GOOGLE_ANALYTICS_TRACKING_ID'
