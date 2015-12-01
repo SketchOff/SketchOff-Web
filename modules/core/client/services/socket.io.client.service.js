@@ -15,8 +15,8 @@ angular.module('core').service('Socket', ['Authentication', '$state', '$timeout'
         if (this.socket) {
           this.socket.on('invite notification', function(msg) {
               console.log('invite notification');
-              console.log(msg);
-              if (confirm('Invite to', msg[0])) {
+	      var s = 'Invite to ' + msg[1] + "'s lobby";
+              if (confirm(s)) {
                   this.emit('join private lobby', [msg[0], msg[2]]);
               }
           });

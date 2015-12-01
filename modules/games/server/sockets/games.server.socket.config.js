@@ -137,6 +137,7 @@ export default function(io, socket) {
              ConnectedPlayer.in_game = false;
              GameRoomManager.ConnectedPlayers.set(socket.request.user.username, ConnectedPlayer);
              if(GameRoom && !GameRoom.isPublic()){
+		console.log('we never made it here');
                 GameRoom.setLobbyLeader();
                 io.to(GameRoom.getRoomID()).emit('update lobby info', GameRoom.getLobbyInfo());
              }
