@@ -2,7 +2,7 @@
     <h1>Hello {{authentication.user.username}}</h1>
     <h2>Welcome To The Game Room</h2>
     <div id="d">
-        <div class="playerContainer" ng-show="authentication.user.username !== GameRoom.judge && GameRoom.drawing_countdown>-1" drawing-player>
+        <div class="playerContainer" ng-show="!(authentication.user.username === GameRoom.judge) && GameRoom.state === 'DRAWING'" drawing-player>
             <div class="cavnasContainer">
                 <canvas width="640" height="480" class="sketchpad" id="canvas">
                     Your browser does not support HTML5 Canvas
@@ -17,7 +17,7 @@
             <br>
         </div>
 
-        <div ng-show="authentication.user.username !== GameRoom.judge && GameRoom.drawing_countdown>-1">
+        <div ng-show="!(authentication.user.username === GameRoom.judge) && GameRoom.state === 'DRAWING'">
             <span>Size: {{playerVars.toolSize}}</span>
             <span class="glyphicon glyphicon-plus-sign" ng-click=increaseToolSize()></span>
             <span class="glyphicon glyphicon-minus-sign" ng-click=decreaseToolSize()></span>
@@ -64,40 +64,6 @@
             </div>
         </div>
     </div>
-
-    <!--
-    <div ng-if="authentication.user.username === GameRoom.judge" drawing-judge>
-        <table>
-            <tr>
-                <td>
-                    <p>Player: {{getPlayer(1)}}</p>
-                    <canvas width="640" height="480" class="jsketchpad" id="sp1">
-                        Your browser does not support HTML5 Canvas
-                    </canvas>
-                </td>
-                <td ng-if="existPlayer(2)">
-                    <p>Player: {{getPlayer(2)}}</p>
-                    <canvas width="640" height="480" class="jsketchpad" id="sp2">
-                        Your browser does not support HTML5 Canvas
-                    </canvas>
-                </td>
-            </tr>
-            <tr>
-                <td ng-if="existPlayer(3)">
-                    <p>Player: {{getPlayer(2)}}</p>
-                    <canvas width="640" height="480" class="jsketchpad" id="sp1">
-                        Your browser does not support HTML5 Canvas
-                    </canvas>
-                </td>
-                <td ng-if="existPlayer(4)">
-                    <p>Player: {{getPlayer(2)}}</p>
-                    <canvas width="640" height="480" class="jsketchpad" id="sp2">
-                        Your browser does not support HTML5 Canvas
-                    </canvas>
-                </td>
-            </tr>
-        </table>
-        -->
 
     <h3 style="color: red">Game Room Info
     <h4>Game ID: <i>{{GameRoom.game_id}}</i></h4>
