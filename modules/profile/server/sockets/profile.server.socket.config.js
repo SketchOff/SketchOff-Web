@@ -22,6 +22,14 @@ export default function(io, socket) {
     });
 
 */
+
+    socket.on('reject friend request', function(requesterId) {
+        if (requesterId.profileId)
+            prof.deleteFriendRequest(String(requesterId.profileId), String(socket.request.user._id), io);
+        else
+            console.log('profile id not found');
+    });
+
     socket.on('accept friend request', function(requesterId) {
     	//check if requesterId is in socket.profile.pendingfriendrequests?
     	if (requesterId.profileId)

@@ -8,6 +8,10 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
       Socket.connect();
     }
 
+    Socket.on('return delete friend request', function (profileIdToRemove) {
+      //code to remove list entry for friend
+      console.log('received socket call to remove ' + profileIdToRemove + ' from pending friend requests list');
+    });
 
     Socket.on('return friend request pending', function(status) {
       console.log("socket received signal");
@@ -19,6 +23,10 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
         $scope.friendReqButton = "sent";  
       }
     });
+
+    $scope.ignoreFriendRequest = function(pendingFriendId) {
+      Socket.emit('reject friend request', pendingFriendId);
+    };
 
     $scope.acceptFriendRequest = function(pendingFriendId) {
       //console.log(requesterId.profileId);

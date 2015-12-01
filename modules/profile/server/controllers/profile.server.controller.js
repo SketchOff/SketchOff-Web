@@ -27,6 +27,24 @@ exports.read = function (req, res) {
 
 export function userExists() {} // not sure if I want to use this.
 
+export function deleteFriendRequest(profileIdPending, userId, io) {
+
+  User.update({'_id': userId}, {$pull: {'pendingFriendRequests': { 'requestedBy': profileIdPending}}}, {multi:false}, function(err, numAffected) {
+    if (err) { console.log('deleteFriendRequest():update db for addProfileAsFriend broke.', err); return false;}
+    console.log(numAffected);
+  });
+  var user = User.findOne({'_id': userId});
+  user.update('pendingFriendRequests');
+  getDisplayUserName(userId, function(display, username) {
+    var currentuser = GameRoomManager.ConnectedPlayers.get(username);
+    console.log(currentuser);
+    io.to(currentuser.socket_id).emit('return delete friend request', profileIdPending);
+  });
+
+}
+
+export function emitToUserId(msg, userId, io) {}
+export function emitToUsername(msg, userId, io) {}
 export function isUserFriend(profileId, userId, callback) {
 
   var user = User.findOne( { '_id': userId });
