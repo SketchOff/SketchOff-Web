@@ -78,12 +78,14 @@ class Queue {
     }
 
     addAvailableGame(game_id) {
+        console.log('adding', game_id, 'to available games.');
         this.available_games.push(game_id);
         if (this.hasAdminSubscribers()) _io.to('admin_updates').emit('available games update', this.available_games);
         if (this.getStateName() !== 'AVAILABLE_GAMES') this.setState('AVAILABLE_GAMES');
     }
 
     removeAvailableGame(game_id) {
+        console.log('removing', game_id, 'to available games.');
         var available_game_index = this.available_games.indexOf(game_id);
         if (available_game_index > -1) this.available_games.splice(available_game_index, 1);
         if (this.hasAdminSubscribers()) _io.to('admin_updates').emit('available games update', this.available_games);

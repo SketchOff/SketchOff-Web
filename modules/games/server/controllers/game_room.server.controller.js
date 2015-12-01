@@ -63,8 +63,21 @@ export default class GameRoom {
         this.interval = null;
         this.winner_points = 100;
         this.participation_points = 10;
-        this.State = new GameRoomStates.Establishing(this);
-        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
+        this.chat_messages = [];
+        if (this.isPublic()) {
+            this.State = new GameRoomStates.Establishing(this);
+        } else {
+            this.lobbyLeader = null;
+            this.setLobbyLeader();
+            console.log("THE FOLLOWING LINE IS HERE");
+            console.log(this.lobbyLeader);
+            this.State = new GameRoomStates.Lobby(this);
+        }
+        if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getInfo()]);
+    }
+
+    getChatMessages() {
+        return this.chat_messages;
     }
 
     getCountdownTimes() {
@@ -115,6 +128,13 @@ export default class GameRoom {
         });
     }
 
+    setLobbyLeader() {
+        if (this.players.length !== 0) {
+            console.log(this.players);
+            this.lobbyLeader = this.players[this.players.length - 1].request.user.username;
+        }
+    }
+
     getRoomType() {
         if (this.is_public) return 'public';
         return 'private';
@@ -143,17 +163,44 @@ export default class GameRoom {
         return num === max_players;
     }
 
+    //error here?
+    // Add a player to the game
+    addPlayer(player) {
+        if (!player.game_room_id) {
+            player.game_room_id = this.getRoomID();
+            if (player.rooms.indexOf(this.getRoomID()) < 0) {
+                player.join(this.getRoomID());
+            }
+        }
+        if (this.getStateName === "LOBBY") {
+            this.players.push(player);
+        } else {
+            var index = getRandomIntInclusive(0, this.players.length - 1);
+            this.players.splice(index, 0, player);
+        }
+        var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
+        ConnectedPlayer.in_game = true;
+        ConnectedPlayer.in_queue = false;
+    }
+
     addWaitingPlayer(player) {
         var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
         ConnectedPlayer.in_queue = false;
         ConnectedPlayer.in_game = true;
         GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
 
-        player.join(this._id);
-        player.game_room_id = this._id;
+        player.join(this.getRoomID());
+        player.game_room_id = this.getRoomID();
         this.waiting_players.push(player);
-        getIO().to(this._id).emit('player joining', this.getWaitingPlayerUsernames());
+        getIO().to(this.getRoomID()).emit('player joining', this.getPlayersInfo());
         if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
+        this.addMessage({
+            type: 'status',
+            text: 'is now connected',
+            created: Date.now(),
+            profileImageURL: player.request.user.profileImageURL,
+            username: player.request.user.username
+        });
     }
 
     getPlayerUsernames() {
@@ -276,19 +323,56 @@ export default class GameRoom {
         } else if (this.getNumPlayers() < min_players) {
             console.log('not enough playing player but enough total players');
             this.setState('Ending', 'Not enough active players to continue.');
+            this.addMessage({
+                type: 'status',
+                text: 'disconnected',
+                created: Date.now(),
+                profileImageURL: player.request.user.profileImageURL,
+                username: player.request.user.username
+            });
         } else {
+            getIO().to(this.getRoomID()).emit('player leaving', this.getPlayersInfo());
             if (player.request.user.username.localeCompare(this.judge.request.username) === 0) {
-                console.log('The judge left the game.');
+                console.log('The judge left the game. But the game will continue.');
                 this.setState('Ending', 'The judge left the game.');
             } else {
-                console.log('player left but doesnt effect game play');
-                getIO().to(this._id).emit('player leaving', {
-                    players: this.getPlayerUsernames(),
-                    waiting_players: this.getWaitingPlayerUsernames()
-                });
+                console.log('Player left but doesnt effect game play');
             }
             if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
+            this.addMessage({
+                type: 'status',
+                text: 'disconnected',
+                created: Date.now(),
+                profileImageURL: player.request.user.profileImageURL,
+                username: player.request.user.username
+            });
+            if ((this.getStateName() !== 'LOBBY') || this.getNumPlayers() === 0) {
+                if (this.getNumAllPlayers() < min_players) {
+                    console.log('Terminating because not enough total players');
+                    this.setState('Terminating');
+                } else if (this.getNumPlayers() < min_players) {
+                    console.log('not enough playing player but enough total players');
+                    this.setState('Ending', 'Not enough active players to continue.');
+                } else {
+                    console.log('Sending players info', this.getPlayersInfo());
+                    getIO().to(this.getRoomID()).emit('player leaving', this.getPlayersInfo());
+                    if (player.request.user.username.localeCompare(this.judge.request.username) === 0) {
+                        console.log('The judge left the game. But the game will continue.');
+                        this.setState('Ending', 'The judge left the game.');
+                    } else {
+                        console.log('Player left but doesnt effect game play');
+                    }
+                    if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
+                }
+            }
         }
+    }
+
+    getPlayersInfo() {
+        var PlayersInfo = {};
+        PlayersInfo.players = this.getPlayerUsernames();
+        PlayersInfo.waiting_players = this.getWaitingPlayerUsernames();
+        return PlayersInfo;
     }
 
     getRoomInfo() {
@@ -310,9 +394,21 @@ export default class GameRoom {
             waiting_players: this.getWaitingPlayerUsernames(),
             state: this.getStateName(),
             judge: this.getJudgeUsername(),
-            phrases: this.getPhrases()
+            phrases: this.getPhrases(),
+            chat_messages: this.getChatMessages()
         };
         return GameInfo;
+    }
+
+    getLobbyInfo() {
+        var LobbyInfo = {};
+        LobbyInfo.lobbyLeader = this.lobbyLeader;
+        LobbyInfo.players = this.getPlayerUsernames();
+        LobbyInfo.state = this.getStateName();
+        LobbyInfo._id = this.getRoomID();
+        LobbyInfo.min_players = min_players;
+        LobbyInfo.max_players = max_players;
+        return LobbyInfo;
     }
 
     hasAdminSubscribers() {
@@ -321,7 +417,7 @@ export default class GameRoom {
 
     disconnectAllPlayers() {
         this.waiting_players.forEach(function(player) {
-            player.leave(this._id);
+            player.leave(this.getRoomID());
             delete player.game_room_id;
 
             player.active_user = false;
@@ -332,7 +428,7 @@ export default class GameRoom {
         }, this);
 
         this.players.forEach(function(player) {
-            player.leave(this._id);
+            player.leave(this.getRoomID());
             delete player.game_room_id;
 
             player.active_user = false;
@@ -359,7 +455,7 @@ export default class GameRoom {
     }
 
     saveGame() {
-        var _id = this._id;
+        var _id = this.getGameID();
 
         var _game = {
             players: this.getPlayerUsers(),
@@ -377,6 +473,14 @@ export default class GameRoom {
                 });
             }
         });
+        try {
+            game.save();
+        } catch (e) {
+            console.log('Error saving game');
+            console.log(e);
+            // TODO: Handle this socket event
+            getIO().to(this.getRoomID()).emit('game save failure');
+        }
     }
 
     awardPoints() {
@@ -407,6 +511,10 @@ export default class GameRoom {
         }
     }
 
+    startPrivateGame() {
+        this.setState('Establishing');
+    }
+
     countdownFactory(time, NextState, emit_msg) {
         var time_left = time;
         var that = this;
@@ -424,4 +532,15 @@ export default class GameRoom {
             }
         }, 1000);
     }
+
+    addMessage(msg) {
+        this.chat_messages.unshift(msg);
+        if (this.getChatMessages().length >= 20) this.chat_messages.pop();
+        getIO().to(this.getRoomID()).emit('receiving chat messages', this.getChatMessages());
+        console.log('adding message', msg);
+    }
+}
+
+function getRandomIntInclusive(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }

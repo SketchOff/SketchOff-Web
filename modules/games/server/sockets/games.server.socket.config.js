@@ -10,7 +10,6 @@ var setSocket = false;
 
 // Create the game socket.io configuration
 export default function(io, socket) {
-
     if (!setSocket) {
          setSocket = true;
          q.setIO(io);
@@ -46,6 +45,52 @@ export default function(io, socket) {
          }
     });
 
+    socket.on('join private lobby', function(msg) {
+	   //ADDING THE PLAYER ISNT WORKING I DONT KNOW WHY
+	   var GameRoom = GameRoomManager.getGameRoom(msg[0]);
+           GameRoom.addPlayer(socket);
+	   console.log(GameRoom.players[0].rooms);
+	   console.log(GameRoom.players[1].rooms);
+	   io.to(msg[1]).emit('joined private lobby');
+       	   io.to(GameRoom.getRoomID()).emit('update lobby info', GameRoom.getLobbyInfo());
+	});
+
+
+    socket.on('start private game', function(){
+        console.log('start private game');
+        var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
+        GameRoom.startPrivateGame();
+        io.to(GameRoom.getRoomID()).emit('go private game');
+    });
+
+
+     socket.on('create private game', function() {
+         var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
+	 console.log('creating private game');
+         if (ConnectedPlayer.in_queue) {
+            socket.emit('already in queue');
+	    //remove from queue?
+         } else if (ConnectedPlayer.in_game) {
+            socket.emit('already in game');
+	    //remove from game?
+         } else {
+	     GameRoomManager.createGameRoom([socket], false);
+	     ConnectedPlayer.in_game = true;
+         }
+     });
+
+     socket.on('get all avaliable players', function(){	
+	 var avaliablePlayers = {};
+	 GameRoomManager.ConnectedPlayers.forEach(function(val, key){if( !val.in_game && !val.in_queue){avaliablePlayers[key]=val;}});
+	 socket.emit('avaliable players responding', avaliablePlayers);
+     });
+    
+
+     socket.on('invite player', function(msg){
+     var invite_socket_id = msg;
+	 io.to(msg).emit('invite notification', [socket.game_room_id, socket.request.user.username, invite_socket_id]); 
+     });
+
     socket.on('get game info', function() {
          var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
          socket.emit('game info responding', GameRoom.getGameInfo());
@@ -57,6 +102,20 @@ export default function(io, socket) {
              GameRoomManager.ConnectedPlayers.set(username, ConnectedPlayer);
          }
      });
+
+     socket.on('get lobby info', function(){
+          var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
+	  console.log(socket.game_room_id);
+          socket.emit('lobby info responding', {
+           lobbyLeader: GameRoom.lobbyLeader,
+           max_players: GameRoom.max_players,
+           min_players: GameRoom.min_players,
+	       _id: GameRoom._id,
+	       players: GameRoom.getPlayerUsernames(),
+	       state: GameRoom.getStateName()
+          });
+     });
+
 
      socket.on('set phrase', function(msg) {
          var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
@@ -77,6 +136,10 @@ export default function(io, socket) {
              var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
              ConnectedPlayer.in_game = false;
              GameRoomManager.ConnectedPlayers.set(socket.request.user.username, ConnectedPlayer);
+             if(GameRoom && !GameRoom.isPublic()){
+                GameRoom.setLobbyLeader();
+                io.to(GameRoom.getRoomID()).emit('update lobby info', GameRoom.getLobbyInfo());
+             }
          }
      });
 
@@ -95,12 +158,23 @@ export default function(io, socket) {
          socket.emit('initial rooms info', GameRoomManager.getInfo());
      });
 
+     // Send a chat messages to all connected sockets when a message is received
+     socket.on('receiving chat message', function(message) {
+         var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
+
+         message.type = 'message';
+         message.created = Date.now();
+         message.profileImageURL = socket.request.user.profileImageURL;
+         message.username = socket.request.user.username;
+
+         GameRoom.addMessage(message);
+     });
+
      socket.on('disconnect', function() {
          var GameRoom;
 
          if (socket.request.user.username) {
              console.log(socket.request.user.username, 'has disconnected');
-
              var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(socket.request.user.username);
 
              if (ConnectedPlayer && ConnectedPlayer.num_connections === 1) {
@@ -111,7 +185,13 @@ export default function(io, socket) {
 
                  if (socket.game_room_id) {
                      GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
-                     GameRoom.removePlayer(socket);
+                     if (GameRoom){
+			  GameRoom.removePlayer(socket);
+			  if (!GameRoom.isPublic()){
+                    		GameRoom.setLobbyLeader();
+                    		io.to(GameRoom.getRoomID()).emit('update lobby info', GameRoom.getLobbyInfo());
+                	  }
+		     }
                  }
                  GameRoomManager.ConnectedPlayers.delete(socket.request.user.username);
              } else {
@@ -124,7 +204,7 @@ export default function(io, socket) {
 
                      if (socket.game_room_id) {
                          GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
-                         GameRoom.removePlayer(socket);
+                         if (GameRoom) GameRoom.removePlayer(socket);
                      }
                  }
              }
@@ -143,6 +223,6 @@ export default function(io, socket) {
         // console.log(data);
         var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
         GameRoom.emitToEveryone('CLIENT_S2P_pDiff', data);
-});
+    });
 
 }

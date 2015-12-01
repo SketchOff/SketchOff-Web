@@ -104,27 +104,28 @@
     <h4>Players: <i>{{GameRoom.players.join(', ')}}</i></h4>
     <h4 ng-if="GameRoom.waiting_players && GameRoom.waiting_players.length">Waiting Players: <i>{{GameRoom.waiting_players.join(', ')}}</i></h4>
     <h4>Judge: <i>{{GameRoom.judge}}</i></h4>
-    <h4>State: <i>{{GameRoom.state}}</i></h4>
+    <h4>State: <span style="color:green">{{GameRoom.state}}</span></h4>
+
+    <div class="countdown" ng-switch on="GameRoom.state">
+        <h5 id="selecting-phrase-countdown" ng-switch-when="ESTABLISHING" ng-if="GameRoom.phrase_selection_countdown > -1" style="color: orange">
+            Select Phrase Countdown: {{GameRoom.phrase_selection_countdown}}
+        </h5>
+        <h5 id="drawing-countdown" ng-switch-when="DRAWING" ng-if="GameRoom.drawing_countdown > -1" style="color: orange">
+            Drawing Countdown: {{GameRoom.drawing_countdown}}
+        </h5>
+        <h5 id="selecting-winner-countdown" ng-switch-when="SELECTING_WINNER" ng-if="GameRoom.winner_selection_countdown > -1 " style="color: orange">
+            Selecting Winner Countdown: {{GameRoom.winner_selection_countdown}}
+        </h5>
+        <h5 id="new-game-countdown" ng-switch-when="ENDING" ng-if="GameRoom.new_game_countdown > -1" style="color: orange">
+            New Game Countdown: {{GameRoom.new_game_countdown}}
+        </h5>
+    </div>
+
     <h4 ng-if="GameRoom.phrase">Phrase: <i>{{GameRoom.phrase}}</i></h4>
     <h4 ng-if="GameRoom.winner">Winner: <i>{{GameRoom.winner}}</i></h4>
     <h4 ng-if="GameRoom.early_end_reason">Early End Reason: <i>{{GameRoom.early_end_reason}}</i></h4>
     <h4 ng-if="GameRoom.early_end_reason">Heres 10xp for participating</h4>
     <h4 ng-if="GameRoom.judge_didnt_pick">The judge didn't pick a winner. You get 10xp for participating.</i></h4>
-
-    <div class="countdown" ng-switch on="GameRoom.state">
-        <h5 id="selecting-phrase-countdown" ng-switch-when="ESTABLISHING" ng-if="GameRoom.phrase_selection_countdown > -1" style="color: green">
-            Select Phrase Countdown: {{GameRoom.phrase_selection_countdown}}
-        </h5>
-        <h5 id="drawing-countdown" ng-switch-when="DRAWING" ng-if="GameRoom.drawing_countdown > -1" style="color: green">
-            Drawing Countdown: {{GameRoom.drawing_countdown}}
-        </h5>
-        <h5 id="selecting-winner-countdown" ng-switch-when="SELECTING_WINNER" ng-if="GameRoom.winner_selection_countdown > -1 " style="color: green">
-            Selecting Winner Countdown: {{GameRoom.winner_selection_countdown}}
-        </h5>
-        <h5 id="new-game-countdown" ng-switch-when="ENDING" ng-if="GameRoom.new_game_countdown > -1" style="color: green">
-            New Game Countdown: {{GameRoom.new_game_countdown}}
-        </h5>
-    </div>
 
     <div id="choose-phrase" ng-if="authentication.user.username === GameRoom.judge && GameRoom.state === 'ESTABLISHING'">
         <h3 style="color:blue">Ur da judge. Choose a phrase.</h3>
@@ -133,4 +134,44 @@
     <button class="btn btn-info" ng-repeat="player in GameRoom.players" style="margin-right: 8px" ng-click=setWinner(player) ng-if="GameRoom.state === 'SELECTING_WINNER' && authentication.user.username === GameRoom.judge && player !== GameRoom.judge">{{player}}</button>
     <br>
     <button class="btn btn-danger" ng-click="leaveGameRoom()" style="margin-top: 8px">Leave Game</button>
+    <div class="page-header">
+        <h1>Chat</h1>
+    </div>
+    <div class="message-container">
+        <!-- The message form -->
+        <form class="col-xs-12 col-md-offset-4 col-md-4" ng-submit="sendMessage();">
+            <fieldset class="row">
+                <div class="input-group">
+                    <input type="text" id="messageText" name="messageText" class="form-control" ng-model="messageText" placeholder="Enter new message">
+                    <span class="input-group-btn">
+          <button type="submit" class="btn btn-primary" ng-disabled="!messageText.length">Submit</button>
+        </span>
+                </div>
+            </fieldset>
+        </form>
+        <ul class="list-unstyled" style="display: inline-block; height: 200px; overflow-y: auto">
+            <!-- List all messages -->
+            <li class="col-xs-12 col-md-offset-4 col-md-4 chat-message" ng-repeat="message in GameRoom.chat_messages">
+                <div style="display:inline" ng-switch="message.type">
+                    <div style="display:inline" ng-switch-default>
+                        <small class="pull-right text-muted" ng-bind="message.created | date:'mediumTime'"></small>
+                        <a ui-sref="profile.view({profileId: message.username})" target="_blank">
+                            <img ng-src="{{message.profileImageURL}}" alt="{{message.username}}" class="pull-left chat-profile-image" /></a>
+                        <div class="pull-left chat-message-details">
+                            <a ui-sref="profile.view({profileId: message.username})" target="_blank"><strong ng-bind="message.username"></strong></a>
+                            <br>
+                            <span ng-bind="message.text"></span>
+                        </div>
+                    </div>
+                    <div style="display: inline" ng-switch-when="status">
+                        <small class="pull-right text-muted" ng-bind="message.created | date:'mediumTime'"></small>
+                        <div class="pull-left chat-message-details">
+                            <a ui-sref="profile.view({profileId: message.username})" target="_blank"><strong ng-bind="message.username"></strong></a>
+                            <span ng-bind="message.text"></span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
 </section>

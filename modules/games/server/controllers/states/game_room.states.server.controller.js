@@ -10,6 +10,33 @@ import {
 }
 from '../queue.server.controller';
 
+export class Lobby {
+    constructor(GameRoom){
+	console.log('made it to lobby');
+	this.GameRoom = GameRoom;
+	this.name = 'LOBBY';
+	this.connectPlayers();
+    }
+
+    connectPlayers() {
+        this.GameRoom.players.forEach(function(player) {
+            player.join(this.GameRoom.getRoomID());
+            player.game_room_id = this.GameRoom.getRoomID();
+     	    var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
+      	    if (ConnectedPlayer) {
+          	  ConnectedPlayer.in_queue = false;
+           	 ConnectedPlayer.in_game = true;
+            }
+        }, this);
+	console.log(this.GameRoom.getPlayerUsernames());
+
+    }
+
+    getName(){
+        return this.name;
+    }
+}
+
 export class Establishing {
     constructor(GameRoom) {
         this.GameRoom = GameRoom;
@@ -42,11 +69,26 @@ export class Establishing {
             player.game_room_id = this.GameRoom.getRoomID();
 
             var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
+<<<<<<< HEAD
              if (ConnectedPlayer) {
                  ConnectedPlayer.in_queue = false;
                  ConnectedPlayer.in_game = true;
              }
              GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
+=======
+            if (ConnectedPlayer) {
+                ConnectedPlayer.in_queue = false;
+                ConnectedPlayer.in_game = true;
+            }
+            GameRoomManager.ConnectedPlayers.set(player.request.user.username, ConnectedPlayer);
+            this.GameRoom.addMessage({
+                type: 'status',
+                text: 'is now connected',
+                created: Date.now(),
+                profileImageURL: player.request.user.profileImageURL,
+                username: player.request.user.username
+            });
+>>>>>>> origin/presentation
         }, this);
     }
 
@@ -74,6 +116,13 @@ export class SelectingWinner {
     constructor(GameRoom) {
         this.name = 'SELECTING_WINNER';
         this.GameRoom = GameRoom;
+<<<<<<< HEAD
+=======
+        if (!this.GameRoom.isFull() && this.GameRoom.isPublic()) {
+            this.available = true;
+            q.addAvailableGame(this.GameRoom.getRoomID());
+        }
+>>>>>>> origin/presentation
         getIO().to(this.GameRoom.getRoomID()).emit('SELECTING_WINNER');
         if (!this.GameRoom.isFull() && this.GameRoom.isPublic()) q.addAvailableGame(this.GameRoom.getRoomID());
         this.GameRoom.countdownFactory(this.GameRoom.getWinnerSelectionTime(), 'Ending', 'selecting winner countdown');
@@ -90,6 +139,14 @@ export class Ending {
         this.name = 'ENDING';
         this.GameRoom = GameRoom;
 
+<<<<<<< HEAD
+=======
+        if (!this.GameRoom.isAvailable() && !this.GameRoom.isFull() && this.GameRoom.isPublic()) {
+            this.available = true;
+            q.addAvailableGame(this.GameRoom.getRoomID());
+        }
+
+>>>>>>> origin/presentation
         if (this.GameRoom.winner.localeCompare('No winner yet') === 0) {
             this.GameRoom.noWinner();
             if (!reason) {

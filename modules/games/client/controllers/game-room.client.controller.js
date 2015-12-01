@@ -22,6 +22,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         };
 
         $scope.MAX_UNDO_STATES = 10;
+        $scope.GameRoom.chat_messages = [];
 
         var is_judge = false;
         var set_winner = false;
@@ -34,6 +35,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         /* START Socket Event Functions */
 
         var gameInfoResponse = function(msg) {
+            console.log('game info response', msg);
             for (var key in msg) {
                 $scope.GameRoom[key] = msg[key];
             }
@@ -92,7 +94,8 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         };
 
         var playerJoin = function(msg) {
-            $scope.GameRoom.waiting_players = msg;
+            $scope.GameRoom.players = msg.players;
+            $scope.GameRoom.waiting_players = msg.waiting_players;
         };
 
         var selectPhraseCountdown = function(msg) {
@@ -112,8 +115,14 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         };
 
         var playerLeft = function(msg) {
+            console.log(msg);
             $scope.GameRoom.players = msg.players;
             $scope.GameRoom.waiting_players = msg.waiting_players;
+        };
+
+        var messagesReceived = function(msg) {
+            console.log('chat messages', msg);
+            $scope.GameRoom.chat_messages = msg;
         };
 
         /* END Socket Event Functions */
@@ -145,6 +154,9 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
 
         Socket.on('player leaving', playerLeft);
 
+        // Add an event listener to the 'chatMessage' event
+        Socket.on('receiving chat messages', messagesReceived);
+
         /* END Socket Event Listeners */
 
         /* START Button Functions */
@@ -166,8 +178,21 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
                 $state.go('home');
             }
         };
-        /* END Button Functions */
 
+        // Create a controller method for sending messages
+        $scope.sendMessage = function() {
+            // Create a new message object
+            var msg = {
+                text: this.messageText
+            };
+
+            Socket.emit('receiving chat message', msg);
+
+            // Clear the message text
+            this.messageText = '';
+        };
+
+        /* END Button Functions */
 
         $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
             if (fromState.name === 'games.room') {
@@ -238,6 +263,34 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
 
             $scope.broadcastCanvasData(pkt);
         };
+
+        // Remove the event listener when the controller instance is destroyed
+        $scope.$on('$destroy', function() {
+            Socket.removeListener('game info responding');
+            Socket.removeListener('ESTABLISHING');
+            Socket.removeListener('DRAWING');
+            Socket.removeListener('SELECTING_WINNER');
+            Socket.removeListener('ENDING');
+            Socket.removeListener('TERMINATING');
+            Socket.removeListener('player joining');
+            Socket.removeListener('selecting phrase countdown');
+            Socket.removeListener('drawing countdown');
+            Socket.removeListener('selecting winner countdown');
+            Socket.removeListener('starting new game countdown');
+            Socket.removeListener('player leaving');
+            Socket.removeListener('receiving chat messages');
+            Socket.removeListener('CLIENT_P2S_pSync');
+            Socket.removeListener('CLIENT_P2S_pDiff');
+        });
+
+
+        $rootScope.$on('$stateChangeStart',
+            function(event, toState, toParams, fromState, fromParams) {
+                if (fromState.name === 'games.room') {
+                    Socket.emit('leave room');
+                }
+            }
+        );
 
         $scope.redoClicked = function() {
             if($scope.hasRedo().color === "green") {
