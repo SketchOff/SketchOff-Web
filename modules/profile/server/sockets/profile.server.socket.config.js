@@ -25,7 +25,8 @@ export default function(io, socket) {
 
     socket.on('delete friend', function(friend) {
         //do checks?
-        console.log("received socket call: delete friend. friend: " + friend.profileId);
+        if (friend)
+            console.log("received socket call: delete friend. friend: " + friend.profileId);
         prof.deleteFriendship(String(friend.profileId), String(socket.request.user._id), io);
     });
 
