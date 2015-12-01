@@ -9,14 +9,9 @@ angular.module('games')
       // console.log(element.children()[0].style);
       // console.log(window.getComputedStyle(element.children()[0], null).marginLeft);
 
-      // rip readability
-      // xoffset due to floating relative stuff
-      var xoffset = 30+parseInt(window.getComputedStyle(element.children()[0], null).marginLeft.split('px')[0]);
-
-      var canvas = element.children().children()[0];
+      var canvas = element[0];
 
     	var ctx = canvas.getContext('2d');
-      var ctxtemp = element.children().children()[1].getContext('2d');
 
       // var ctx2 = element[1].getContext('2d');
 
@@ -53,15 +48,27 @@ angular.module('games')
 
         // console.log(event);
       	// canDraw = !scope.amJudge();
+        var bb = canvas.getBoundingClientRect();
 
-      	anchorX = event.clientX-xoffset;
+        /*
+      	anchorX = event.offsetX;
       	anchorY = event.offsetY;
 
-      	lastX = event.clientX-xoffset;
+      	lastX = event.offsetX;
       	lastY = event.offsetY;
 
-      	currentX = event.clientX-xoffset;
+      	currentX = event.offsetX;
       	currentY = event.offsetY;
+        */
+
+        anchorX = event.clientX-bb.left;
+        anchorY = event.clientY-bb.top;
+
+        lastX = event.clientX-bb.left;
+        lastY = event.clientY-bb.top;
+
+        currentX = event.clientX-bb.left;
+        currentY = event.clientY-bb.top;
 
         if(currentX < 0 || currentX > 640 || currentY < 0 || currentY > 480) {
           return;
@@ -93,9 +100,14 @@ angular.module('games')
     	});
 
       element.bind('mousemove', function(event){
+        var bb = canvas.getBoundingClientRect();
+
+        currentX = event.clientX-bb.left;
+        currentY = event.clientY-bb.top;
+
       	// Update needed variables
-      	currentX = event.clientX-xoffset;
-      	currentY = event.offsetY;
+      	// currentX = event.offsetX;
+      	// currentY = event.offsetY;
 
       	if(drawing){
           // Switch behavior based on active tool
@@ -108,7 +120,7 @@ angular.module('games')
             	drawMoveDot(currentX, currentY, lastX, lastY, scope.playerVars.toolColor, scope.playerVars.toolSize);
           	  break;
           	case 1:
-              drawMoveLine(currentX, currentY, anchorX, anchorY, scope.playerVars.toolColor, scope.playerVars.toolSize);
+              // drawMoveLine(currentX, currentY, anchorX, anchorY, scope.playerVars.toolColor, scope.playerVars.toolSize);
           	  break;
             case 2:
               socketPushToolData([
@@ -120,8 +132,13 @@ angular.module('games')
           	  console.log('ERROR: No tool selected on mouseMove or invalid tool id: ' +scope.playerVars.activeTool);
           }
         }
-        lastX = event.clientX-xoffset;
-        lastY = event.offsetY;
+
+        lastX = event.clientX-bb.left;
+        lastY = event.clientY-bb.top;
+
+        /*
+        lastX = event.offsetX;
+        lastY = event.offsetY;*/
       });
 
       element.bind('mouseup', function(event){
@@ -195,6 +212,7 @@ angular.module('games')
         canDraw = true;
         canvas.style.border = '1px solid black';
         scope.clientImageStates.uStates = [];
+        scope.virtualCanvases.vc = canvas;
       });
 
       // Disallow drawing state
@@ -288,15 +306,6 @@ angular.module('games')
 
     	}
 
-      function drawMoveLine(currentX, currentY, anchorX, anchorY, toolColor, toolSize) {
-        ctxtemp.clearRect(0,0,640,480);
-        twoPointLine(ctxtemp, anchorX, anchorY, currentX, currentY, toolColor, toolSize);
-        ctxtemp.fillStyle = toolColor;
-        ctxtemp.beginPath();
-        ctxtemp.arc(currentX, currentY, toolSize, 0, 2*Math.PI, true);
-        ctxtemp.fill();
-      }
-
       function drawMoveErase(currentX, currentY, lastX, lastY, toolColor, toolSize) {
         var tslopey = lastY - currentY;
         var tslopex = lastX - currentX;
@@ -322,7 +331,7 @@ angular.module('games')
     	}
 
       function drawUpLine(currentX, currentY, anchorX, anchorY, toolColor, toolSize) {
-        ctxtemp.clearRect(0,0,640,480);
+        // ctxtemp.clearRect(0,0,640,480);
         twoPointLine(ctx, anchorX, anchorY, currentX, currentY, toolColor, toolSize);
         drawDownDot(currentX, currentY, toolColor, toolSize);
       }

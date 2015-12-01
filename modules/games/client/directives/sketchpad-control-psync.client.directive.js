@@ -9,7 +9,7 @@ angular.module('games')
       var ctx = canvas.getContext('2d');
 
     	Socket.on('CLIENT_S2P_pSync', function(data) {
-    		console.log('syncplayer client_s2p_psync received');
+    		// console.log('syncplayer client_s2p_psync received');
         if(data.clientID === element.children()[1].innerHTML) {
           var img = new Image();
           img.src = null;

@@ -53,7 +53,7 @@ angular.module('games')
     	});
 
     	Socket.on('CLIENT_S2P_pSync', function(data) {
-    		console.log('judge client_s2p_psync received');
+    		// console.log('judge client_s2p_psync received');
         if(data.clientID === element.children()[1].innerHTML) {
           var img = new Image();
           img.src = null;
@@ -162,7 +162,7 @@ angular.module('games')
     	}
 
       function judgeDiffToolLine(toolData, ctx) {
-        console.log("2pointline called");
+        // console.log("2pointline called");
         var x1, y1, x2, y2, color, thick;
         var temp = toolData[1];
 
