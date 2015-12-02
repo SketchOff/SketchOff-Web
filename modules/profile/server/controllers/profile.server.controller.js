@@ -7,6 +7,7 @@
 var path = require('path'),
   mongoose = require('mongoose'),
   User = mongoose.model('User'),
+  Game = mongoose.model('Game'),
   friend_request = mongoose.model('friend_request'),
   // Article = mongoose.model('Article'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
@@ -360,8 +361,14 @@ export function profileByIDHelper(req, res, next, id) {
       else if (!user) return res.status(404).send({ message: 'No profile with that identifier has been found' });
 
       user.isProfileUser = profileSameAsUser;
-      req.Profile = user;
-      next();
+      var queryGameHistory = Game.find({players:id}).populate({path:'judge winner players', select: '_id username displayName'}).lean().exec(function (err, gamesFound) {
+        if (err) return next(err);
+        //if (gamesFound)
+        console.log(gamesFound);
+        user.gameHistory = gamesFound;
+        req.Profile = user;
+        next();
+      });
     });
 }
 

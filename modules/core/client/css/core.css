@@ -53,3 +53,15 @@ a:hover .header-profile-image {
 .navbar-brand:focus {
   text-decoration: none;
 }
+
+.glyphicon.glyphicon-one-fine-dot:before {
+  content: "\25cf";
+  font-size: 1.5em;
+}
+
+.circle-icon .glyphicon {
+  /*background-color: #3A3A3A;
+  padding: 6px;
+  font-size: 1em;
+  border-radius: 50%;    */
+}
