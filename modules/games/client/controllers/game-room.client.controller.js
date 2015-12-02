@@ -21,6 +21,10 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             cState: null
         };
 
+        $scope.virtualCanvases = {
+            vc: null
+        };
+
         $scope.MAX_UNDO_STATES = 10;
         $scope.GameRoom.chat_messages = [];
 
@@ -66,7 +70,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
             $scope.GameRoom.phrase = undefined;
             $scope.GameRoom.winner = undefined;
             // TODO: Give judge a countdown to select phrase, otherwise kick judge
-            console.log($scope.GameRoom.players);
+            // console.log($scope.GameRoom.players);
         };
 
         var draw = function(msg) {
@@ -235,7 +239,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         };
 
         $scope.undoClicked = function() {
-            console.log('attempted undo');
+            // console.log('attempted undo');
             if($scope.hasUndo().color === "green") {
                 // console.log('undo successful ' + $scope.clientImageStates.uStates.length -1);
                 var img = new Image(640, 480);

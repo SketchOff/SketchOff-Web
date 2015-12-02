@@ -259,8 +259,42 @@ export default class GameRoom {
     }
 
     getPhrases() {
-        var phrases = ['pregnant pencils', 'tall people', 'smelly clothes', 'pesty pelicans'];
+        var adjs = ["other", "new", "good", "high", "old", "great", "big", "American", "small", "large", "national", "young", "different", "black", "long", "little", "important", "political", "bad", "white", "real", "best", "right", "social", "only", "public", "sure", "low", "early", "able", "human", "local", "late", "hard", "major", "better", "economic", "strong", "possible", "whole", "free", "military", "true", "federal", "international", "full", "special", "easy", "clear", "recent", "certain", "personal", "open", "red", "difficult", "available", "likely", "short", "single", "medical", "current", "wrong", "private", "past", "foreign", "fine", "common", "poor", "natural", "significant", "similar", "hot", "dead", "central", "happy", "serious", "ready", "simple", "left", "physical", "general", "environmental", "financial", "blue", "democratic", "dark", "various", "entire", "close", "legal", "religious", "cold", "final", "main", "green", "nice", "huge", "popular", "traditional", "cultural"];
+        var noun = ["time", "issue", "year", "side", "people", "kind", "way", "head", "day", "house", "man", "service", "thing", "friend", "woman", "father", "life", "power", "child", "hour", "world", "game", "school", "line", "state", "end", "family", "member", "student", "law", "group", "car", "country", "city", "problem", "community", "hand", "name", "part", "president", "place", "team", "case", "minute", "week", "idea", "company", "kid", "system", "body", "program", "information", "question", "back", "work", "parent", "government", "face", "number", "others", "night", "level", "Mr", "office", "point", "door", "home", "health", "water", "person", "room", "art", "mother", "war", "area", "history", "money", "party", "storey", "result", "fact", "change", "month", "morning", "lot", "reason", "right", "research", "study", "girl", "book", "guy", "eye", "food", "job", "moment", "word", "air", "business", "teacher"];
+        var adjset = this.getWordSet(adjs, this.getFourRand());
+        var nounset = this.getWordSet(noun, this.getFourRand());
+        var phrases = [
+            adjset[0] + ' '+ nounset[0],
+            adjset[1] + ' '+ nounset[1],
+            adjset[2] + ' '+ nounset[2],
+            adjset[3] + ' '+ nounset[3]
+        ];
+
+        // var phrases = ['pregnant pencils', 'tall people', 'smelly clothes', 'pesty pelicans'];
         return phrases;
+    }
+
+    // Returns 4 unique random numbers in range 1-100
+    getFourRand() {
+        var rands = [-1, -1, -1, -1];
+        for(var i=0; i<rands.length; i++) {
+            // fast round
+            var tmp = ~~(Math.random()*100);
+            while(rands.indexOf(tmp) > 0) {
+                tmp = ~~(Math.random()*100);
+            }
+            rands[i] = tmp;
+        }
+        return rands;
+    }
+
+    // Returns an array of words from wordList as determined by indexes
+    getWordSet(wordList, indexes) {
+        var a = [];
+        for(var i=0; i<indexes.length;i++) {
+            a.push(wordList[indexes[i]]);
+        }
+        return a;
     }
 
     setPhrase(phrase) {
@@ -323,12 +357,14 @@ export default class GameRoom {
         }
         delete player.game_room_id;
 
+
+	if ((this.getStateName() !== 'LOBBY') || this.getNumPlayers() === 0) {
         if (this.getNumAllPlayers() < min_players) {
             console.log('Terminating because not enough total players');
-            this.setState('Terminating');
-        } else if (this.getNumPlayers() < min_players) {
-            console.log('not enough playing player but enough total players');
-            this.setState('Ending', 'Not enough active players to continue.');
+         	  this.setState('Terminating');
+   	  	 } else if (this.getNumPlayers() < min_players) {
+       	     console.log('not enough playing player but enough total players');
+         	  this.setState('Ending', 'Not enough active players to continue.');
             this.addMessage({
                 type: 'status',
                 text: 'disconnected',
@@ -352,26 +388,8 @@ export default class GameRoom {
                 profileImageURL: player.request.user.profileImageURL,
                 username: player.request.user.username
             });
-            if ((this.getStateName() !== 'LOBBY') || this.getNumPlayers() === 0) {
-                if (this.getNumAllPlayers() < min_players) {
-                    console.log('Terminating because not enough total players');
-                    this.setState('Terminating');
-                } else if (this.getNumPlayers() < min_players) {
-                    console.log('not enough playing player but enough total players');
-                    this.setState('Ending', 'Not enough active players to continue.');
-                } else {
-                    console.log('Sending players info', this.getPlayersInfo());
-                    getIO().to(this.getRoomID()).emit('player leaving', this.getPlayersInfo());
-                    if (player.request.user.username.localeCompare(this.judge.request.username) === 0) {
-                        console.log('The judge left the game. But the game will continue.');
-                        this.setState('Ending', 'The judge left the game.');
-                    } else {
-                        console.log('Player left but doesnt effect game play');
-                    }
-                    if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
-                }
-            }
         }
+	}
     }
 
     getPlayersInfo() {
@@ -397,6 +415,7 @@ export default class GameRoom {
         var GameInfo = {
             game_id: this.getGameID(),
             players: this.getPlayerUsernames(),
+            players_minus_judge: getNotJudge(this.getPlayerUsernames(), this.getJudgeUsername()),
             waiting_players: this.getWaitingPlayerUsernames(),
             state: this.getStateName(),
             judge: this.getJudgeUsername(),
@@ -581,4 +600,15 @@ export default class GameRoom {
 
 function getRandomIntInclusive(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getNotJudge(players, judge) {
+    var t = players.slice();
+    // console.log(t, judge);
+    var i = t.indexOf(judge);
+    if(i>-1) {
+        t.splice(i, 1);
+    }
+    // console.log(t);
+    return t;
 }
