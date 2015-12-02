@@ -2,9 +2,9 @@
     <h1>Hello {{authentication.user.username}}</h1>
     <h2>Welcome To The Game Room</h2>
     <div id="d">
-        <div class="playerContainer" ng-show="!(authentication.user.username === GameRoom.judge) && GameRoom.state === 'DRAWING'" drawing-player>
+        <div class="playerContainer" ng-show="!(authentication.user.username === GameRoom.judge) && GameRoom.state === 'DRAWING'">
             <div class="cavnasContainer">
-                <canvas width="640" height="480" class="sketchpad" id="canvas">
+                <canvas width="640" height="480" class="sketchpad" id="canvas" drawing-player>
                     Your browser does not support HTML5 Canvas
                 </canvas>
                   <!--
@@ -12,7 +12,7 @@
                     Your browser does not support HTML5 Canvas
                   </canvas>
                   -->
-                <canvas width="640" height="480" class="tempOverlay" id="canvasTempLayer"></canvas>
+                <canvas width="640" height="480" class="tempOverlay" id="canvasTempLayer" drawing-playerlt></canvas>
             </div>
             <br>
         </div>
@@ -50,7 +50,7 @@
             </div>
         </div>
 
-        <div ng-show="authentication.user.username !== GameRoom.judge && GameRoom.state === 'SELECTING_WINNER'">
+        <div ng-show="!(authentication.user.username === GameRoom.judge) && GameRoom.state === 'SELECTING_WINNER'">
             <div ng-repeat="player in GameRoom.players_minus_judge" drawing-sp>
                 <h3>{{player}}</h3>
                 <canvas width="640" height="480" class="pssketchpad">{{player}}</canvas>
