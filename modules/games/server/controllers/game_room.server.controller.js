@@ -11,6 +11,7 @@ var path = require('path'),
     mongoose = require('mongoose'),
     Game = mongoose.model('Game'),
     User = mongoose.model('User'),
+    Flag = mongoose.model('Flag'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
 // Default game properties
@@ -230,6 +231,7 @@ export default class GameRoom {
 
     // TODO: Flag player for leaving mid game
     removePlayer(player) {
+        this.flagPlayer(player.request.user._id);
         console.log('removing', player.request.user.username, 'from', this.getRoomID());
         player.leave(this.getRoomID());
         player.active_user = false;
@@ -259,7 +261,28 @@ export default class GameRoom {
             } else {
                 console.log('Player left but doesnt effect game play');
             }
-            if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
+            if (this.hasAdminSubscribers())
+                getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
+        }
+    }
+
+    flagPlayer(user_id){
+        if(this.getStateName() !== 'ENDING'){
+            User.findById(user_id).exec(function (err, user){
+                if(err || !user){
+                    console.log('problem trying to flag user');
+                    throw err;
+                }
+                var TheUser = user;
+                var TheFlag = new Flag({created: Date.now,reason: 'Left game early'});
+                TheUser.flags.push(TheFlag);
+                TheUser.save(function (err) {
+                    if (err) {
+                        console.log('problem trying to push flag to user');
+                        throw err;
+                    }
+                });
+            });
         }
     }
 
