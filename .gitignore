@@ -79,3 +79,5 @@ gruntWithKeys.sh
 
 # emacs temp files
 *~
+
+uploads/*

@@ -11,7 +11,11 @@ var path = require('path'),
     mongoose = require('mongoose'),
     Game = mongoose.model('Game'),
     User = mongoose.model('User'),
-    errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+    Drawing = mongoose.model('Drawing'),
+    errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
+    fs = require('fs'),
+    mkdirp = require('mkdirp');
+
 
 // Default game properties
 export var min_players = 2;
@@ -530,6 +534,49 @@ export default class GameRoom {
         getIO().to(this.getRoomID()).emit('receiving chat messages', this.getChatMessages());
         console.log('adding message', msg);
     }
+
+
+    saveImage(round_id, player_name, data) {
+        var path = './uploads/' + round_id + '/';
+        var fname = player_name + '.png';
+        var loc = path+fname;
+        mkdirp(path, function(err) {
+            if(err) {
+                throw err;
+            }
+            else {
+                var dt = data.replace(/^data:image\/\w+;base64,/, "");
+                // console.log(dt);
+                // var buf = new Buffer(data, 'base64');
+                // fs.writeFile(path+fname, buf, function(err) {
+                fs.writeFile(loc, dt, 'base64', function(err) {
+                    if(err) {
+                        throw err;
+                    }
+                    console.log('Wrote image to ' + path);
+
+                    User.findOne({username: player_name}, '_id', function(err, id) {
+                        var _drawing = {
+                            author: id,
+                            fileLocation: loc,
+                        };
+                        var drawing = new Drawing(_drawing);
+
+                        try {
+                            drawing.save();
+                        } catch (e) {
+                            console.log('Error saving drawing to db');
+                            console.log(e);
+                        }
+
+                    });
+
+
+                });
+            }
+        });
+    }
+
 }
 
 function getRandomIntInclusive(min, max) {

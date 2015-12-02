@@ -14,10 +14,6 @@ var GameSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  drawings: [{
-    type: Schema.ObjectId,
-    ref: 'Drawing'
-  }],
   players: [{
     type: Schema.ObjectId,
     ref: 'User'
