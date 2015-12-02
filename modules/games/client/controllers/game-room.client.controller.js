@@ -239,7 +239,7 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         };
 
         $scope.undoClicked = function() {
-            console.log('attempted undo');
+            // console.log('attempted undo');
             if($scope.hasUndo().color === "green") {
                 // console.log('undo successful ' + $scope.clientImageStates.uStates.length -1);
                 var img = new Image(640, 480);

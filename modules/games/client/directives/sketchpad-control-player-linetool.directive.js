@@ -162,13 +162,13 @@ angular.module('games')
       });
 
       function setVC(destroy) {
-        console.log('vc attempted to be applied');
+        // console.log('vc attempted to be applied');
         if(scope.virtualCanvases.vc !== null) {
-          console.log('vc attempted hooked');
+          // console.log('vc attempted hooked');
           virtualCanvas = scope.virtualCanvases.vc;
         }
         else {
-          console.log('vc not hooked');
+          // console.log('vc not hooked');
         }
       }
 

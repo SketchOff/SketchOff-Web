@@ -190,7 +190,7 @@ angular.module('games')
           scope.clientImageStates.uStates.push(dt);
         }
         else {
-          console.log('had to shift');
+          // console.log('had to shift');
           scope.clientImageStates.uStates.shift();
           scope.clientImageStates.uStates.push(dt);
         }

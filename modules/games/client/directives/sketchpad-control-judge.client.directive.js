@@ -113,7 +113,7 @@ angular.module('games')
           uStates.push(dt);
         }
         else {
-          console.log('had to shift');
+          // console.log('had to shift');
           uStates.shift();
           uStates.push(dt);
         }

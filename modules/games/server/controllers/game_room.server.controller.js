@@ -427,6 +427,7 @@ export default class GameRoom {
         var GameInfo = {
             game_id: this.getGameID(),
             players: this.getPlayerUsernames(),
+            players_minus_judge: getNotJudge(this.getPlayerUsernames(), this.getJudgeUsername()),
             waiting_players: this.getWaitingPlayerUsernames(),
             state: this.getStateName(),
             judge: this.getJudgeUsername(),
@@ -568,4 +569,15 @@ export default class GameRoom {
 
 function getRandomIntInclusive(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getNotJudge(players, judge) {
+    var t = players.slice();
+    // console.log(t, judge);
+    var i = t.indexOf(judge);
+    if(i>-1) {
+        t.splice(i, 1);
+    }
+    // console.log(t);
+    return t;
 }
