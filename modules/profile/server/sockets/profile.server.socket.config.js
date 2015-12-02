@@ -40,7 +40,7 @@ export default function(io, socket) {
     socket.on('accept friend request', function(pendingFriend) {
     	//check if requesterId is in socket.profile.pendingfriendrequests?
     	if (pendingFriend.profileId)
-    		prof.createFriendship(String(pendingFriend.profileId), String(socket.request.user._id));
+    		prof.createFriendship(String(pendingFriend.profileId), String(socket.request.user._id), io);
     	else
     		console.log('profile id not found');
     	//console.log(String(requesterId.profileId), String(socket.request.user._id));

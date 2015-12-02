@@ -49,6 +49,9 @@ export function deleteFriendship(profileId, userId, io) {
         if (err) { console.log('createFriendship():update db for addUserAsFriend broke.', err); return false;}
         console.log(numAffected);
       });
+
+      emitToUserId('return friendship delete', userId, profileId, io);
+      emitToUserId('return friendship delete', profileId, userId, io);
     }
   });
 }
@@ -139,7 +142,7 @@ User.findOne({'_id': userId});
 }
 
 
-export function createFriendship(profileId, userId) {
+export function createFriendship(profileId, userId, io) {
 
   isUserPendingFriendRequest(userId, profileId, function (isPendingRequest) {
     if (isPendingRequest) {
@@ -184,6 +187,30 @@ export function createFriendship(profileId, userId) {
           });
         }
       });
+
+      getDisplayUserNameXP(userId, function(dname, uname, uXP) {
+        var userData = {
+          _id: userId,
+          username: uname,
+          displayName: dname,
+          xp: uXP
+        };
+              emitToUserId('return friendship create', userData, profileId, io);
+
+      });
+
+      getDisplayUserNameXP(profileId, function(dname, uname, uXP) {
+        var userData = {
+          _id: userId,
+          username: uname,
+          displayName: dname,
+          xp: uXP
+        };
+              emitToUserId('return friendship create', userData, userId, io);
+
+      });
+      emitToUserId('return delete friend request', userId, profileId, io);
+      emitToUserId('return delete friend request', profileId, userId, io);
     }
   });
 }
@@ -287,11 +314,12 @@ export function friendRequest(toProfileId, fromUserId, io) {
           createFriendRequest(toProfileId, fromUserId, function(success) {
             if (success) {
               console.log('Friend request submitted');
-              getDisplayUserName(fromUserId, function(dname, uname) {
+              getDisplayUserNameXP(fromUserId, function(dname, uname, uXP) {
                 var fromUser = {
                   _id: fromUserId,
                   username: uname,
-                  displayName: dname
+                  displayName: dname,
+                  xp: uXP
                 };
                 emitToUserId('friend request received', fromUser, toProfileId, io);
                 emitToUsername('return friend request pending', 'success', uname, io);
@@ -313,6 +341,24 @@ export function getDisplayUserName(userId, callback) {
       User.findById(userId, function (err, user) {
         if (err) {console.log('getDisplayUserName(): mongoose query failed'); return;}
         callback(user.displayName, user.username);
+      });
+    }
+} 
+
+export function getDisplayName(userId, callback) {
+    if (mongoose.Types.ObjectId.isValid(userId)) {
+      User.findById(userId, function (err, user) {
+        if (err) {console.log('getDisplayUserName(): mongoose query failed'); return;}
+        callback(user.displayName);
+      });
+    }
+} 
+
+export function getDisplayUserNameXP(userId, callback) {
+    if (mongoose.Types.ObjectId.isValid(userId)) {
+      User.findById(userId, function (err, user) {
+        if (err) {console.log('getDisplayUserName(): mongoose query failed'); return;}
+        callback(user.displayName, user.username, user.xp);
       });
     }
 } 
