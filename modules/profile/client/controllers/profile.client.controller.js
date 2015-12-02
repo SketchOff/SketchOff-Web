@@ -8,10 +8,50 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
       Socket.connect();
     }
 
+    Socket.on('return friendship delete', function (profileIdToRemove) {
+      if (profileIdToRemove && $scope.Profile.isProfileUser) {
+        if ($scope.Profile.friends) {
+        for (var i = 0; i<$scope.Profile.friends.length; i++) {
+                  if ($scope.Profile.friends[i]._id === profileIdToRemove) {
+                    console.log('found it!');
+                    break;
+                  }
+                }
+                if (i < $scope.Profile.friends.length) {
+                  console.log("value of i:", i);
+                  $scope.Profile.friends.splice(i,1);
+                }
+
+                console.log($scope.Profile);
+                $scope.$apply();
+              }
+      }
+    });
+
     Socket.on('return delete friend request', function (profileIdToRemove) {
       //code to remove list entry for friend
-      if (profileIdToRemove) {
-        console.log('received socket call to remove ' + profileIdToRemove + ' from pending friend requests list');
+      if (profileIdToRemove && $scope.Profile.isProfileUser) {
+                console.log('received socket call to remove ' + profileIdToRemove + ' from pending friend requests list');
+                console.log($scope.Profile);
+                if ($scope.Profile.pendingFriendRequests) {
+                for (var i = 0; i<$scope.Profile.pendingFriendRequests.length; i++) {
+                  if ($scope.Profile.pendingFriendRequests[i].requestedBy._id === profileIdToRemove) {
+                    console.log('found it!');
+                    break;
+                  }
+                }
+                if (i < $scope.Profile.pendingFriendRequests.length) {
+                  console.log("value of i:", i);
+                  $scope.Profile.pendingFriendRequests.splice(i,1);
+                }
+
+                console.log($scope.Profile);
+                $scope.$apply();
+}
+                //$scope.Profile.pendingFriendRequests.splice($scope.Profile.pendingFriendRequests.indexOf())
+       // var el = document.getElementById("req_"+profileIdToRemove);
+       // el.style.display="none";
+        //$document.find('#req_'+profileIdToRemove).style.display = "none";
         //$scope.Profile.friends.splice(profileIdToRemove, 1); 
         // var myEl = angular.element( document.querySelector( '#'+profileIdToRemove ) );
         // myEl.remove();
@@ -29,8 +69,22 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
       }
     });
 
+    Socket.on('return friendship create', function(userToBefriend) {
+      if (userToBefriend && $scope.Profile.isProfileUser) {
+        $scope.Profile.friends.push(userToBefriend);
+        $scope.$apply();
+      } 
+    });
+
     Socket.on('friend request received', function (fromUser) {
       if (fromUser) console.log("friend request received from",fromUser);
+      console.log($scope.Profile);
+      if (fromUser && $scope.Profile.isProfileUser) {
+        $scope.Profile.pendingFriendRequests.push({requestedBy:fromUser});
+        $scope.$apply();
+        console.log($scope.Profile);
+      }
+
     });
 
     $scope.deleteFriend = function(friend) {
