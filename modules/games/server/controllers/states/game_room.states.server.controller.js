@@ -12,23 +12,23 @@ from '../queue.server.controller';
 
 export class Lobby {
     constructor(GameRoom){
-	console.log('made it to lobby');
-	this.GameRoom = GameRoom;
-	this.name = 'LOBBY';
-	this.connectPlayers();
+        console.log('made it to lobby');
+        this.GameRoom = GameRoom;
+        this.name = 'LOBBY';
+        this.connectPlayers();
     }
 
     connectPlayers() {
         this.GameRoom.players.forEach(function(player) {
             player.join(this.GameRoom.getRoomID());
             player.game_room_id = this.GameRoom.getRoomID();
-     	    var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
-      	    if (ConnectedPlayer) {
-          	  ConnectedPlayer.in_queue = false;
-           	 ConnectedPlayer.in_game = true;
+            var ConnectedPlayer = GameRoomManager.ConnectedPlayers.get(player.request.user.username);
+            if (ConnectedPlayer) {
+                  ConnectedPlayer.in_queue = false;
+                 ConnectedPlayer.in_game = true;
             }
         }, this);
-	console.log(this.GameRoom.getPlayerUsernames());
+        console.log(this.GameRoom.getPlayerUsernames());
 
     }
 
@@ -42,7 +42,7 @@ export class Establishing {
         this.GameRoom = GameRoom;
         this.name = 'ESTABLISHING';
         this.GameRoom.players = shuffle(this.GameRoom.players);
-        this.GameRoom.judge = this.GameRoom.players[0];
+        this.GameRoom.judge = this.GameRoom.players[Math.floor(Math.random() * this.GameRoom.players.length)]; // this.GameRoom.players[0];
         this.GameRoom.winner = 'No winner yet';
         if (this.GameRoom.isFirstGame()) {
             this.connectPlayers();

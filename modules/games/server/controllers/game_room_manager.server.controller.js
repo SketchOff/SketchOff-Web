@@ -20,7 +20,7 @@ export function createGameRoom(players, public_game, CountdownTimes) {
 
 // remove a GameRoom from the GameRooms map
 export function removeGameRoom(game_room_id) {
-    console.trace('removeGameRoom ' + game_room_id);
+//    console.trace('removeGameRoom ' + game_room_id);
     var Room = GameRooms.get(game_room_id);
     Room.disconnectAllPlayers();
     GameRooms.delete(game_room_id);
