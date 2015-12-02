@@ -20,14 +20,21 @@
     <div ng-if="error.already_waiting">
         ALREADY WAITING WHAT ARE YOU DOING
     </div>
-
-    <div class="row">
+    <h1 style="text-align: center">Welcome!</h1>
+    <br>
+    <div class="row" style="text-align: center">
         <a class="btn btn-primary btn-lg" href="" ng-if="authentication.user" ng-click="joinPublicGame()">Join Public Game</a>
         <a class="btn btn-primary btn-lg" href="" ng-if="authentication.user" ng-click="startPrivateGame()">Start Private Game</a>
     </div>
-    <div>
-        <h2>Lorem Ipsum!</h2>
-        <p>Aliquam auctor nibh ullamcorper, auctor nibh ac, varius nunc.</p>
+
+    <div style="text-align: center">
+      <div ng-if="!authentication.user">
+        <p> Please log in or sign up to start playing. </p>
+      </div>
+      <div ng-if="authentication.user">
+        <h4> Click on one of the above buttons to get started! </h4>
+      </div>
+<!--
         <p>Ut eu orci at nibh mollis rutrum.</p>
         <ul>
             <li>
@@ -46,8 +53,10 @@
                 Nam malesuada elit eu arcu dignissim imperdiet.
             </li>
         </ul>
+-->
     </div>
     <br><br>
+<!--
     <div class="row">
         <div class="col-md-3">
             <h2><strong>C</strong>ategory 1</h2>
@@ -66,10 +75,11 @@
             <p>Vivamus libero leo, ultrices quis arcu id, vestibulum facilisis dui. Nunc vitae varius urna. Nullam ut tristique nibh. Vestibulum vitae enim molestie eros sagittis dapibus.</p>
         </div>
     </div>
+-->
     <div class="well">
         <h2>Author Comments</h2>
-        <p>
-            <em>Something something</em> thanks for checking out the game <em>something something</em>
+        <p> Thanks for checking out our game. We're still in early alpha so be nice :)
+
             <!-- Once you're familiar with the foundation technology, check out the MEAN.JS Documentation:
             <ul>
                 <li><a target="_blank" href="http://meanjs.org/docs.html">MEAN.JS Documentation</a>
