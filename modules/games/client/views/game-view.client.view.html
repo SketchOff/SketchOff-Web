@@ -1,0 +1,26 @@
+<section ng-controller="GameViewController" ng-init="findOne()">
+    <h1 ng-if="!game.game_id">No Game Found</h1>
+    <div ng-if="game.game_id">
+        <h3>{{game}}</h3>
+    </div>
+    <ul ng-if="game.game_id">
+        <li>Judge
+            <div>
+                <img ng-src="{{game.judge.profileImageURL}}" alt="{{game.judge.username}}" class="pull-left chat-profile-image" style="margin-left: 10px" /></a>
+                <div class="pull-left">
+                    <a ui-sref="profile.view({profileId: game.judge.username})" target="_blank" style="margin-left: 4px"><strong ng-bind="game.judge.username"></strong></a>
+                </div>
+            </div>
+        </li>
+        <li ng-if="!game.early_end">Winner: {{game.winner.username}}</li>
+        <li ng-if="game.early_end">Winner: None</li>
+        <li>Players
+            <div ng-repeat="player in game.players">
+                <img ng-src="{{player.profileImageURL}}" alt="{{player.username}}" class="pull-left chat-profile-image" style="margin-left: 10px" /></a>
+                <div class="pull-left">
+                    <a ui-sref="profile.view({profileId: player.username})" target="_blank" style="margin-left: 4px"><strong ng-bind="player.username"></strong></a>
+                </div>
+            </div>
+        </li>
+    </ul>
+</section>

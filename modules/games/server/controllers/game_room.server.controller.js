@@ -52,7 +52,7 @@ export default class GameRoom {
         this.players = players;
         // Set the room_id generated from the game_rooms controller
         this.room_id = room_id;
-        this._id = room_id + '#1';
+        this._id = room_id + '-1';
         this.is_public = is_public_room;
         // Set to true if judge leaves
         this.first_game = true;
@@ -248,10 +248,11 @@ export default class GameRoom {
     }
 
     incrementGameID() {
-        var temp = this._id.split('#');
+        var temp = this._id.split('-');
         var game_num = parseInt(temp[1]);
         game_num++;
-        this._id = this.room_id + '#' + game_num;
+        this._id = this.room_id + '-' + game_num;
+        console.log('incrementing game id', this._id);
     }
 
     getPhrases() {
@@ -381,6 +382,7 @@ export default class GameRoom {
         var RoomInfo = {};
         RoomInfo.room_type = this.getRoomType();
         RoomInfo.state = this.getStateName();
+        RoomInfo.game_id = this.getGameID();
         RoomInfo.players = this.getPlayerUsernames();
         RoomInfo.waiting_players = this.getWaitingPlayerUsernames();
         RoomInfo.judge = this.getJudgeUsername();
@@ -456,14 +458,20 @@ export default class GameRoom {
         return winner_user_object;
     }
 
-    saveGame() {
+    saveGame(early_end_reason) {
         var _id = this.getGameID();
 
         var _game = {
             players: this.getPlayerUsers(),
             judge: this.getJudgeUser(),
-            winner: this.getWinnerUser()
+            winner: this.getWinnerUser(), 
+            game_id: this.getGameID()
         };
+
+        if (early_end_reason) {
+            _game.early_end = early_end_reason;
+        }
+
         var game = new Game(_game);
 
         try {

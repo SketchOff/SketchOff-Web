@@ -29,6 +29,14 @@ var GameSchema = new Schema({
   winner: {
     type: Schema.ObjectId,
     ref: 'User'
+  },
+  game_id: {
+    type: String,
+    required: 'Game must have an id'
+  },
+  early_end: {
+    type: String,
+    default: ''
   }
 });
 

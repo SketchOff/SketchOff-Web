@@ -3,20 +3,13 @@
 /**
  * Module dependencies.
  */
-var GameRoomManager = require('../controllers/game_room_manager.server.controller');
+var gamesPolicy = require('../policies/games.server.policy'),
+  games = require('../controllers/games.http.server.controller');
 
 module.exports = function (app) {
-  // // Articles collection routes
-  // app.route('/api/articles').all(articlesPolicy.isAllowed)
-  //   .get(articles.list)
-  //   .post(articles.create);
+    app.route('/api/games/:gameId').all(gamesPolicy.isAllowed)
+    .get(games.read);
 
-  // // Single article routes
-  // app.route('/api/articles/:articleId').all(articlesPolicy.isAllowed)
-  //   .get(articles.read)
-  //   .put(articles.update)
-  //   .delete(articles.delete);
+  app.param('gameId', games.gameByID);
 
-  // // Finish by binding the article middleware
-  // app.param('articleId', articles.articleByID);
 };
