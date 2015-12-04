@@ -1,26 +1,78 @@
 <section ng-controller="GameViewController" ng-init="findOne()">
-    <h1 ng-if="!game.game_id">No Game Found</h1>
-    <div ng-if="game.game_id">
-        <h3>{{game}}</h3>
-    </div>
-    <ul ng-if="game.game_id">
-        <li>Judge
-            <div>
-                <img ng-src="{{game.judge.profileImageURL}}" alt="{{game.judge.username}}" class="pull-left chat-profile-image" style="margin-left: 10px" /></a>
-                <div class="pull-left">
-                    <a ui-sref="profile.view({profileId: game.judge.username})" target="_blank" style="margin-left: 4px"><strong ng-bind="game.judge.username"></strong></a>
+    <section ng-if="flags.ready">
+        <h1 ng-if="!game.game_id">No Game Found</h1>
+        <ul style="list-style: none;">
+            <li>
+                <div><strong>Judge</strong>
+                    <table style="border-spacing: 5px; border-collapse: separate;">
+                        <tr>
+                            <td style="margin-right: 20px">
+                                <img ng-src="{{game.judge.profileImageURL}}" alt="{{game.judge.username}}" class="chat-profile-image" style="margin-left: 10px" />
+                            </td>
+                            <td>
+                                <div>
+                                    <a ui-sref="profile.view({profileId: game.judge.username})" target="_blank">
+                                        <strong ng-bind="game.judge.username"></strong>
+                                    </a>
+                                </div>
+                                <div><span class="badge" ng-bind="game.judge.xp + ' XP'" /></div>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
-            </div>
-        </li>
-        <li ng-if="!game.early_end">Winner: {{game.winner.username}}</li>
-        <li ng-if="game.early_end">Winner: None</li>
-        <li>Players
-            <div ng-repeat="player in game.players">
-                <img ng-src="{{player.profileImageURL}}" alt="{{player.username}}" class="pull-left chat-profile-image" style="margin-left: 10px" /></a>
-                <div class="pull-left">
-                    <a ui-sref="profile.view({profileId: player.username})" target="_blank" style="margin-left: 4px"><strong ng-bind="player.username"></strong></a>
+            </li>
+            <li ng-if="!game.early_end"><strong>Winner:</strong>
+                <table style="border-spacing: 5px; border-collapse: separate;">
+                    <tr>
+                        <td style="margin-right: 20px">
+                            <img ng-src="{{game.winner.profileImageURL}}" alt="{{game.winner.username}}" class="chat-profile-image" style="margin-left: 10px" />
+                        </td>
+                        <td>
+                            <div>
+                                <a ui-sref="profile.view({profileId: game.winner.username})" target="_blank">
+                                    <strong ng-bind="game.winner.username"></strong>
+                                </a>
+                            </div>
+                            <div><span class="badge" ng-bind="game.winner.xp + ' XP'" /></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img style="margin-left: 12px; margin-top: 8px" ng-src="uploads/{{game.game_id}}/{{game.winner.username}}.png" alt="" />
+                        </td>
+                    </tr>
+                </table>
+            </li>
+            <li ng-if="game.early_end"><strong>Winner:</strong> None
+                <div>
                 </div>
-            </div>
-        </li>
-    </ul>
+            </li>
+            <li><strong>Other Players:</strong>
+                <div ng-repeat="player in game.players" ng-if="player.username !== game.judge.username && game.winner.username !== player.username">
+                    <table style="border-spacing: 5px; border-collapse: separate;">
+                        <tr>
+                            <td style="margin-right: 20px">
+                                <img ng-src="{{player.profileImageURL}}" alt="{{player.username}}" class="chat-profile-image" style="margin-left: 10px" />
+                            </td>
+                            <td>
+                                <div>
+                                    <a ui-sref="profile.view({profileId: player.username})" target="_blank">
+                                        <strong ng-bind="player.username"></strong>
+                                    </a>
+                                </div>
+                                <div><span class="badge" ng-bind="player.xp + ' XP'" /></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img style="margin-left: 12px; margin-top: 8px" ng-src="uploads/{{game.game_id}}/{{player.username}}.png" alt="" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </li>
+            <li ng-if="game.early_end"><strong>Reason for Ending Early:</strong> {{game.early_end}}</li>
+            <li><strong>Created:</strong> {{game.created | date:'short'}}</li>
+        </ul>
+    </section>
 </section>
