@@ -1,0 +1,4 @@
+.popover {
+    /* just in case it would overlap with fixed navbar, then show this over the navbar. Original value 1010, value for navbar is 1030 */
+    z-index: 1030;
+}

@@ -153,7 +153,7 @@ export class Ending {
         message.winner = this.GameRoom.getWinner();
         getIO().to(this.GameRoom.getRoomID()).emit('ENDING', message);
         this.GameRoom.countdownFactory(this.GameRoom.getNewGameTime(), 'Establishing', 'starting new game countdown');
-        this.GameRoom.saveGame();
+        this.GameRoom.saveGame(reason);
         this.GameRoom.awardPoints();
 
         if (this.GameRoom.isFirstGame()) this.GameRoom.first_game = false;

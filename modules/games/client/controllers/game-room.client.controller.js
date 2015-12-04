@@ -51,9 +51,11 @@ angular.module('games').controller('GameRoomController', ['$rootScope', '$scope'
         // };
 
         var establish = function(msg) {
+            console.log(msg);
             $scope.GameRoom.state = 'ESTABLISHING';
             $scope.GameRoom.judge = msg.judge;
             $scope.GameRoom.players = msg.players;
+            $scope.GameRoom.game_id = msg.game_id;
             $scope.GameRoom.players_minus_judge = msg.players.slice();
             var i = msg.players.indexOf(msg.judge);
             if(i>-1) {
