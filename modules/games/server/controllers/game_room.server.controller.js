@@ -13,9 +13,15 @@ var path = require('path'),
     User = mongoose.model('User'),
     Drawing = mongoose.model('Drawing'),
     errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
-    fs = require('fs'),
-    mkdirp = require('mkdirp');
+    fs = require('fs');
 
+var mkdirSync = function(path) {
+    try {
+        fs.mkdirSync(path);
+    } catch (e) {
+        if (e.code !== 'EEXIST') throw e;
+    }
+};
 
 // Default game properties
 export var min_players = 2;
@@ -107,7 +113,7 @@ export default class GameRoom {
     // Emits _data_ to everyone
     emitToEveryone(type, data) {
         // console.log('emitting data to everyone');
-        this.players.forEach(function (player) {
+        this.players.forEach(function(player) {
             player.emit(type, data);
         });
     }
@@ -115,8 +121,8 @@ export default class GameRoom {
     // Emits _data_ to player_id (Authentication.user._uid)
     emitToPlayer(type, player_id, data) {
         // console.log('emitting data to specific player ' + player_id);
-        this.players.forEach(function (player) {
-            if(player.request.user._uid === player_id) {
+        this.players.forEach(function(player) {
+            if (player.request.user._uid === player_id) {
                 player.emit(type, data);
             }
         });
@@ -125,8 +131,8 @@ export default class GameRoom {
     // Emits _data_ to everyone except player_id (Authentication.user._uid)
     emitToEveryoneExcept(type, player_id, data) {
         // console.log('emitting data to everyone except ' + player_id);
-        this.players.forEach(function (player) {
-            if(player.request.user._uid !== player_id) {
+        this.players.forEach(function(player) {
+            if (player.request.user._uid !== player_id) {
                 player.emit(type, data);
             }
         });
@@ -265,10 +271,10 @@ export default class GameRoom {
         var adjset = this.getWordSet(adjs, this.getFourRand());
         var nounset = this.getWordSet(noun, this.getFourRand());
         var phrases = [
-            adjset[0] + ' '+ nounset[0],
-            adjset[1] + ' '+ nounset[1],
-            adjset[2] + ' '+ nounset[2],
-            adjset[3] + ' '+ nounset[3]
+            adjset[0] + ' ' + nounset[0],
+            adjset[1] + ' ' + nounset[1],
+            adjset[2] + ' ' + nounset[2],
+            adjset[3] + ' ' + nounset[3]
         ];
 
         // var phrases = ['pregnant pencils', 'tall people', 'smelly clothes', 'pesty pelicans'];
@@ -278,11 +284,11 @@ export default class GameRoom {
     // Returns 4 unique random numbers in range 1-100
     getFourRand() {
         var rands = [-1, -1, -1, -1];
-        for(var i=0; i<rands.length; i++) {
+        for (var i = 0; i < rands.length; i++) {
             // fast round
-            var tmp = ~~(Math.random()*100);
-            while(rands.indexOf(tmp) > 0) {
-                tmp = ~~(Math.random()*100);
+            var tmp = ~~(Math.random() * 100);
+            while (rands.indexOf(tmp) > 0) {
+                tmp = ~~(Math.random() * 100);
             }
             rands[i] = tmp;
         }
@@ -292,7 +298,7 @@ export default class GameRoom {
     // Returns an array of words from wordList as determined by indexes
     getWordSet(wordList, indexes) {
         var a = [];
-        for(var i=0; i<indexes.length;i++) {
+        for (var i = 0; i < indexes.length; i++) {
             a.push(wordList[indexes[i]]);
         }
         return a;
@@ -359,38 +365,38 @@ export default class GameRoom {
         delete player.game_room_id;
 
 
-	if ((this.getStateName() !== 'LOBBY') || this.getNumPlayers() === 0) {
-        if (this.getNumAllPlayers() < min_players) {
-            console.log('Terminating because not enough total players');
-         	  this.setState('Terminating');
-   	  	 } else if (this.getNumPlayers() < min_players) {
-       	     console.log('not enough playing player but enough total players');
-         	  this.setState('Ending', 'Not enough active players to continue.');
-            this.addMessage({
-                type: 'status',
-                text: 'disconnected',
-                created: Date.now(),
-                profileImageURL: player.request.user.profileImageURL,
-                username: player.request.user.username
-            });
-        } else {
-            getIO().to(this.getRoomID()).emit('player leaving', this.getPlayersInfo());
-            if (player.request.user.username.localeCompare(this.judge.request.username) === 0) {
-                console.log('The judge left the game. But the game will continue.');
-                this.setState('Ending', 'The judge left the game.');
+        if ((this.getStateName() !== 'LOBBY') || this.getNumPlayers() === 0) {
+            if (this.getNumAllPlayers() < min_players) {
+                console.log('Terminating because not enough total players');
+                this.setState('Terminating');
+            } else if (this.getNumPlayers() < min_players) {
+                console.log('not enough playing player but enough total players');
+                this.setState('Ending', 'Not enough active players to continue.');
+                this.addMessage({
+                    type: 'status',
+                    text: 'disconnected',
+                    created: Date.now(),
+                    profileImageURL: player.request.user.profileImageURL,
+                    username: player.request.user.username
+                });
             } else {
-                console.log('Player left but doesnt effect game play');
+                getIO().to(this.getRoomID()).emit('player leaving', this.getPlayersInfo());
+                if (player.request.user.username.localeCompare(this.judge.request.username) === 0) {
+                    console.log('The judge left the game. But the game will continue.');
+                    this.setState('Ending', 'The judge left the game.');
+                } else {
+                    console.log('Player left but doesnt effect game play');
+                }
+                if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
+                this.addMessage({
+                    type: 'status',
+                    text: 'disconnected',
+                    created: Date.now(),
+                    profileImageURL: player.request.user.profileImageURL,
+                    username: player.request.user.username
+                });
             }
-            if (this.hasAdminSubscribers()) getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
-            this.addMessage({
-                type: 'status',
-                text: 'disconnected',
-                created: Date.now(),
-                profileImageURL: player.request.user.profileImageURL,
-                username: player.request.user.username
-            });
         }
-	}
     }
 
     getPlayersInfo() {
@@ -487,7 +493,7 @@ export default class GameRoom {
         var _game = {
             players: this.getPlayerUsers(),
             judge: this.getJudgeUser(),
-            winner: this.getWinnerUser(), 
+            winner: this.getWinnerUser(),
             game_id: this.getGameID()
         };
 
@@ -563,44 +569,42 @@ export default class GameRoom {
     }
 
 
+
+
     saveImage(round_id, player_name, data) {
         var path = './uploads/' + round_id + '/';
         var fname = player_name + '.png';
-        var loc = path+fname;
-        mkdirp(path, function(err) {
-            if(err) {
+        var loc = path + fname;
+
+        mkdirSync(path);
+
+        var dt = data.replace(/^data:image\/\w+;base64,/, "");
+        // console.log(dt);
+        // var buf = new Buffer(data, 'base64');
+        // fs.writeFile(path+fname, buf, function(err) {
+        fs.writeFile(loc, dt, 'base64', function(err) {
+            if (err) {
                 throw err;
             }
-            else {
-                var dt = data.replace(/^data:image\/\w+;base64,/, "");
-                // console.log(dt);
-                // var buf = new Buffer(data, 'base64');
-                // fs.writeFile(path+fname, buf, function(err) {
-                fs.writeFile(loc, dt, 'base64', function(err) {
-                    if(err) {
-                        throw err;
-                    }
-                    console.log('Wrote image to ' + path);
+            console.log('Wrote image to ' + path);
 
-                    User.findOne({username: player_name}, '_id', function(err, id) {
-                        var _drawing = {
-                            author: id,
-                            fileLocation: loc,
-                        };
-                        var drawing = new Drawing(_drawing);
+            User.findOne({
+                username: player_name
+            }, '_id', function(err, id) {
+                var _drawing = {
+                    author: id,
+                    fileLocation: loc,
+                };
+                var drawing = new Drawing(_drawing);
 
-                        try {
-                            drawing.save();
-                        } catch (e) {
-                            console.log('Error saving drawing to db');
-                            console.log(e);
-                        }
+                try {
+                    drawing.save();
+                } catch (e) {
+                    console.log('Error saving drawing to db');
+                    console.log(e);
+                }
 
-                    });
-
-
-                });
-            }
+            });
         });
     }
 
@@ -614,7 +618,7 @@ function getNotJudge(players, judge) {
     var t = players.slice();
     // console.log(t, judge);
     var i = t.indexOf(judge);
-    if(i>-1) {
+    if (i > -1) {
         t.splice(i, 1);
     }
     // console.log(t);
