@@ -14,7 +14,6 @@ angular.module('games').controller('GameViewController', ['$scope', '$stateParam
                 gameId: $stateParams.gameId
             }, function(game) {
                 $scope.flags.ready = true;
-                console.log('flags ready', $scope.flags.ready);
             });
         };
 
