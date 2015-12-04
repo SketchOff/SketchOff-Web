@@ -4,10 +4,10 @@ import GameRoom from './game_room.server.controller.js';
 
 var GameRooms = new Map();
 var DefaultCountdownTimes ={};
-DefaultCountdownTimes.choose_phrase = 30; //10   /// EDITED FOR DEMO
+DefaultCountdownTimes.choose_phrase = 10;
 DefaultCountdownTimes.drawing = 40;
-DefaultCountdownTimes.winner_selection = 30;  //5
-DefaultCountdownTimes.new_game = 20; //5
+DefaultCountdownTimes.winner_selection = 10;
+DefaultCountdownTimes.new_game = 5;
 
 export var ConnectedPlayers = new Map();
 
