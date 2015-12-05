@@ -32,6 +32,12 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
         $state.go('games.room');
     });
 
+	Socket.on('get kicked', function(){
+	     Socket.emit('leave room');
+	     $state.go('home');
+	     alert("You've been kicked from the lobby!");
+	});
+
 	$scope.invitePlayers = function() {
             $scope.animationsEnabled = true;
             modalInstance = $uibModal.open({
@@ -40,6 +46,15 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
                 controller: 'InvitePlayersCtrl'
             });
         };
+
+	$scope.kick = function(playerUserName) {
+	  if($scope.GameRoom.lobbyLeader === playerUserName){
+		alert("You can't kick yourself!  Just leave the game...");
+	  }
+	  else{
+	  	Socket.emit('kick player', playerUserName);
+	  }
+	};
 
     $scope.leaveGame = function() {
             Socket.emit('leave room');

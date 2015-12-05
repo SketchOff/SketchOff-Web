@@ -85,6 +85,16 @@ export default function(io, socket) {
          socket.emit('avaliable players responding', avaliablePlayers);
      });
 
+     socket.on('kick player', function(playerUserName){
+	var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
+	var arrayLength = GameRoom.players.length;
+		for (var i = 0; i < arrayLength; i++) {
+			console.log(GameRoom.players[i].request.user.username);
+    			if (GameRoom.players[i].request.user.username === playerUserName){
+				GameRoom.players[i].emit('get kicked');
+			}
+		}
+     });
 
      socket.on('invite player', function(msg){
      var invite_socket_id = msg;
