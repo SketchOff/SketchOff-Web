@@ -1,8 +1,8 @@
 'use strict';
 
 //Games controller
-angular.module('games').controller('PrivateGamesController', ['$scope', 'Authentication', 'Socket', '$uibModal', '$interval', '$state',
-    function($scope, Authentication, Socket, $uibModal, $interval, $state) {
+angular.module('games').controller('PrivateGamesController', ['$scope', 'Authentication', 'Socket', '$uibModal', '$state', '$rootScope',
+    function($scope, Authentication, Socket, $uibModal, $state, $rootScope) {
         $scope.authentication = Authentication;
 
         var modalInstance;
@@ -63,6 +63,13 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
                 alert("not enough players to start");
             }
         };
+
+        $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
+            if (fromState.name === 'games.private-lobby') {
+                console.log('leaving room');
+                Socket.emit('leave room');
+            }
+        });
 
     }
 
