@@ -12,8 +12,10 @@ var path = require('path'),
     Game = mongoose.model('Game'),
     User = mongoose.model('User'),
     Drawing = mongoose.model('Drawing'),
-    errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
-    fs = require('fs');
+    Flag = mongoose.model('Flag'),
+    fs = require('fs'),
+    errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+
 
 var mkdirSync = function(path) {
     try {
@@ -22,6 +24,7 @@ var mkdirSync = function(path) {
         if (e.code !== 'EEXIST') throw e;
     }
 };
+
 
 // Default game properties
 export var min_players = 2;
@@ -350,6 +353,7 @@ export default class GameRoom {
 
     // TODO: Flag player for leaving mid game
     removePlayer(player) {
+        this.flagPlayer(player.request.user._id);
         console.log('removing', player.request.user.username, 'from', this.getRoomID());
         player.leave(this.getRoomID());
         player.active_user = false;
@@ -396,6 +400,28 @@ export default class GameRoom {
                     username: player.request.user.username
                 });
             }
+            if (this.hasAdminSubscribers())
+                getIO().to('admin_updates').emit('room update', [this.getRoomID(), this.getRoomInfo()]);
+        }
+    }
+
+    flagPlayer(user_id){
+        if(this.getStateName() !== 'ENDING'){
+            User.findById(user_id).exec(function (err, user){
+                if(err || !user){
+                    console.log('problem trying to flag user');
+                    throw err;
+                }
+                var TheUser = user;
+                var TheFlag = new Flag({created: Date.now,reason: 'Left game early'});
+                TheUser.flags.push(TheFlag);
+                TheUser.save(function (err) {
+                    if (err) {
+                        console.log('problem trying to push flag to user');
+                        throw err;
+                    }
+                });
+            });
         }
     }
 

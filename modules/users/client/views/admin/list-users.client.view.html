@@ -8,9 +8,22 @@
         <input class="form-control col-md-4" type="text" ng-model="search" placeholder="Search" ng-change="figureOutItemsToDisplay()" />
       </div>
     </div>
+    <div class="row">
+      <div class="col-md-4 checkbox">
+	<label><input type="checkbox" value="" ng-model="flagChecked" ng-true-value="'YES'" ng-false-value="'NO'" ng-change="figureOutItemsToDisplay()">Show Flagged Users Only</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 form-group">
+	Sort Users by: 
+	<select class="form-control" ng-options="v for v in sortBy.values" ng-model="sortBy.value" ng-change="figureOutItemsToDisplay()">
+	</select>
+      </div>
+    </div>
   </div>
   <div class="list-group">
     <a ng-repeat="user in pagedItems" ui-sref="admin.user({userId: user._id})" class="list-group-item">
+      <p class="list-group-item-text pull-right">{{user.flags.length}}<span class="glyphicon glyphicon-flag"></span></p>
       <h4 class="list-group-item-heading" ng-bind="user.username"></h4>
       <p class="list-group-item-text pull-right small" ng-bind="user.roles"></p>
       <p class="list-group-item-text" ng-bind="user.email"></p>
