@@ -514,6 +514,7 @@ export default class GameRoom {
     }
 
     saveGame(early_end_reason) {
+        console.log('Saving game', this.getGameID());
         var _id = this.getGameID();
 
         var _game = {
@@ -597,8 +598,8 @@ export default class GameRoom {
 
 
 
-    saveImage(round_id, player_name, data) {
-        var path = './uploads/' + round_id + '/';
+    saveImage(game_id, player_name, data) {
+        var path = './uploads/' + game_id + '/';
         var fname = player_name + '.png';
         var loc = path + fname;
 

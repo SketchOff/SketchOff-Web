@@ -135,7 +135,6 @@ export default function(io, socket) {
      socket.on('set winner', function(msg) {
          var GameRoom = GameRoomManager.getGameRoom(socket.game_room_id);
          GameRoom.setWinner(msg);
-         GameRoom.setState('Ending');
      });
 
      socket.on('leave room', function() {
