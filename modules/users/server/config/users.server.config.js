@@ -23,7 +23,7 @@ module.exports = function (app, db) {
       _id: id
     }, '-salt -password', function (err, user) {
       done(err, user);
-    });
+    }).populate('pendingFriendRequests.requestedBy').exec();
   });
 
   // Initialize strategies

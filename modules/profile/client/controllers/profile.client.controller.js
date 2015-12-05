@@ -32,7 +32,6 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
             //code to remove list entry for friend
             if (profileIdToRemove && $scope.Profile.isProfileUser) {
                 console.log('received socket call to remove ' + profileIdToRemove + ' from pending friend requests list');
-                console.log($scope.Profile);
                 if ($scope.Profile.pendingFriendRequests) {
                     for (var i = 0; i < $scope.Profile.pendingFriendRequests.length; i++) {
                         if ($scope.Profile.pendingFriendRequests[i].requestedBy._id === profileIdToRemove) {
@@ -45,7 +44,6 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
                         $scope.Profile.pendingFriendRequests.splice(i, 1);
                     }
 
-                    console.log($scope.Profile);
                     $scope.$apply();
                 }
                 //$scope.Profile.pendingFriendRequests.splice($scope.Profile.pendingFriendRequests.indexOf())
@@ -84,7 +82,6 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
                     requestedBy: fromUser
                 });
                 $scope.$apply();
-                console.log($scope.Profile);
             }
 
         });
@@ -144,9 +141,6 @@ angular.module('profile').controller('ProfileController', ['$scope', '$statePara
             }
             $scope.Profile = Profiles.get({
                 profileId: $stateParams.profileId
-            }, function(data) {
-                console.log(data);
-                console.log($scope.authentication.user.username === data.username);
             });
             Socket.emit('init profile page', $stateParams.profileId);
             //$stateParams.profileId = $scope.Profile._id;

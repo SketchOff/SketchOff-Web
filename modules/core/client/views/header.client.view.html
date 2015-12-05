@@ -32,13 +32,21 @@
         <ul class="nav navbar-nav navbar-right" ng-show="authentication.user">
             <li class="dropdown" dropdown>
                 <a class="dropdown-toggle" dropdown-toggle role="button">
-                    <i class="fa fa-heart"></i>
+                    <i class="fa fa-heart"></i>&nbsp;<span ng-if="authentication.user.pendingFriendRequests.length>0" class="label label-success" style="position: relative; bottom: 1px">{{authentication.user.pendingFriendRequests.length}}</span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li>
+                    <li ng-if="authentication.user.pendingFriendRequests.length === 0">
                         A new friend request!
                     </li>
-                    <li class="divider"></li>
+                    <span ng-repeat="request in authentication.user.pendingFriendRequests">
+                        <li>
+                            <a ui-sref="profile.view({profileId: request.requestedBy.username})"> {{request.requestedBy.username}}</a>
+                            <button class="btn btn-success glyphicon glyphicon-ok"></button>
+                            <button class="btn btn-danger glyphicon glyphicon-remove"></button>
+
+                        </li>
+                        <li ng-if="$index > 0" class="divider"></li>
+                    </span>
                 </ul>
             </li>
             <li class="dropdown" dropdown>
