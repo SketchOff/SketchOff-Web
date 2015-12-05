@@ -167,7 +167,6 @@ module.exports.initModulesClientRoutes = function (app) {
 
   // Globbing static routing
   config.folders.client.forEach(function (staticPath) {
-    console.log('static paths', staticPath);
     app.use(staticPath, express.static(path.resolve('./' + staticPath)));
   });
 };
