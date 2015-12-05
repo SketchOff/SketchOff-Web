@@ -11,7 +11,7 @@ angular.module('games').config(['$stateProvider',
                 template: '<ui-view/>'
             })
             .state('games.room', {
-                url: '',
+                url: 'play',
                 templateUrl: 'modules/games/client/views/game-room.client.view.html'
             })
             .state('games.terminated', {
@@ -19,7 +19,7 @@ angular.module('games').config(['$stateProvider',
                 templateUrl: 'modules/games/client/views/terminated-game-room.client.view.html'
             })
             .state('games.private-lobby', {
-                url: '',
+                url: 'lobby',
                 templateUrl: 'modules/games/client/views/private-room-lobby.client.view.html'
             })
             .state('games.view', {

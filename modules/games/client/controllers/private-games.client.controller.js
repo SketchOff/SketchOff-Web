@@ -5,40 +5,36 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
     function($scope, Authentication, Socket, $uibModal, $interval, $state) {
         $scope.authentication = Authentication;
 
-	var modalInstance;
-
-	$scope.Test = {};
-	$scope.Test.players = ['Player 1', 'Player A', 'Player !'];
-
+        var modalInstance;
 
         var getLobbyInfo = function() {
             Socket.emit('get lobby info');
             console.log('game info emitted');
         };
-   	getLobbyInfo();
+        getLobbyInfo();
 
         Socket.on('lobby info responding', function(msg) {
-        	$scope.GameRoom = msg;
-        });
-
-        Socket.on('update lobby info', function(msg) {
-		console.log("made it to lobby info thing");
-		console.log(msg);
             $scope.GameRoom = msg;
         });
 
-    Socket.on('go private game', function(){
-        console.log('go private game');
-        $state.go('games.room');
-    });
+        Socket.on('update lobby info', function(msg) {
+            console.log('made it to lobby info thing');
+            console.log(msg);
+            $scope.GameRoom = msg;
+        });
 
-	Socket.on('get kicked', function(){
-	     Socket.emit('leave room');
-	     $state.go('home');
-	     alert("You've been kicked from the lobby!");
-	});
+        Socket.on('go private game', function() {
+            console.log('go private game');
+            $state.go('games.room');
+        });
 
-	$scope.invitePlayers = function() {
+        Socket.on('get kicked', function() {
+            Socket.emit('leave room');
+            $state.go('home');
+            alert("You've been kicked from the lobby!");
+        });
+
+        $scope.invitePlayers = function() {
             $scope.animationsEnabled = true;
             modalInstance = $uibModal.open({
                 animation: $scope.animationsEnabled,
@@ -47,31 +43,27 @@ angular.module('games').controller('PrivateGamesController', ['$scope', 'Authent
             });
         };
 
-	$scope.kick = function(playerUserName) {
-	  if($scope.GameRoom.lobbyLeader === playerUserName){
-		alert("You can't kick yourself!  Just leave the game...");
-	  }
-	  else{
-	  	Socket.emit('kick player', playerUserName);
-	  }
-	};
+        $scope.kick = function(playerUserName) {
+            if ($scope.GameRoom.lobbyLeader === playerUserName) {
+                alert("You can't kick yourself!  Just leave the game...");
+            } else {
+                Socket.emit('kick player', playerUserName);
+            }
+        };
 
-    $scope.leaveGame = function() {
+        $scope.leaveGame = function() {
             Socket.emit('leave room');
             $state.go('home');
         };
 
-	$scope.startGame = function() {
-	    if($scope.GameRoom.players.length >= $scope.GameRoom.min_players){
-            Socket.emit('start private game');
-        } else {
-            alert("not enough players to start");
-        }
-	};
+        $scope.startGame = function() {
+            if ($scope.GameRoom.players.length >= $scope.GameRoom.min_players) {
+                Socket.emit('start private game');
+            } else {
+                alert("not enough players to start");
+            }
+        };
 
     }
 
 ]);
-
-
-

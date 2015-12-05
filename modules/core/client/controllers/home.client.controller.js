@@ -27,9 +27,9 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
             console.log("already wating");
         });
 
-	$scope.startPrivateGame = function() {
-		Socket.emit('create private game');
-		$state.go('games.private-lobby');
+        $scope.startPrivateGame = function() {
+            Socket.emit('create private game');
+            $state.go('games.private-lobby');
         };
     }
 ]);
