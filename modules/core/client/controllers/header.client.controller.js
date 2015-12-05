@@ -5,6 +5,7 @@ angular.module('core').controller('HeaderController', ['$scope', '$state', 'Auth
         // Expose view variables
         $scope.$state = $state;
         $scope.authentication = Authentication;
+        console.log($scope.authentication.user);
 
         // Get the topbar menu
         $scope.menu = Menus.getMenu('topbar');
@@ -14,11 +15,5 @@ angular.module('core').controller('HeaderController', ['$scope', '$state', 'Auth
         $scope.toggleCollapsibleMenu = function() {
             $scope.isCollapsed = !$scope.isCollapsed;
         };
-
-        // Collapsing the menu after navigation
-        $scope.$on('$stateChangeSuccess', function() {
-            $scope.isCollapsed = false;
-            $scope.authentication = Authentication;
-        });
     }
 ]);
