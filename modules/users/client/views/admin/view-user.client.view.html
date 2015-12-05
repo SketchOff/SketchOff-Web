@@ -46,6 +46,14 @@
         <div class="col-md-3"><strong>Roles</strong></div>
         <div class="col-md-6" ng-bind="user.roles"></div>
       </div>
+      <hr/>
+      <div class="row">
+        <div class="col-md-3"><strong>Flags</strong></div>
+        <div class="col-md-6 list-group-item" ng-repeat="flag in flags">
+          <p class="list-group-item-text">Created: <span ng-bind="flag.created"></span></p>
+          <p class="list-group-item-text">Reason: <span ng-bind="flag.reason"></span></p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
