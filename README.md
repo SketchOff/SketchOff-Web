@@ -54,7 +54,7 @@ The recommended way to get SketchOff is to directly clone the repository:
 $ git clone https://github.com/SketchOff/SketchOff-Web.git
 ```
 
-This will clone the latest version of the MEAN.JS repository to a **meanjs** folder.
+This will clone the latest version of the SketchOff repository to a **SketchOff** folder.
 
 ### Downloading The Repository Zip File
 Another way to use the SketchOff is to download a zip copy from the [master branch on GitHub](https://github.com/SketchOff/SketchOff-Web/archive/master.zip). You can also do this using `wget` command:
@@ -80,16 +80,16 @@ This command does a few things:
 * If you're running in a development environment, it will then also install development dependencies needed for testing and running your application.
 * Finally, when the install process is over, npm will initiate a bower install command to install all the front-end modules needed for the application
 
-## Running Your Application
-After the install process is over, you'll be able to run your application using Grunt, just run grunt default task:
+## Running The Application
+After the install process is over, you'll be able to run the application using Grunt, just run grunt default task:
 
 ```
 $ grunt
 ```
 
-Your application should run on port 3000 with the *development* environment configuration, so in your browser just go to [http://localhost:3000](http://localhost:3000)
+The application should run on port 3000 with the *development* environment configuration, so in your browser just go to [http://localhost:3000](http://localhost:3000)
 
-That's it! Your application should be running. To proceed with your development, check the other sections in this documentation.
+That's it! The application should be running. To proceed with your development, check the other sections in this documentation.
 If you encounter any problems, try the Troubleshooting section.
 
 * explore `config/env/development.js` for development environment configuration options
@@ -155,9 +155,9 @@ $ grunt test:client
 ```
 
 
-## Getting Started With MEAN.JS
-You have your application running, but there is a lot of stuff to understand. We recommend you go over the [Official Documentation](http://meanjs.org/docs.html).
-In the docs we'll try to explain both general concepts of MEAN components and give you some guidelines to help you improve your development process. We tried covering as many aspects as possible, and will keep it updated by your request. You can also help us develop and improve the documentation by checking out the *gh-pages* branch of this repository.
+## Special thanks to MEAN.js
+We recommend you go over the [Official Documentation](http://meanjs.org/docs.html).
+In the docs it'll try to explain both general concepts of MEAN components and give you some guidelines to help you improve your development process. You can also help them develop and improve by checking out their github repository.
 
 ## License
 (The MIT License)
