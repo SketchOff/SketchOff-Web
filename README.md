@@ -5,7 +5,7 @@
 [![Dependencies Status](https://david-dm.org/meanjs/mean.svg)](https://david-dm.org/meanjs/mean)
 [![Coverage Status](https://coveralls.io/repos/meanjs/mean/badge.svg?branch=master&service=github)](https://coveralls.io/github/meanjs/mean?branch=master)
 
-Sketchoff was built by a team of 6 developers for Case Western Reserve University's Fall 2015 Software Engineering class project. [**_You can play our alpha version here!_**](http://www.sketchoff.xyz:8443)
+Sketchoff was built by a team of 6 developers for Case Western Reserve University's Fall 2015 Software Engineering class project. [**_You can play our alpha version here!_**](http://sketchoff.xyz:8443)
 <br><br>
 SketchOff is a web app that allows you and your friends to compete to draw pictures based on randomly generated phrases. Once a game begins, one player is randomly picked to be a judge and selects a generated phrase for players to draw within a certain time limit. Players have a wide variety of drawing tools at their disposal in the game. Once time is up, the judge selects who they think drew the best picture, and the winner is awarded experience points. Players can keep track of their points and game history in their in-game profiles, and can view the profiles of other players. If a player sees someone they enjoy playing with, they can send that user a friend request. In the game, players can use an in-game chat function, allowing them to communicate with other players as they play the game. The competition is on, as the players SketchOff!
 
